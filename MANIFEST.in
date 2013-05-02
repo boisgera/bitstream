@@ -1,0 +1,5 @@
+include bitstream.pyx
+include manual.txt
+include benchmark.py
+
+

@@ -24,6 +24,7 @@ metadata = dict(
   name = "bitstream",
   version = "0.0.0.dev",
   description = "Bitstream",
+  url = "https://github.com/boisgera/bitstream",
   author = u"Sébastien Boisgérault",
   author_email = "Sebastien.Boisgerault@mines-paristech.fr",
   license = "MIT License",
