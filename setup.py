@@ -41,7 +41,7 @@ def make_extension(with_cython=None):
 
 metadata = dict(
   name = "bitstream",
-  version = "1.0.0-alpha.1",
+  version = "1.0.0-alpha.2",
   description = "Binary data structure with a stream interface",
   url = "https://github.com/boisgera/bitstream",
   author = u"Sébastien Boisgérault",
