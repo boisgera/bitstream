@@ -1,0 +1,4 @@
+*~
+*.c
+*.egg-info
+/dist
