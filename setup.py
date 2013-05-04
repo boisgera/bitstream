@@ -2,23 +2,43 @@
 # coding: utf-8
 
 # Python 2.7 Standard Library
-from distutils.version import StrictVersion as Version
+from distutils.version import LooseVersion as Version
+import importlib
+import os.path
+import sys
 
 # Third-Party Libraries
 import setuptools
-from Cython.Build import cythonize
 
 
-def require_numpy(version=None):
+WITH_CYTHON = True
+
+def require(module, version=None):
     try:
-        import numpy
+        _module = importlib.import_module(module)
     except:
-        error = "The NumPy package is not available."
-        raise ImportError(error)
-    if version:
-        if not Version(numpy.__version__) >= Version(version):
-            error = "The version of NumPy should be at least {0}."
-            raise ImportError(error.format(version))
+        error = "The module {0!r} is not available."
+        raise ImportError(error.format(module))
+    if version is not None:
+        if not Version(_module.__version__) >= Version(version):
+            error = "The version of {0!r} should be at least {1}."
+            raise ImportError(error.format(module, version))
+
+def make_extension(with_cython=None):
+    if with_cython is None:
+        with_cython = WITH_CYTHON
+    if with_cython:
+        require("Cython", "0.15.1")
+        import Cython
+        from Cython.Build import cythonize
+        print cythonize("bitstream.pyx")
+        return cythonize("bitstream.pyx")
+    else:
+        if os.path.exists("bitstream.c"):
+            return [setuptools.Extension("bitstream", sources=["bitstream.c"])]
+        else:
+            error = "file not found: 'bitstream.c'"
+            raise IOError(error)
 
 metadata = dict(
   name = "bitstream",
@@ -30,13 +50,21 @@ metadata = dict(
   license = "MIT License",
 )
 
-contents = dict(
-  ext_modules = cythonize("bitstream.pyx")
-)
-
 
 if __name__ == "__main__":
-    require_numpy("1.6.1")
+
+    require("numpy", "1.6.1")
+
+    try:
+        print sys.argv
+        sys.argv.remove("--without-cython")
+        WITH_CYTHON = False
+    except ValueError:
+        pass
+    contents = dict(
+      ext_modules = make_extension()
+    )
+
     kwargs = {}
     kwargs.update(metadata)
     kwargs.update(contents)
