@@ -4,6 +4,7 @@
 # Python 2.7 Standard Library
 from distutils.version import LooseVersion as Version
 import importlib
+import os
 import os.path
 import sys
 
@@ -11,7 +12,18 @@ import sys
 import setuptools
 
 
+metadata = dict(
+  name = "bitstream",
+  version = "1.0.0-alpha.3",
+  description = "Binary Data Structure with a Stream Interface",
+  url = "https://github.com/boisgera/bitstream",
+  author = u"Sébastien Boisgérault",
+  author_email = "Sebastien.Boisgerault@mines-paristech.fr",
+  license = "MIT License",
+)
+
 WITH_CYTHON = False
+WITH_REST = False
 
 def require(module, version=None):
     try:
@@ -39,15 +51,10 @@ def make_extension(with_cython=None):
             error = "file not found: 'bitstream.c'"
             raise IOError(error)
 
-metadata = dict(
-  name = "bitstream",
-  version = "1.0.0-alpha.2",
-  description = "Binary data structure with a stream interface",
-  url = "https://github.com/boisgera/bitstream",
-  author = u"Sébastien Boisgérault",
-  author_email = "Sebastien.Boisgerault@mines-paristech.fr",
-  license = "MIT License",
-)
+def make_rest():
+    error = os.system("pandoc -o manual.rst manual.txt > /dev/null")
+    if error:
+        raise RuntimeError("cannot generate ReST documentation.")
 
 
 if __name__ == "__main__":
@@ -64,6 +71,17 @@ if __name__ == "__main__":
     contents = dict(
       ext_modules = make_extension()
     )
+
+    try:
+        sys.argv.remove("--with-rest")
+        WITH_REST = True
+    except ValueError: 
+        pass
+
+    if WITH_REST:
+        metadata["long_description"] = make_rest()
+    else:
+        metadata["long_description"] = open("manual.txt").read()
 
     kwargs = {}
     kwargs.update(metadata)

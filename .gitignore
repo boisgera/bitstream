@@ -1,5 +1,6 @@
 *~
 *.c
+*.rst
 *.html
 *.pdf
 *.egg-info
