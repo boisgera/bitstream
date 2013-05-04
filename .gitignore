@@ -3,4 +3,5 @@
 *.html
 *.pdf
 *.egg-info
+/build
 /dist
