@@ -11,7 +11,7 @@ import sys
 import setuptools
 
 
-WITH_CYTHON = True
+WITH_CYTHON = False
 
 def require(module, version=None):
     try:
@@ -31,7 +31,6 @@ def make_extension(with_cython=None):
         require("Cython", "0.15.1")
         import Cython
         from Cython.Build import cythonize
-        print cythonize("bitstream.pyx")
         return cythonize("bitstream.pyx")
     else:
         if os.path.exists("bitstream.c"):
@@ -53,12 +52,13 @@ metadata = dict(
 
 if __name__ == "__main__":
 
-    require("numpy", "1.6.1")
+    requirements = dict(
+        install_requires = open("requirements.txt").read().splitlines()
+    )
 
     try:
-        print sys.argv
-        sys.argv.remove("--without-cython")
-        WITH_CYTHON = False
+        sys.argv.remove("--with-cython")
+        WITH_CYTHON = True
     except ValueError:
         pass
     contents = dict(
@@ -67,6 +67,7 @@ if __name__ == "__main__":
 
     kwargs = {}
     kwargs.update(metadata)
+    kwargs.update(requirements)
     kwargs.update(contents)
     setuptools.setup(**kwargs)
 
