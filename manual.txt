@@ -1,4 +1,4 @@
-% Bitstream 1.0.0-alpha.1 Manual
+% Bitstream 1.0.0-alpha.2 Manual
 % Sébastien Boisgérault
 % Sat, 04 May 2013
 
@@ -9,8 +9,8 @@ license.
 
 Use [`pandoc`][pandoc] to convert this text file to other formats, 
 such as PDF or HTML. 
-This document is also an executable specification: you can check that its code 
-examples produce the expected results with:
+This document is also an executable specification: 
+you can check that the code examples produce the expected results with
 
     $ python -m doctest -v spec.txt
 
@@ -26,7 +26,7 @@ Send bug reports and requests to <Sebastien.Boisgerault@mines-paristech.fr>.
 About Bitstream
 ================================================================================
 
-Bitstream provides a binary data structure with a stream API for [Python 2.7][Python].
+Bitstream provides a binary data structure with a stream API for [Python][Python].
 
 It is tightly integrated with the [NumPy][NumPy] library with readers 
 and writers for its integer and floating-point number types (*but not all* !
@@ -47,10 +47,41 @@ readers/writers (factories) scheme, etc.**
 Installation
 ================================================================================
 
+Bitstream targets [Python][] 2.7 and has the following dependencies:
+
+**distinguish install vs runtime. And setuptools (or distribute ?) is needed 
+too then (right ?) Check if setuptools is really required (to download 
+dependencies, I think it is). Does installing pip take care of that ?**
+
+  - [NumPy][] version 1.6.1 or later,
+
+  - [Cython][] version 0.15.1 or later (required for BitStream developers only).
+
+**for developers OR people willing to use the GitHub repo, because the c file 
+is not checked in. But on Pypi, even if the sources are downloaded, Cython is
+not needed. For GitHub, give info about the `--with-cython` option. Three
+sections here: Installing (with pip), Installing from PyPi (source distro.)
+and installing from GitHub.**
+
+**CHICKEN-AND-EGG problem with Cython as a dependency, but with cythonize
+ already used in the setup arguments ... Too bad, because otherwise it works 
+in virtualenv ! OK, this one is solved**
+
+[Python 2.7]: http://www.python.org/download/releases/2.7
+[NumPy]: http://www.numpy.org
+
+The easy way to install Bitstream is with [pip][pip]. As root, use the command:
+
+    $ pip install bitstream
+
+Alternatively, ... [GitHub or Pypi ?]
+
 **TODO: install with pip, reference to PyPi.**
 
 **TODO: get from github, install with setup.py (dependencies : cython. 
 Version ?)**
+
+[pip]: https://pypi.python.org/pypi/pip
 
 Getting Started
 ================================================================================
