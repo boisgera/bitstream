@@ -14,7 +14,7 @@ import setuptools
 
 metadata = dict(
   name = "bitstream",
-  version = "1.0.0-alpha.3",
+  version = "1.0.0-alpha.4",
   description = "Binary Data Structure with a Stream Interface",
   url = "https://github.com/boisgera/bitstream",
   author = u"Sébastien Boisgérault",
@@ -79,9 +79,8 @@ if __name__ == "__main__":
         pass
 
     if WITH_REST:
-        metadata["long_description"] = make_rest()
-    else:
-        metadata["long_description"] = open("manual.txt").read()
+        make_rest()
+    metadata["long_description"] = open("manual.rst").read()
 
     kwargs = {}
     kwargs.update(metadata)
