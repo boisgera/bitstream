@@ -1,29 +1,29 @@
-% Bitstream 1.0.0-alpha.2 Manual
+% Bitstream 1.0.0-alpha.3 Manual
 % Sébastien Boisgérault
 % Sat, 04 May 2013
-
-**About this document:**
 
 This document is available under a [Creative Commons Attribution 3.0][CC-BY-3.0]
 license. 
 
-Use [`pandoc`][pandoc] to convert this text file to other formats, 
-such as PDF or HTML. 
-This document is also an executable specification: 
-you can check that the code examples produce the expected results with
+In its original text form, this manual is also an executable specification. 
+Check that the code examples produce the expected results with
 
     $ python -m doctest -v spec.txt
 
-Send bug reports and requests to <Sebastien.Boisgerault@mines-paristech.fr>.
+Use [`pandoc`][pandoc] to convert it to other formats, such as ReST, PDF or HTML.
 
-**TODO: ref to the github repo. instead. Still find a way to give my contact.**
+Follow Bitstream developments on [GitHub][] and [PyPI][].
+
 
 [CC-BY-3.0]: http://creativecommons.org/licenses/by/3.0/
 [markdown]: http://daringfireball.net/projects/markdown/
 [pandoc]: http://johnmacfarlane.net/pandoc/
+[GitHub]: https://github.com/boisgera/bitstream
+[PyPI]: https://pypi.python.org/pypi/bitstream
 
+-----------
 
-About Bitstream
+What is Bitstream ?
 ================================================================================
 
 Bitstream provides a binary data structure with a stream API for [Python][Python].
@@ -47,41 +47,48 @@ readers/writers (factories) scheme, etc.**
 Installation
 ================================================================================
 
-Bitstream targets [Python][] 2.7 and has the following dependencies:
+Bitstream targets [Python 2.7][], you will need to install it first.
 
-**distinguish install vs runtime. And setuptools (or distribute ?) is needed 
-too then (right ?) Check if setuptools is really required (to download 
-dependencies, I think it is). Does installing pip take care of that ?**
+Then, several installation options are available:
 
-  - [NumPy][] version 1.6.1 or later,
+  - **Easy install:** if the [pip][] package manager is available, execute the 
+    following command as root:
 
-  - [Cython][] version 0.15.1 or later (required for BitStream developers only).
+        $ pip install bitstream
 
-**for developers OR people willing to use the GitHub repo, because the c file 
-is not checked in. But on Pypi, even if the sources are downloaded, Cython is
-not needed. For GitHub, give info about the `--with-cython` option. Three
-sections here: Installing (with pip), Installing from PyPi (source distro.)
-and installing from GitHub.**
+    The dependencies of Bitstream will be handled automatically.
+    If you don't have root privileges, use [virtualenv][].
 
-**CHICKEN-AND-EGG problem with Cython as a dependency, but with cythonize
- already used in the setup arguments ... Too bad, because otherwise it works 
-in virtualenv ! OK, this one is solved**
+  - **Install from source:** the releases of Bitstream are available
+    on the [Python Package Index (PyPi)][PyPi]. Once you have 
+    downloaded and unpacked the archive, to build the Bitstream module, 
+    you need [setuptools][] (or its fork [distribute][]).
+    You also need to install the [NumPy][] package, version 1.6.1 or later. 
+    Then, as root, execute
+
+        $ python setup.py install
+
+  - **Hack with git:** to experiment with the latest version of Bitstream, 
+    clone the GitHub repository:
+
+        $ git clone git://github.com/boisgera/bitstream.git
+
+    To actually build the module, you will need everything you need to build
+    from source and will execute the same command. If in addition, you want
+    to edit the source files, you will also need the [Cython][] compiler, 
+    version 0.15.1 or later and will execute instead:
+
+        $ python setup.py install --with-cython
+
 
 [Python 2.7]: http://www.python.org/download/releases/2.7
-[NumPy]: http://www.numpy.org
-
-The easy way to install Bitstream is with [pip][pip]. As root, use the command:
-
-    $ pip install bitstream
-
-Alternatively, ... [GitHub or Pypi ?]
-
-**TODO: install with pip, reference to PyPi.**
-
-**TODO: get from github, install with setup.py (dependencies : cython. 
-Version ?)**
-
+[Cython]: http://www.cython.org
 [pip]: https://pypi.python.org/pypi/pip
+[virtualenv]: https://pypi.python.org/pypi/virtualenv
+[PyPi]: https://pypi.python.org/pypi/bitstream/
+[setuptools]: https://pypi.python.org/pypi/setuptools
+[distribute]: http://pythonhosted.org/distribute/
+[NumPy]: http://www.numpy.org
 
 Getting Started
 ================================================================================
@@ -103,7 +110,7 @@ For convenience, we import all symbols from its top-level module.
 [NumPy]: http://www.numpy.org/
 
 
-Quick overview of `bitstream` features
+Overview of Bitstream Features
 ================================================================================ 
 
     >>> stream = BitStream()
@@ -135,7 +142,7 @@ Quick overview of `bitstream` features
     <BLANKLINE>
 
 
-Readers and Writers
+Built-in Readers and Writers
 ================================================================================
 
 Bools
@@ -350,6 +357,12 @@ TODO:
   - reader tests
 
 
+Integers
+--------------------------------------------------------------------------------
+
+**TODO**
+
+
 Floating-Point Numbers
 --------------------------------------------------------------------------------
 
@@ -379,7 +392,7 @@ The byte order is big endian:
     >>> BitStream(struct.pack(">d", pi)) == BitStream(pi)
     True
 
-Extra `BitStream` Methods
+Extra Methods
 ================================================================================
 
 
@@ -398,7 +411,7 @@ Extra `BitStream` Methods
 
   - hash, comparison.
 
-User-Defined Readers and Writers
+Custom Writers and Readers
 ================================================================================
 
     >>> import bitstream
@@ -580,4 +593,11 @@ To select a writer, we use the proper instance of type tag:
     [1]
     >>> stream.read(uint(8), 3)
     [2, 3, 4]
+
+Examples
+================================================================================
+
+Unary coder / Rice coder ? Huffman tree/table coder ?
+
+
 
