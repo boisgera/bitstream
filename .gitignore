@@ -1,4 +1,6 @@
 *~
 *.c
+*.html
+*.pdf
 *.egg-info
 /dist
