@@ -22,7 +22,7 @@ def require_numpy(version=None):
 
 metadata = dict(
   name = "bitstream",
-  version = "0.0.0.dev",
+  version = "1.0.0-alpha.1",
   description = "Binary data structure with a stream interface",
   url = "https://github.com/boisgera/bitstream",
   author = u"Sébastien Boisgérault",

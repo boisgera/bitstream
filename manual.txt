@@ -1,6 +1,6 @@
-% Bitstream 1.0 Manual
+% Bitstream 1.0.0-alpha.1 Manual
 % Sébastien Boisgérault
-% Thu, 18 Apr 2013
+% Sat, 04 May 2013
 
 **About this document:**
 
