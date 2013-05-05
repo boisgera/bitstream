@@ -75,6 +75,7 @@ def make_pdf():
     file = tempfile.NamedTemporaryFile()
     file.write(header)
     file.write(open("manual.txt").read())
+    file.flush()
     os.system("pandoc -o manual.pdf {0}".format(file.name))
     file.close()
 
