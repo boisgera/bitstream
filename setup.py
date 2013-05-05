@@ -15,11 +15,18 @@ import setuptools
 metadata = dict(
   name = "bitstream",
   version = "1.0.0-alpha.4",
-  description = "Binary Data Structure with a Stream Interface",
+  description = "A Binary Data Structure with a Stream Interface",
   url = "https://github.com/boisgera/bitstream",
   author = u"Sébastien Boisgérault",
   author_email = "Sebastien.Boisgerault@mines-paristech.fr",
   license = "MIT License",
+  classifiers = [
+    "Development Status :: 3 - Alpha",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: POSIX :: Linux",
+    "Programming Language :: Python :: 2.7",
+    "Programming Language :: Cython",
+    ]
 )
 
 WITH_CYTHON = False
