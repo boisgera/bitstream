@@ -2,11 +2,13 @@
 # coding: utf-8
 
 # Python 2.7 Standard Library
-from distutils.version import LooseVersion as Version
+import datetime
+import distutils.version
 import importlib
 import os
 import os.path
 import sys
+import tempfile
 
 # Third-Party Libraries
 import setuptools
@@ -39,6 +41,7 @@ def require(module, version=None):
         error = "The module {0!r} is not available."
         raise ImportError(error.format(module))
     if version is not None:
+        Version = distutils.version.LooseVersion
         if not Version(_module.__version__) >= Version(version):
             error = "The version of {0!r} should be at least {1}."
             raise ImportError(error.format(module, version))
@@ -59,10 +62,41 @@ def make_extension(with_cython=None):
             raise IOError(error)
 
 def make_rest():
-    error = os.system("pandoc -o manual.rst manual.txt > /dev/null")
+    error = os.system("pandoc -o manual.rst manual.txt")
     if error:
         raise RuntimeError("cannot generate ReST documentation.")
 
+def make_pdf():
+    "Generate a PDF documentation"
+    title  = metadata["name"].capitalize() + " " + metadata["version"]
+    author = metadata["author"].encode("utf-8")
+    date   = datetime.date.today().strftime("%d %B %Y")
+    header = "%{0}\n%{1}\n%{2}\n\n".format(title, author, date)
+    file = tempfile.NamedTemporaryFile()
+    file.write(header)
+    file.write(open("manual.txt").read())
+    os.system("pandoc -o manual.pdf {0}".format(file.name))
+    file.close()
+
+def command(function):
+     contents = dict(
+       description = function.__doc__, 
+       user_options = [],
+       initialize_options = lambda self: None,
+       finalize_options = lambda self: None,
+       run = lambda self: function()
+     )
+     return type(
+       function.__name__.capitalize(), 
+       (setuptools.Command, object), 
+       contents
+     )
+
+commands = dict(
+    cmdclass = dict(
+        pdf = command(make_pdf)
+    )
+)
 
 if __name__ == "__main__":
 
@@ -93,5 +127,6 @@ if __name__ == "__main__":
     kwargs.update(metadata)
     kwargs.update(requirements)
     kwargs.update(contents)
+    kwargs.update(commands)
     setuptools.setup(**kwargs)
 
