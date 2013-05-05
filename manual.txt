@@ -1,7 +1,3 @@
-% Bitstream 1.0.0-alpha.4 Manual
-% Sébastien Boisgérault
-% Sat, 04 May 2013
-
 This document is available under a [Creative Commons Attribution 3.0][CC-BY-3.0]
 license. 
 
@@ -10,7 +6,7 @@ Check that the code examples produce the expected results with
 
     $ python -m doctest -v spec.txt
 
-Use [`pandoc`][pandoc] to convert it to other formats, such as ReST, PDF or HTML.
+Use [pandoc][pandoc] to convert it to other formats, such as ReST, PDF or HTML.
 
 Follow Bitstream developments on [GitHub][] and [PyPI][].
 
