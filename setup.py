@@ -17,7 +17,7 @@ import setuptools
 metadata = dict(
   name = "bitstream",
   version = "1.0.0-alpha.4",
-  description = "A Binary Data Structure with a Stream Interface",
+  description = "A Binary Data Type with a Stream Interface",
   url = "https://github.com/boisgera/bitstream",
   author = u"Sébastien Boisgérault",
   author_email = "Sebastien.Boisgerault@mines-paristech.fr",
@@ -64,7 +64,7 @@ def make_extension(with_cython=None):
 def make_rest():
     error = os.system("pandoc -o manual.rst manual.txt")
     if error:
-        raise RuntimeError("cannot generate ReST documentation.")
+        raise OSError(error, "cannot generate ReST documentation")
 
 def make_pdf():
     "Generate a PDF documentation"
@@ -76,8 +76,10 @@ def make_pdf():
     file.write(header)
     file.write(open("manual.txt").read())
     file.flush()
-    os.system("pandoc -o manual.pdf {0}".format(file.name))
+    error = os.system("pandoc -o manual.pdf {0}".format(file.name))
     file.close()
+    if error:
+        raise OSError(error, "cannot generate PDF documentation")
 
 def command(function):
      contents = dict(
