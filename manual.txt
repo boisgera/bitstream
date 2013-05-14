@@ -1,13 +1,11 @@
+
 **About this document.** It is originally a plain text file using the [Markdown] 
 [] syntax, but you may be reading a HTML, PDF or ReST version instead. In
 any case, the contents are subject to a [Creative Commons Attribution 3.0] 
 [CC-BY-3.0] license. 
 
-[CC-BY-3.0]: http://creativecommons.org/licenses/by/3.0/
 [markdown]: http://daringfireball.net/projects/markdown/
-[pandoc]: http://johnmacfarlane.net/pandoc/
-[GitHub]: https://github.com/boisgera/bitstream
-[PyPI]: https://pypi.python.org/pypi/bitstream
+[CC-BY-3.0]: http://creativecommons.org/licenses/by/3.0/
 
 
 What is Bitstream ?
@@ -95,7 +93,6 @@ what one should do depending on the aim.
 
         $ python setup.py install --with-cython
 
-
 [Python 2.7]: http://www.python.org/download/releases/2.7
 [Cython]: http://www.cython.org
 [pip]: https://pypi.python.org/pypi/pip
@@ -105,12 +102,8 @@ what one should do depending on the aim.
 [distribute]: http://pythonhosted.org/distribute/
 [NumPy]: http://www.numpy.org
 
+
 Getting Started
-================================================================================
-
-...
-
-Ante
 ================================================================================  
     
 Most of the features of bitstream are available via the `BitStream` class.
