@@ -1,15 +1,7 @@
-This document is available under a [Creative Commons Attribution 3.0][CC-BY-3.0]
-license. 
-
-In its original text form, this manual is also an executable specification. 
-Check that the code examples produce the expected results with
-
-    $ python -m doctest -v spec.txt
-
-Use [pandoc][pandoc] to convert it to other formats, such as ReST, PDF or HTML.
-
-Follow Bitstream developments on [GitHub][] and [PyPI][].
-
+**About this document.** It is originally a plain text file using the [Markdown] 
+[] syntax, but you may be reading a HTML, PDF or ReST version instead. In
+any case, the contents are subject to a [Creative Commons Attribution 3.0] 
+[CC-BY-3.0] license. 
 
 [CC-BY-3.0]: http://creativecommons.org/licenses/by/3.0/
 [markdown]: http://daringfireball.net/projects/markdown/
@@ -17,35 +9,59 @@ Follow Bitstream developments on [GitHub][] and [PyPI][].
 [GitHub]: https://github.com/boisgera/bitstream
 [PyPI]: https://pypi.python.org/pypi/bitstream
 
------------
 
 What is Bitstream ?
 ================================================================================
 
-Bitstream provides a binary data structure with a stream API for [Python][Python].
+Bitstream provides a binary data type with a stream interface 
+for [Python] [].
 
-It is tightly integrated with the [NumPy][NumPy] library with readers 
-and writers for its integer and floating-point number types (*but not all* !
-Refer to NumPy *most common types* ?). 
-Vectorization with NumPy arrays (*explain*).
+  - **Binary Data:** the `BitStream` class is a linearly ordered container of bits.
+    The standard library, is only convenient to manage binary data at the byte level. 
+    Consider using BitStream instead, especially you need to address the bit level.
 
-User-defined readers and writers ... (and family / factory).
+  - **Stream Interface:** you can only read data at the start of a stream 
+    and write data at its end.
+    This is a very simple way to interact with binary data, but it is also
+    the pattern that comes naturally in many applications. To manage
+    binary codes and formats, in my experience, random data access is 
+    not a requirement.
 
-Implemented with [Cython][Cython], it should be fast enough for your use case.
+  - **Python and NumPy Types.** BitStream has built-in readers and writers
+    for the common data types with a standard binary layout: bools, 
+    ASCII strings, fixed-size integers and floating-point integers. 
 
+  - **User-Defined Types.** The list of supported types and binary 
+    representation may be enlarged at will: new readers and writers 
+    can be implemented and associated to specific data types.
+
+  - **Performance.** Bitstream is a Python C-extension module that has been
+    optimized for the common use cases. Hopefully, it will be fast enough 
+    for your needs ! Under the hood, the [Cython] [] language and compiler 
+    are used to generate this extension module.
+
+  - **Open-Source:** the Bitstream software is distributed under a [MIT license]
+    [MIT], its documentation under a [Creative Commons Attribution 3.0] 
+    [CC-BY-3.0] license. The development takes place on [GitHub] [] and 
+    releases are also available on [PyPi] [].
+
+[struct]: http://docs.python.org/2/library/struct.html
 [Python]: http://www.python.org/
 [Cython]: http://www.cython.org
+[bitarray]: https://pypi.python.org/pypi/bitarray
+[bitstring]: https://code.google.com/p/python-bitstring
+[MIT]: http://opensource.org/licenses/MIT
 
-**TODO: describe key features: binary data structure, stream-like API, 
-integration with NumPy arrays, integers and float data, user-defined 
-readers/writers (factories) scheme, etc.**
 
-Installation
+Requirements & Installation
 ================================================================================
 
 Bitstream targets [Python 2.7][], you will need to install it first.
 
-Then, several installation options are available:
+**TODO:** move NumPy dependency here (? Dunno ...), talk about Linux-only platform.
+
+Then, several installation options are available: **TODO:** state clearly
+what one should do depending on the aim.
 
   - **Easy install:** if the [pip][] package manager is available, execute the 
     following command as root:
@@ -58,8 +74,11 @@ Then, several installation options are available:
   - **Install from source:** the releases of Bitstream are available
     on the [Python Package Index (PyPi)][PyPi]. Once you have 
     downloaded and unpacked the archive, to build the Bitstream module, 
-    you need [setuptools][] (or its fork [distribute][]).
-    You also need to install the [NumPy][] package, version 1.6.1 or later. 
+    you need [setuptools][].
+    You also need to install the [NumPy][] package, version 1.6.1 or later.
+
+    **TODO: test if numpy is automatically download if needed**.
+ 
     Then, as root, execute
 
         $ python setup.py install
@@ -510,8 +529,8 @@ For example, we have:
     >>> BitStream([3, 3, 3, 3])
     11111111
 
-We sometimes say that this code is not *self-delimiting*, because there is 
-no way to know the boundary between the bits coding different integers. 
+We say that this code is not *self-delimiting*, as there is no way to know 
+where is the boundary between the bits coding for different integers. 
 
 For natural numbers with known bounds, we may solve this problem by setting
 a number of bits to be used for each integer. However, to do that, we
@@ -589,6 +608,17 @@ To select a writer, we use the proper instance of type tag:
     [1]
     >>> stream.read(uint(8), 3)
     [2, 3, 4]
+
+
+Unit Tests
+================================================================================
+
+The text version of the document you are reading is also an executable
+specification. Check that the code examples produce the expected results 
+with
+
+    $ python -m doctest -v manual.txt
+
 
 Examples
 ================================================================================
