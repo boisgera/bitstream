@@ -1020,10 +1020,10 @@ cpdef read_uint32(BitStream stream, n=None):
     uint32s = numpy.zeros(num_uint32s, dtype=numpy.uint32)
     if bit_index == 0:
         for i in range(num_uint32s):
-            uint32 = (_bytes[byte_index + 4*i  ] << 24) + \
-                     (_bytes[byte_index + 4*i+1] << 16) + \
-                     (_bytes[byte_index + 4*i+2] <<  8) + \
-                     (_bytes[byte_index + 4*i+3]      )
+            uint32 = (<unsigned long>(_bytes[byte_index + 4*i  ]) << 24) + \
+                     (<unsigned long>(_bytes[byte_index + 4*i+1]) << 16) + \
+                     (<unsigned long>(_bytes[byte_index + 4*i+2]) <<  8) + \
+                     (<unsigned long>(_bytes[byte_index + 4*i+3])      )
             uint32s[i] = uint32
     else:
         bit_index_c = 8 - bit_index
@@ -1162,14 +1162,14 @@ cpdef read_uint64(BitStream stream, n=None):
             raise ReadError("end of stream")
         stream._read_offset += 64
         if bit_index == 0:
-            uint64 = (_bytes[byte_index    ] << 56) + \
-                     (_bytes[byte_index + 1] << 48) + \
-                     (_bytes[byte_index + 2] << 40) + \
-                     (_bytes[byte_index + 3] << 32) + \
-                     (_bytes[byte_index + 4] << 24) + \
-                     (_bytes[byte_index + 5] << 16) + \
-                     (_bytes[byte_index + 6] <<  8) + \
-                     (_bytes[byte_index + 7]      )
+            uint64 = (<unsigned long long>(_bytes[byte_index    ]) << 56) + \
+                     (<unsigned long long>(_bytes[byte_index + 1]) << 48) + \
+                     (<unsigned long long>(_bytes[byte_index + 2]) << 40) + \
+                     (<unsigned long long>(_bytes[byte_index + 3]) << 32) + \
+                     (<unsigned long long>(_bytes[byte_index + 4]) << 24) + \
+                     (<unsigned long long>(_bytes[byte_index + 5]) << 16) + \
+                     (<unsigned long long>(_bytes[byte_index + 6]) <<  8) + \
+                     (<unsigned long long>(_bytes[byte_index + 7])      )
             return numpy.uint64(uint64)
         else:
             bit_index_c = 8 - bit_index
