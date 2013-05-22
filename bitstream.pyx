@@ -193,6 +193,7 @@ cdef type uint16  = numpy.uint16
 cdef type int16   = numpy.int16
 cdef type uint32  = numpy.uint32
 cdef type int32   = numpy.int32
+cdef type uint64  = numpy.uint64
 cdef type float64 = numpy.float64
 cdef type ndarray = numpy.ndarray
 cdef object zero = 0
@@ -1058,10 +1059,10 @@ cpdef _write_uint32(BitStream stream, np.ndarray[np.uint32_t, ndim=1] uint32s):
     
     if bit_index == 0:
         for i in range(num_uint32s):
-            _bytes[byte_index + 2*i  ] = <unsigned char>((uint32s[i] >> 24)      )
-            _bytes[byte_index + 2*i+1] = <unsigned char>((uint32s[i] >> 16) & 255)
-            _bytes[byte_index + 2*i+2] = <unsigned char>((uint32s[i] >>  8) & 255)
-            _bytes[byte_index + 2*i+3] = <unsigned char>((uint32s[i]      ) & 255)
+            _bytes[byte_index + 4*i  ] = <unsigned char>((uint32s[i] >> 24)      )
+            _bytes[byte_index + 4*i+1] = <unsigned char>((uint32s[i] >> 16) & 255)
+            _bytes[byte_index + 4*i+2] = <unsigned char>((uint32s[i] >>  8) & 255)
+            _bytes[byte_index + 4*i+3] = <unsigned char>((uint32s[i]      ) & 255)
     else:
         for i in range(num_uint32s):
             for s in range(4):
@@ -1128,6 +1129,130 @@ cpdef _write_int32(BitStream stream, np.ndarray[np.int32_t, ndim=1] int32s):
     stream._write_offset += 32 * num_int32s
 
 register(int32, reader=read_int32, writer=write_int32)
+
+cpdef read_uint64(BitStream stream, n=None):
+    """
+    Read unsigned 32-bit integers from a stream.
+    """
+    cdef unsigned char* _bytes
+    cdef size_t byte_index
+    cdef unsigned long bit_length, 
+    cdef unsigned char bit_index, bit_index_c
+    cdef unsigned char mask1, mask2
+    cdef unsigned long long uint64
+    cdef size_t i
+    cdef unsigned char s
+    cdef size_t num_uint64s
+
+    _bytes = stream._bytes
+    byte_index = stream._read_offset / 8
+    bit_index  = stream._read_offset - 8 * byte_index
+    
+    if n is None:
+        if len(stream) < 64:
+            raise ReadError("end of stream")
+        stream._read_offset += 64
+        if bit_index == 0:
+            uint64 = (_bytes[byte_index    ] << 56) + \
+                     (_bytes[byte_index + 1] << 48) + \
+                     (_bytes[byte_index + 2] << 40) + \
+                     (_bytes[byte_index + 3] << 32) + \
+                     (_bytes[byte_index + 4] << 24) + \
+                     (_bytes[byte_index + 5] << 16) + \
+                     (_bytes[byte_index + 6] <<  8) + \
+                     (_bytes[byte_index + 7]      )
+            return numpy.uint64(uint64)
+        else:
+            bit_index_c = 8 - bit_index
+            mask1 = 255 >> bit_index
+            mask2 = 255 - mask1
+            uint64 = 0
+            for s in range(8):
+                uint64 = uint64 << 8
+                uint64 += ((_bytes[byte_index + s    ] & mask1) << bit_index) + \
+                          ((_bytes[byte_index + s + 1] & mask2) >> bit_index_c)
+            return numpy.uint64(uint64)
+
+    if len(stream) < 64 * n:
+        raise ReadError("end of stream")
+
+    num_uint64s = min(n, len(stream) / 64)
+    uint64s = numpy.zeros(num_uint64s, dtype=numpy.uint64)
+    if bit_index == 0:
+        for i in range(num_uint64s):
+            uint64 = (_bytes[byte_index + 8*i  ] << 56) + \
+                     (_bytes[byte_index + 8*i+1] << 48) + \
+                     (_bytes[byte_index + 8*i+2] << 40) + \
+                     (_bytes[byte_index + 8*i+3] << 32) + \
+                     (_bytes[byte_index + 8*i+4] << 24) + \
+                     (_bytes[byte_index + 8*i+5] << 16) + \
+                     (_bytes[byte_index + 8*i+6] <<  8) + \
+                     (_bytes[byte_index + 8*i+7]      )
+            uint64s[i] = uint64
+    else:
+        bit_index_c = 8 - bit_index
+        mask1 = 255 >> bit_index
+        mask2 = 255 - mask1
+        for i in range(num_uint64s):
+            uint64 = 0
+            for s in range(8):
+                uint64 = uint64 << 8
+                uint64 = ((_bytes[byte_index + 8*i+s  ] & mask1) << bit_index  ) + \
+                         ((_bytes[byte_index + 8*i+s+1] & mask2) >> bit_index_c)
+            uint64s[i] = uint64
+    stream._read_offset += 64 * num_uint64s
+    return uint64s
+
+cpdef write_uint64(BitStream stream, data):
+    """
+    Write unsigned 64-bit integers into a stream.
+    """
+    array = numpy.array(data, uint64, copy=false, ndmin=1)
+    _write_uint64(stream, array)
+
+cpdef _write_uint64(BitStream stream, np.ndarray[np.uint64_t, ndim=1] uint64s):
+    """
+    Write a 1-dim. arrray of unsigned 64-bit integers into a stream.
+    """
+    cdef unsigned char* _bytes
+    cdef size_t i, num_uint64s, byte_index
+    cdef unsigned long bit_length, bit_index, bit_index_c
+    cdef unsigned char mask1, mask2, base, byte
+                            
+    num_uint64s = len(uint64s)
+    stream._extend(64 * num_uint64s)
+    _bytes = stream._bytes
+
+    byte_index = stream._write_offset / 8
+    bit_index  = stream._write_offset - 8 * byte_index
+    bit_index_c = 8 - bit_index
+
+    mask2 = 255 >> bit_index
+    mask1 = 255 - mask2
+    
+    if bit_index == 0:
+        for i in range(num_uint64s):
+            _bytes[byte_index + 8*i  ] = <unsigned char>((uint64s[i] >> 56) & 255)
+            _bytes[byte_index + 8*i+1] = <unsigned char>((uint64s[i] >> 48) & 255)
+            _bytes[byte_index + 8*i+2] = <unsigned char>((uint64s[i] >> 40) & 255)
+            _bytes[byte_index + 8*i+3] = <unsigned char>((uint64s[i] >> 32) & 255)
+            _bytes[byte_index + 8*i+4] = <unsigned char>((uint64s[i] >> 24) & 255)
+            _bytes[byte_index + 8*i+5] = <unsigned char>((uint64s[i] >> 16) & 255)
+            _bytes[byte_index + 8*i+6] = <unsigned char>((uint64s[i] >>  8) & 255)
+            _bytes[byte_index + 8*i+7] = <unsigned char>((uint64s[i]      ) & 255)
+    else:
+        for i in range(num_uint64s):
+            for s in range(8):
+                base = (uint64s[i] >> (8 * (7 - s))) & 255                   
+                byte = (<unsigned char>base) >> bit_index
+                _bytes[byte_index + 8*i+s] = \
+                  (_bytes[byte_index + 8*i+s] & mask1) | byte
+                byte = ((<unsigned char>base) << bit_index) & 255
+                _bytes[byte_index + 8*i+s+1] = \
+                  (_bytes[byte_index + 8*i+s+1] & mask2) | byte
+    stream._write_offset += 64 * num_uint64s
+
+register(uint64, reader=read_uint64, writer=write_uint64)
 
 
 #
