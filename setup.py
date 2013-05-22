@@ -107,6 +107,8 @@ if __name__ == "__main__":
         install_requires = open("requirements.txt").read().splitlines()
     )
 
+    # TODO: force WITH_CYTHON and WITH_REST when `sdist` is selected ?
+
     try:
         sys.argv.remove("--with-cython")
         WITH_CYTHON = True
