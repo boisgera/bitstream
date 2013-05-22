@@ -293,6 +293,10 @@ cdef class BitStream:
             write_uint32(self, data)
         elif type is int32:
             write_int32(self, data)
+        elif type is uint64:
+            write_uint64(self, data)
+        elif type is int64:
+            write_int64(self, data)
         elif type is float or type is float64:
             write_float64(self, data)
         # fallback to the writers dictionary
@@ -336,6 +340,10 @@ cdef class BitStream:
             return read_uint32(self, n)
         elif type is int32:
             return read_int32(self, n)
+        elif type is uint64:
+            return read_uint64(self, n)
+        elif type is int64:
+            return read_int64(self, n)
         elif type is float or type is float64:
             return read_float64(self, n)
         # fallback to the readers dictionary
