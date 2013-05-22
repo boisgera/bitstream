@@ -194,6 +194,7 @@ cdef type int16   = numpy.int16
 cdef type uint32  = numpy.uint32
 cdef type int32   = numpy.int32
 cdef type uint64  = numpy.uint64
+cdef type int64  = numpy.int64
 cdef type float64 = numpy.float64
 cdef type ndarray = numpy.ndarray
 cdef object zero = 0
@@ -1254,6 +1255,62 @@ cpdef _write_uint64(BitStream stream, np.ndarray[np.uint64_t, ndim=1] uint64s):
 
 register(uint64, reader=read_uint64, writer=write_uint64)
 
+cpdef read_int64(BitStream stream, n=None):
+    """
+    Read signed 64-bit integers from a stream.
+    """
+    return read_uint64(stream, n).astype("int64")
+
+cpdef write_int64(BitStream stream, data):
+    """
+    Write signed 64-bit integers into a stream.
+    """
+    array = numpy.array(data, int64, copy=false, ndmin=1)
+    _write_int64(stream, array)
+
+cpdef _write_int64(BitStream stream, np.ndarray[np.int64_t, ndim=1] int64s):
+    """
+    Write a 1-dim. arrray of unsigned 64-bit integers into a stream.
+    """
+    cdef unsigned char* _bytes
+    cdef size_t i, num_int64s, byte_index
+    cdef unsigned long bit_length, bit_index, bit_index_c
+    cdef unsigned char mask1, mask2, base, byte
+                            
+    num_int64s = len(int64s)
+    stream._extend(64 * num_int64s)
+    _bytes = stream._bytes
+
+    byte_index = stream._write_offset / 8
+    bit_index  = stream._write_offset - 8 * byte_index
+    bit_index_c = 8 - bit_index
+
+    mask2 = 255 >> bit_index
+    mask1 = 255 - mask2
+    
+    if bit_index == 0:
+        for i in range(num_int64s):
+            _bytes[byte_index + 8*i  ] = <unsigned char>((int64s[i] >> 56) & 255)
+            _bytes[byte_index + 8*i+1] = <unsigned char>((int64s[i] >> 48) & 255)
+            _bytes[byte_index + 8*i+2] = <unsigned char>((int64s[i] >> 40) & 255)
+            _bytes[byte_index + 8*i+3] = <unsigned char>((int64s[i] >> 32) & 255)
+            _bytes[byte_index + 8*i+4] = <unsigned char>((int64s[i] >> 24) & 255)
+            _bytes[byte_index + 8*i+5] = <unsigned char>((int64s[i] >> 16) & 255)
+            _bytes[byte_index + 8*i+6] = <unsigned char>((int64s[i] >>  8) & 255)
+            _bytes[byte_index + 8*i+7] = <unsigned char>((int64s[i]      ) & 255)
+    else:
+        for i in range(num_int64s):
+            for s in range(8):
+                base = (int64s[i] >> (8 * (7 - s))) & 255                   
+                byte = (<unsigned char>base) >> bit_index
+                _bytes[byte_index + 8*i+s] = \
+                  (_bytes[byte_index + 8*i+s] & mask1) | byte
+                byte = ((<unsigned char>base) << bit_index) & 255
+                _bytes[byte_index + 8*i+s+1] = \
+                  (_bytes[byte_index + 8*i+s+1] & mask2) | byte
+    stream._write_offset += 64 * num_int64s
+
+register(int64, reader=read_int64, writer=write_int64)
 
 #
 # Floating-Point Data Reader and Writer: 64 bits (double)
