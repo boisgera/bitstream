@@ -2,6 +2,7 @@
 # coding: utf-8
 
 # Python 2.7 Standard Library
+import ConfigParser
 import datetime
 import distutils.version
 import importlib
@@ -31,8 +32,26 @@ metadata = dict(
     ]
 )
 
-WITH_CYTHON = False
-WITH_REST = False
+setuptools.Distribution.global_options.extend([
+    ("cython", "c", "compile Cython files"),
+    ("rest"  , "r", "generate reST documentation")
+])
+
+
+CYTHON = None
+REST = None
+
+if os.path.isfile("setup.cfg"):
+    parser = ConfigParser.ConfigParser()
+    parser.read("setup.cfg")
+    try:
+        CYTHON = parser.getboolean("global", "cython")
+    except ConfigParser.NoOptionError:
+        pass
+    try:
+        REST = parser.getboolean("global", "rest")
+    except ConfigParser.NoOptionError:
+        pass
 
 def require(module, version=None):
     try:
@@ -46,10 +65,8 @@ def require(module, version=None):
             error = "The version of {0!r} should be at least {1}."
             raise ImportError(error.format(module, version))
 
-def make_extension(with_cython=None):
-    if with_cython is None:
-        with_cython = WITH_CYTHON
-    if with_cython:
+def make_extension():
+    if CYTHON:
         require("Cython", "0.15.1")
         import Cython
         from Cython.Build import cythonize
@@ -107,24 +124,25 @@ if __name__ == "__main__":
         install_requires = open("requirements.txt").read().splitlines()
     )
 
-    # TODO: force WITH_CYTHON and WITH_REST when `sdist` is selected ?
+    if "-c" in sys.argv:
+        sys.argv.remove("-c")
+        CYTHON = True
+    if "--cython" in sys.argv:
+        sys.argv.remove("--cython")
+        CYTHON = True
 
-    try:
-        sys.argv.remove("--with-cython")
-        WITH_CYTHON = True
-    except ValueError:
-        pass
     contents = dict(
       ext_modules = make_extension()
     )
 
-    try:
-        sys.argv.remove("--with-rest")
-        WITH_REST = True
-    except ValueError: 
-        pass
+    if "-r" in sys.argv:
+        sys.argv.remove("-r")
+        REST = True
+    if "--rest" in sys.argv:
+        sys.argv.remove("--rest")
+        REST = True
 
-    if WITH_REST:
+    if REST:
         make_rest()
     metadata["long_description"] = open("manual.rst").read()
 
