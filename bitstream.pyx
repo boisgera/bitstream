@@ -191,7 +191,7 @@ cdef class BitStream:
     cdef size_t _num_bytes
     cdef unsigned long long _read_offset
     cdef unsigned long long _write_offset
-    cdef list _states
+    cdef public list _states
     cdef unsigned int _state_id
 
     cdef dict readers    
@@ -202,7 +202,13 @@ cdef class BitStream:
         self._write_offset = 0
         self._num_bytes = 0
         self._bytes = NULL
-        self._states = [State(self, 0, 0, 0)]
+
+        cdef State state = State.__new__(State)
+        state._stream = self
+        state._read_offset = self._read_offset
+        state._write_offset = self._write_offset
+        state._id = self._state_id
+        self._states = [state]
         self._state_id = 0
 
     def __init__(self, *args, **kwargs):
@@ -380,36 +386,43 @@ cdef class BitStream:
         bools  = copy.read(bool, len(copy))
         return hash((hashlib.sha1(uint8s).hexdigest(), tuple(bools)))
 
-    def __richcmp__(self, other, int operation):
+    def __richcmp__(BitStream self, other, int operation):
         # see http://docs.cython.org/src/userguide/special_methods.html
         cdef boolean equal
         if operation not in (2, 3):
             raise NotImplementedError()
-        s1 = self.copy() # read_only would be better ...
-        s2 = other.copy() # test for type, 
-        equal = all(s1.read(numpy.uint8, len(s1) / 8) == s2.read(numpy.uint8, len(s2) / 8)) and\
-                (s1.read(bool, len(s1)) == s2.read(bool, len(s2)))
+        if not isinstance(other, BitStream):
+            equal = false
+        else:
+           s1 = self.copy() # read_only would be better ...
+           s2 = other.copy() # test for type, 
+           equal = all(s1.read(numpy.uint8, len(s1) / 8) == s2.read(numpy.uint8, len(s2) / 8)) and\
+                   (s1.read(bool, len(s1)) == s2.read(bool, len(s2)))
         if operation == 2:
             return equal
         else:
             return not equal
 
-    cdef State save(self):
+    cpdef State save(BitStream self):
         cdef State state
         state = self._states[-1]
         if state._read_offset != self._read_offset or \
            state._write_offset != self._write_offset:
             self._state_id = self._state_id + 1
-            # BUG: cython -a displays this line as not optimized ...
-            # is it because `State` is not recognized as an extension type ?
-            # We have a general PyObjectCall going on here, even if I 
-            # declare save as C-only. Should I / can I use a struct instead ?
-            state = State(self, self._read_offset, self._write_offset, self._state_id)
+            # Fast instantiation (<http://docs.cython.org/src/userguide/extension_types.html>)
+            state = State.__new__(State)
+            # For some reason, setting the state data in constructors would
+            # trigger the (slow) conversion of these data to Python objects.
+            # That may have been corrected in late 0.19.x versions of Cython.
+            state._stream = self
+            state._read_offset = self._read_offset
+            state._write_offset = self._write_offset
+            state._id = self._state_id
             self._states.append(state)
         return state
 
-    cpdef restore(self, State state):
-        if self != state._stream:
+    cpdef restore(BitStream self, State state):
+        if self is not state._stream:
             raise ValueError("the state does not belong to this stream.")
         # The restore action may fail, so we work on a copy of the saved states.
         states = copy.copy(self._states)
@@ -432,20 +445,20 @@ cdef class BitStream:
 # ------------------------------------------------------------------------------
 #
 
-cdef class State: # meant to be opaque and immutable.
+cdef class State: # treat as opaque and immutable.
     cdef readonly BitStream _stream
     cdef readonly unsigned long long _read_offset
     cdef readonly unsigned long long _write_offset
     cdef readonly unsigned int _id
 
-    def __cinit__(self, BitStream stream, 
-                        unsigned long long _read_offset, 
-                        unsigned long long _write_offset, 
-                        unsigned int _id):
-        self._stream = stream
-        self._read_offset = _read_offset
-        self._write_offset = _write_offset
-        self._id = _id
+#    def __cinit__(self, BitStream stream, 
+#                        unsigned long long _read_offset, 
+#                        unsigned long long _write_offset, 
+#                        unsigned int _id):
+#        self._stream = stream
+#        self._read_offset = _read_offset
+#        self._write_offset = _write_offset
+#        self._id = _id
 
 # TODO: hash
 
@@ -455,7 +468,7 @@ cdef class State: # meant to be opaque and immutable.
         if operation not in (2, 3):
             raise NotImplementedError()
         # BUG: the state attribute access is not optimized ... Why ?
-        equal = self._stream == other._stream and \
+        equal = self._stream is other._stream and \
                 self._read_offset == other._read_offset and \
                 self._write_offset == other._write_offset and \
                 self._id == other._id

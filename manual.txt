@@ -25,7 +25,7 @@ for [Python] [].
     binary codes and formats, in my experience, random data access is 
     not a requirement.
 
-  - **Python and NumPy Types.** BitStream has built-in readers and writers
+  - **Python and [[ Types.** BitStream has built-in readers and writers
     for the common data types with a standard binary layout: bools, 
     ASCII strings, fixed-size integers and floating-point integers. 
 
@@ -94,7 +94,6 @@ what one should do depending on the aim.
         $ python setup.py install --with-cython
 
 [Python 2.7]: http://www.python.org/download/releases/2.7
-[Cython]: http://www.cython.org
 [pip]: https://pypi.python.org/pypi/pip
 [virtualenv]: https://pypi.python.org/pypi/virtualenv
 [PyPi]: https://pypi.python.org/pypi/bitstream/
@@ -116,7 +115,6 @@ For convenience, we import all symbols from its top-level module.
 
     >>> from numpy import *
 
-[NumPy]: http://www.numpy.org/
 
 
 Overview of Bitstream Features
@@ -660,6 +658,70 @@ more complex, requires some thinking. Need to track all restorable
 states in the stream ? Maybe ...
 
 **TODO.** basic doctest.
+
+    >>> stream = BitStream()
+    >>> s0 = stream.save()
+    >>> stream.write("A")
+    >>> s1 = stream.save()
+    >>> stream.write("B")
+    >>> s2 = stream.save()
+    >>> stream.restore(s1)
+    >>> stream == BitStream("A")
+    True
+    >>> stream.restore(s2) # doctest: +ELLIPSIS
+    Traceback (most recent call last):
+    ...
+    ValueError: ...
+    >>> stream.write("C")
+    >>> stream == BitStream("AC")
+    True
+    >>> s3 = stream.save()
+    >>> stream.restore(s1)
+    >>> stream == BitStream("A")
+    True
+    >>> stream.restore(s0)
+    >>> stream == BitStream("")
+    True
+
+Most useful patterns: 
+
+**Avoid copies.** Do read/write stuff on a stream, including some actions that 
+may possibly fail, and keep the original stream intact. Here the snapshot 
+approach avoids a copy of the bitstream. Warning: an use of restore with a 
+state prior to the snaphot in the actions will screw the restoration ...
+
+    >>> stream = BitStream("ABC")
+    >>> snapshot = stream.save()
+    >>> try:
+    ...     _ = stream.read(str, 1)
+    ...     stream.write("D")
+    ...     _ = stream.read(str, 4)
+    ... except bitstream.ReadError:
+    ...     pass
+    ... finally:
+    ...     stream.restore(snapshot)
+    >>> stream == BitStream("ABC")
+    True
+
+**Support true exceptions in readers.** Som reading actions may fail, but you
+are not able to tell beforehand, you have to start a sequence of smaller
+reads before you know of the big read call is going to work. A reader with a
+proper exception support will restore the orginal state of the stream before 
+raising the exception if something goes wrong. Typically, that means a reader
+code with the structure:
+
+    >>> def reader(stream, n=None):
+    ...     snapshot = stream.save()
+    ...     try:
+    ...         pass # do what you have to do.
+    ...     except ReadError: 
+    ...         stream.restore(snapshot)
+    ...         raise
+
+Make convenience functions (with context managers) for those use cases ?
+For the "light-weight copy" that would be easy (under what name ?) but 
+for the reader, that's not obvious, the reader developer may be willing
+to analyze the error and customize the error message before a re-raise ...
 
 
 Unit Tests
