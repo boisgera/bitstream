@@ -25,7 +25,7 @@ for [Python] [].
     binary codes and formats, in my experience, random data access is 
     not a requirement.
 
-  - **Python and [[ Types.** BitStream has built-in readers and writers
+  - **Python and Numpy Types.** BitStream has built-in readers and writers
     for the common data types with a standard binary layout: bools, 
     ASCII strings, fixed-size integers and floating-point integers. 
 
