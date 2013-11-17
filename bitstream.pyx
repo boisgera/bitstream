@@ -44,7 +44,7 @@ of a type when the codec has options.
 # justify it). And we also need 'type' (as a type) in a isinstance ...
 import __builtin__
 cdef object __builtin__type = __builtin__.type
-
+import copy
 import doctest
 import hashlib
 import struct
@@ -97,31 +97,12 @@ cdef extern from "Python.h":
 #     the public keyword ... That would be a nice property ... but probably
 #     a performance and maintenance cost. KISS applies here.
 #
-# UPDATE: save / restore state will allow for a true exception mecanism, 
-#         without corruption, to take place, instead of a mere error handling.
 #
+# Update: above is partially obsolete: the snapshot effort is meant to
+#         allow for all potentially stream-corruptiing operations to be
+#         roll-backed, so that the mere error scheme can be converted to
+#         a robust exception scheme.
 
-# TODO: add `save` (returns a (read_offset, write_offset) state) and `restore`
-#       (with state as an argument) or `load` ? We leverage the fact in our
-#       stream model, the data is not immutable, but no information is lost,
-#       only added at the end, so we may always roll back if we need too.
-#
-#       These two methods shall enable a true exception management (not mere
-#       errors, when shit happens, we still have a usable state), AND at the
-#       same time, read-only streams. Maybe higher-level constructs (with
-#       context manager ?) could be useful here to exploit those two schemes.
-#       
-# UPDATE: if we want the save / restor NOT TO CRASH, we have to ensure of two
-#         things
-#
-#         - first that the state stores the id of the stream ... you can't
-#           restore a state that was not created by you.
-#
-#         - secondly, as restore + write break the immutability of the stream,
-#           save/restore pairs should only be applied in reverse order, with
-#           possible drops in the restore. That should be check by the stream.
-#           What I mean is that save 1, save 2, restore 2, restore 1 os OK,
-#           S1, S2, R1 is ok, but S1, S2, R1, S2 is not.
 #  
 # TODO: Consider using the Numpy C API instead of casting with array.
 #       (see <http://docs.scipy.org/doc/numpy/reference/c-api.array.html>)
@@ -200,6 +181,8 @@ cdef type ndarray = numpy.ndarray
 cdef object zero = 0
 cdef object one  = 1
 
+cdef class State
+
 cdef class BitStream:
     """
     BitStream Class
@@ -208,6 +191,8 @@ cdef class BitStream:
     cdef size_t _num_bytes
     cdef unsigned long long _read_offset
     cdef unsigned long long _write_offset
+    cdef list _states
+    cdef unsigned int _state_id
 
     cdef dict readers    
     cdef dict writers
@@ -217,6 +202,8 @@ cdef class BitStream:
         self._write_offset = 0
         self._num_bytes = 0
         self._bytes = NULL
+        self._states = [State(self, 0, 0, 0)]
+        self._state_id = 0
 
     def __init__(self, *args, **kwargs):
         if args or kwargs:
@@ -395,6 +382,7 @@ cdef class BitStream:
 
     def __richcmp__(self, other, int operation):
         # see http://docs.cython.org/src/userguide/special_methods.html
+        cdef boolean equal
         if operation not in (2, 3):
             raise NotImplementedError()
         s1 = self.copy() # read_only would be better ...
@@ -406,9 +394,75 @@ cdef class BitStream:
         else:
             return not equal
 
+    cdef State save(self):
+        cdef State state
+        state = self._states[-1]
+        if state._read_offset != self._read_offset or \
+           state._write_offset != self._write_offset:
+            self._state_id = self._state_id + 1
+            # BUG: cython -a displays this line as not optimized ...
+            # is it because `State` is not recognized as an extension type ?
+            # We have a general PyObjectCall going on here, even if I 
+            # declare save as C-only. Should I / can I use a struct instead ?
+            state = State(self, self._read_offset, self._write_offset, self._state_id)
+            self._states.append(state)
+        return state
+
+    cpdef restore(self, State state):
+        if self != state._stream:
+            raise ValueError("the state does not belong to this stream.")
+        # The restore action may fail, so we work on a copy of the saved states.
+        states = copy.copy(self._states)
+        while states:
+            if state == <State>states[-1]:
+                self._read_offset  = state._read_offset
+                self._write_offset = state._write_offset
+                self._states = states
+                break
+            else:
+                states.pop()
+        else:
+            raise ValueError("this state is not saved in the stream.")
+
     def __dealloc__(self):
         free(self._bytes)
 
+#
+# Bitstream State
+# ------------------------------------------------------------------------------
+#
+
+cdef class State: # meant to be opaque and immutable.
+    cdef readonly BitStream _stream
+    cdef readonly unsigned long long _read_offset
+    cdef readonly unsigned long long _write_offset
+    cdef readonly unsigned int _id
+
+    def __cinit__(self, BitStream stream, 
+                        unsigned long long _read_offset, 
+                        unsigned long long _write_offset, 
+                        unsigned int _id):
+        self._stream = stream
+        self._read_offset = _read_offset
+        self._write_offset = _write_offset
+        self._id = _id
+
+# TODO: hash
+
+    def __richcmp__(self, State other, int operation):
+        # see http://docs.cython.org/src/userguide/special_methods.html
+        cdef boolean equal
+        if operation not in (2, 3):
+            raise NotImplementedError()
+        # BUG: the state attribute access is not optimized ... Why ?
+        equal = self._stream == other._stream and \
+                self._read_offset == other._read_offset and \
+                self._write_offset == other._write_offset and \
+                self._id == other._id
+        if operation == 2:
+            return equal
+        else:
+            return not equal
 #
 # Bool Reader / Writer
 # ------------------------------------------------------------------------------

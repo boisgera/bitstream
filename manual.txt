@@ -604,6 +604,64 @@ To select a writer, we use the proper instance of type tag:
     [2, 3, 4]
 
 
+Snapshots (Bitstream state)
+================================================================================
+
+(random thought for the moment, fondations for the design of snapshots:)
+
+**TODO:** sort doc material vs dev comments, dispatch, polish.
+
+terms: snapshot (state ?), save, restore.
+
+
+**Goals:** 
+
+  - for the implementation and error API point of view: give a mechanism to roll
+    back all operations that may end up with a "corrupted" stream (stream
+    content has changed but cannot deliver what the read asked for), so
+    that the mere error scheme that we have now on reader can be upgraded
+    to a real exception handling mechansim: if a read fails, the stream
+    state hasn't changed.
+
+  - offer the user with read-only and on-demand roll-back features.
+
+
+Add `save` (returns a (read_offset, write_offset) state) and `restore`
+(with state as an argument) or `load` ? We leverage the fact in our
+stream model, the data is not immutable, but no information is lost,
+only added at the end, so we may always roll back if we need too.
+
+These two methods shall enable a true exception management (not mere
+errors, when shit happens, we still have a usable state), AND at the
+same time, read-only streams. Maybe higher-level constructs (with
+context manager ?) could be useful here to exploit those two schemes.
+       
+UPDATE: if we want the save / restor NOT TO CRASH, we have to ensure of two
+things
+
+  - first that the state stores the id of the stream ... you can't
+    restore a state that was not created by you.
+
+  - secondly, as restore + write break the immutability of the stream,
+    save/restore pairs should only be applied in reverse order, with
+    possible drops in the restore. That should be check by the stream.
+    What I mean is that save 1, save 2, restore 2, restore 1 os OK,
+    S1, S2, R1 is ok, but S1, S2, R1, S2 is not.
+
+Design: `State` class with ref to the stream attribute, `read_offset`,
+`write_offset`, implements the comparison (?). Not that simple. The idea
+behind the comparison is that you should always be able to restore an
+OLDER snapshot but actually if you think of it, that's older in the 
+story of emission of snapshots. So you also have to embed a snapshot 
+number and base your comparison on that. As a consequence, bitstream
+instances have nothing to store but a snapshot number (the number of
+the snapshot that was emitted, or 0 if no snapshot was). No, this is
+more complex, requires some thinking. Need to track all restorable
+states in the stream ? Maybe ...
+
+**TODO.** basic doctest.
+
+
 Unit Tests
 ================================================================================
 
