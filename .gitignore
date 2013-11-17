@@ -1,6 +1,7 @@
 *~
 *.pyc
 *.c
+*.so
 *.rst
 *.html
 *.pdf

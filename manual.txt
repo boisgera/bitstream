@@ -1,10 +1,10 @@
 
 **About this document.** It is originally a plain text file using the [Markdown] 
-[] syntax, but you may be reading a HTML, PDF or ReST version instead. In
-any case, the contents are subject to a [Creative Commons Attribution 3.0] 
+[Markdown] syntax, but you may be reading a HTML, PDF or ReST version instead. 
+In any case, the contents are subject to a [Creative Commons Attribution 3.0] 
 [CC-BY-3.0] license. 
 
-[markdown]: http://daringfireball.net/projects/markdown/
+[Markdown]: http://daringfireball.net/projects/markdown/
 [CC-BY-3.0]: http://creativecommons.org/licenses/by/3.0/
 
 
@@ -15,7 +15,7 @@ Bitstream provides a binary data type with a stream interface
 for [Python] [].
 
   - **Binary Data:** the `BitStream` class is a linearly ordered container of bits.
-    The standard library, is only convenient to manage binary data at the byte level. 
+    The standard library is only convenient to manage binary data at the byte level. 
     Consider using BitStream instead, especially you need to address the bit level.
 
   - **Stream Interface:** you can only read data at the start of a stream 
@@ -98,6 +98,7 @@ what one should do depending on the aim.
 [pip]: https://pypi.python.org/pypi/pip
 [virtualenv]: https://pypi.python.org/pypi/virtualenv
 [PyPi]: https://pypi.python.org/pypi/bitstream/
+[GitHub]: https://github.com/boisgera/bitstream
 [setuptools]: https://pypi.python.org/pypi/setuptools
 [distribute]: http://pythonhosted.org/distribute/
 [NumPy]: http://www.numpy.org
