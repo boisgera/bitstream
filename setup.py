@@ -17,7 +17,7 @@ import setuptools
 
 metadata = dict(
   name = "bitstream",
-  version = "1.0.0-alpha.9",
+  version = "1.0.0-alpha.10",
   description = "A Binary Data Type with a Stream Interface",
   url = "https://github.com/boisgera/bitstream",
   author = u"Sébastien Boisgérault",
@@ -46,11 +46,11 @@ if os.path.isfile("setup.cfg"):
     parser.read("setup.cfg")
     try:
         CYTHON = parser.getboolean("global", "cython")
-    except ConfigParser.NoOptionError:
+    except ConfigParser.NoSectionError, ConfigParser.NoOptionError:
         pass
     try:
         REST = parser.getboolean("global", "rest")
-    except ConfigParser.NoOptionError:
+    except ConfigParser.NoSectionError, ConfigParser.NoOptionError:
         pass
 
 def require(module, version=None):
