@@ -24,7 +24,7 @@ import setuptools
 
 metadata = dict(
   name = "bitstream",
-  version = "1.0.0-alpha.12",
+  version = "1.0.0-alpha.13",
   description = "A Binary Data Type with a Stream Interface",
   url = "https://github.com/boisgera/bitstream",
   author = u"Sébastien Boisgérault",
@@ -40,8 +40,8 @@ metadata = dict(
 )
 
 setuptools.Distribution.global_options.extend([
-    ("cython", "c", "compile Cython files"),
-    ("rest"  , "r", "generate reST documentation")
+    ("cython", "", "compile Cython files"),
+    ("rest"  , "", "generate reST documentation")
 ])
 
 
@@ -131,12 +131,7 @@ if __name__ == "__main__":
         install_requires = open("requirements.txt").read().splitlines()
     )
 
-    if "-c" in sys.argv:
-        print "***", sys.argv
-        sys.argv.remove("-c")
-        CYTHON = True
     if "--cython" in sys.argv:
-        print "***", sys.argv
         sys.argv.remove("--cython")
         CYTHON = True
 
@@ -144,9 +139,6 @@ if __name__ == "__main__":
       ext_modules = make_extension()
     )
 
-    if "-r" in sys.argv:
-        sys.argv.remove("-r")
-        REST = True
     if "--rest" in sys.argv:
         sys.argv.remove("--rest")
         REST = True
