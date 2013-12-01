@@ -14,6 +14,9 @@ import tempfile
 # Third-Party Libraries
 import setuptools
 
+# TODO: to build the library, numpy headers (arrayobject.h for example)
+#       are needed, handle that. When setuptools is "playing" with bitstream,
+#       the headers are not installed (yet ?).
 
 metadata = dict(
   name = "bitstream",
