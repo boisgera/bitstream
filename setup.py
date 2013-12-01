@@ -24,7 +24,7 @@ import setuptools
 
 metadata = dict(
   name = "bitstream",
-  version = "1.0.0-alpha.11",
+  version = "1.0.0-alpha.12",
   description = "A Binary Data Type with a Stream Interface",
   url = "https://github.com/boisgera/bitstream",
   author = u"Sébastien Boisgérault",
@@ -132,9 +132,11 @@ if __name__ == "__main__":
     )
 
     if "-c" in sys.argv:
+        print "***", sys.argv
         sys.argv.remove("-c")
         CYTHON = True
     if "--cython" in sys.argv:
+        print "***", sys.argv
         sys.argv.remove("--cython")
         CYTHON = True
 
