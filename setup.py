@@ -39,12 +39,6 @@ metadata = dict(
     ]
 )
 
-setuptools.Distribution.global_options.extend([
-    ("cython", "", "compile Cython files"),
-    ("rest"  , "", "generate reST documentation")
-])
-
-
 CYTHON = None
 REST = None
 
