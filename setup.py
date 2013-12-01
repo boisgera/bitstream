@@ -16,7 +16,11 @@ import setuptools
 
 # TODO: to build the library, numpy headers (arrayobject.h for example)
 #       are needed, handle that. When setuptools is "playing" with bitstream,
-#       the headers are not installed (yet ?).
+#       the headers are not installed (yet ?). Have a look at
+#       <http://mail.scipy.org/pipermail/numpy-discussion/2010-April/049782.html>
+#       Get rid of the install_require approach, check it manually (numpy,
+#       version >= 1.8 and headers location) and document why.
+
 
 metadata = dict(
   name = "bitstream",
