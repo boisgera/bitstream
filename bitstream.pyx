@@ -151,7 +151,7 @@ cdef extern from "Python.h":
 #
 __author__ = u"Sébastien Boisgérault <Sebastien.Boisgerault@mines-paristech.fr>"
 __license__ = "MIT License"
-__version__ = "1.0.0-alpha.10"
+__version__ = "1.0.0-alpha.11"
 
 #
 # BitStream
