@@ -13,6 +13,7 @@ import tempfile
 
 # Third-Party Libraries
 import setuptools
+import numpy as np
 
 
 metadata = dict(
@@ -23,6 +24,7 @@ metadata = dict(
   author = u"Sébastien Boisgérault",
   author_email = "Sebastien.Boisgerault@mines-paristech.fr",
   license = "MIT License",
+  include_dirs = [np.get_include()],
   classifiers = [
     "Development Status :: 3 - Alpha",
     "License :: OSI Approved :: MIT License",
