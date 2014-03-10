@@ -685,23 +685,39 @@ states in the stream ? Maybe ...
 
 Most useful patterns: 
 
-**Avoid copies.** Do read/write stuff on a stream, including some actions that 
-may possibly fail, and keep the original stream intact. Here the snapshot 
-approach avoids a copy of the bitstream. Warning: an use of restore with a 
-state prior to the snaphot in the actions will screw the restoration ...
+**Avoid copies.** Do read/write stuff on a stream and when you're done, 
+restore the original stream intact. Here the snapshot approach avoids a 
+copy of the bitstream. The pattern is a `try/finally` with a snapshot
+restore in the finally clause.
 
     >>> stream = BitStream("ABC")
     >>> snapshot = stream.save()
     >>> try:
+    ...     # turn "ABC" into "BCD"
     ...     _ = stream.read(str, 1)
     ...     stream.write("D")
+    ... finally:
+    ...     stream.restore(snapshot)
+    >>> stream == BitStream("ABC")
+    True
+
+If an exception can be raised during the read/write, the stream is still 
+restored in the original state.
+
+    >>> from bitstream import ReadError
+    >>> stream = BitStream("ABC")
+    >>> snapshot = stream.save()
+    >>> try:
+    ...     # read too much data
     ...     _ = stream.read(str, 4)
-    ... except bitstream.ReadError:
+    ... except ReadError:
     ...     pass
     ... finally:
     ...     stream.restore(snapshot)
     >>> stream == BitStream("ABC")
     True
+
+Remark: the pattern breaks if during the actions, an earlier snapshot is restored.
 
 **Support true exceptions in readers.** Som reading actions may fail, but you
 are not able to tell beforehand, you have to start a sequence of smaller
