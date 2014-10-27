@@ -91,7 +91,7 @@ what one should do depending on the aim.
     to edit the source files, you will also need the [Cython][] compiler, 
     version 0.15.1 or later and will execute instead:
 
-        $ python setup.py install --with-cython
+        $ python setup.py install --cython
 
 [Python 2.7]: http://www.python.org/download/releases/2.7
 [Cython]: http://www.cython.org
