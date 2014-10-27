@@ -18,7 +18,7 @@ import numpy
 
 metadata = dict(
   name = "bitstream",
-  version = "2.0.0-alpha.2",
+  version = "2.0.0-alpha.3",
   description = "A Binary Data Type with a Stream Interface",
   url = "https://github.com/boisgera/bitstream",
   author = u"Sébastien Boisgérault",
