@@ -1302,9 +1302,10 @@ def write_uint8_1_by_1_test_array_cast():
 if __name__ == "__main__":
     import docbench
     import sys
-    docbench.main(filename="./benchmark.py",
-                  format="text", 
-                  profile=False,
-                  output=sys.stdout)
+    docbench.benchmod()
+#    docbench.main(filename="./benchmark.py",
+#                  format="text", 
+#                  profile=False,
+#                  output=sys.stdout)
 
 
