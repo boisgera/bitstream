@@ -72,7 +72,7 @@ def make_extension():
         require("Cython", "0.15.1")
         import Cython
         from Cython.Build import cythonize
-        return cythonize("bitstream.pyx")
+        return cythonize("bitstream.pyx", include_dirs=[numpy.get_include()])
     else:
         if os.path.exists("bitstream.c"):
             return [setuptools.Extension("bitstream", 
