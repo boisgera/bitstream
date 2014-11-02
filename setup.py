@@ -25,7 +25,7 @@ import numpy
 
 metadata = dict(
   name = "bitstream",
-  version = "1.0.0",
+  version = "1.0.1",
   description = "A Binary Data Type with a Stream Interface",
   url = "https://github.com/boisgera/bitstream",
   author = u"Sébastien Boisgérault",
@@ -48,11 +48,11 @@ if os.path.isfile("setup.cfg"):
     parser.read("setup.cfg")
     try:
         CYTHON = parser.getboolean("global", "cython")
-    except ConfigParser.NoSectionError, ConfigParser.NoOptionError:
+    except (ConfigParser.NoOptionError, ConfigParser.NoSectionError):
         pass
     try:
         REST = parser.getboolean("global", "rest")
-    except ConfigParser.NoSectionError, ConfigParser.NoOptionError:
+    except (ConfigParser.NoOptionError, ConfigParser.NoSectionError):
         pass
 
 def require(module, version=None):
@@ -69,7 +69,7 @@ def require(module, version=None):
 
 def make_extension():
     if CYTHON:
-        require("Cython", "0.15.1")
+        require("Cython")
         import Cython
         from Cython.Build import cythonize
         return cythonize("bitstream.pyx", include_dirs=[numpy.get_include()])
@@ -125,7 +125,7 @@ commands = dict(
 if __name__ == "__main__":
 
     # Check Numpy availability but do not try to install it.
-    require("numpy", "1.8.0")
+    require("numpy")
 
     if "--cython" in sys.argv:
         sys.argv.remove("--cython")
