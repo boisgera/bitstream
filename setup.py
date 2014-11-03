@@ -20,10 +20,11 @@ except ImportError:
 import setuptools
 import pkg_resources
 
-# Numpy: check availability
+# Numpy
 try:
     requirement = "numpy"
     pkg_resources.require(requirement)
+    import numpy
 except pkg_resources.DistributionNotFound:
     error = "{0!r} not available".format(requirement)
     raise ImportError(error)
