@@ -13,7 +13,7 @@ import tempfile
 
 # Pip Package Manager
 try:
-    pip
+    import pip
 except ImportError:
     error = "pip is not installed, refer to <{url}> for instructions."
     raise ImportError(error.format(url="http://pip.readthedocs.org"))
