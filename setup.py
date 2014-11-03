@@ -11,14 +11,30 @@ import os.path
 import sys
 import tempfile
 
-# Third-Party Libraries
+# Pip Package Manager
+try:
+    pip
+except ImportError:
+    error = "pip is not installed, refer to <{url}> for instructions."
+    raise ImportError(error.format(url="http://pip.readthedocs.org"))
 import setuptools
-import numpy
+import pkg_resources
 
+# Numpy: check availability
+try:
+    requirement = "numpy"
+    pkg_resources.require(requirement)
+except pkg_resources.DistributionNotFound:
+    error = "{0!r} not available".format(requirement)
+    raise ImportError(error)
 
+#
+# Metadata
+# ------------------------------------------------------------------------------
+#
 metadata = dict(
   name = "bitstream",
-  version = "2.0.3-alpha.3",
+  version = "2.0.3-alpha.4",
   description = "A Binary Data Type with a Stream Interface",
   url = "https://github.com/boisgera/bitstream",
   author = u"Sébastien Boisgérault",
@@ -33,42 +49,53 @@ metadata = dict(
     ]
 )
 
-setuptools.Distribution.global_options.extend([
-    ("cython", "c", "compile Cython files"),
-    ("rest"  , "r", "generate reST documentation")
-])
-
-
+#
+# CYTHON and REST options management (from setup.cfg)
+# ------------------------------------------------------------------------------
+#
 CYTHON = None
 REST = None
 
-if os.path.isfile("setup.cfg"):
-    parser = ConfigParser.ConfigParser()
-    parser.read("setup.cfg")
-    try:
-        CYTHON = parser.getboolean("global", "cython")
-    except (ConfigParser.NoOptionError, ConfigParser.NoSectionError):
-        pass
-    try:
-        REST = parser.getboolean("global", "rest")
-    except (ConfigParser.NoOptionError, ConfigParser.NoSectionError):
-        pass
+setuptools.Distribution.global_options.extend([
+    ("cython", None, "compile Cython files"),
+    ("rest"  , None, "generate reST documentation")
+])
 
-def require(module, version=None):
-    try:
-        _module = importlib.import_module(module)
-    except:
-        error = "The module {0!r} is not available."
-        raise ImportError(error.format(module))
-    if version is not None:
-        Version = distutils.version.LooseVersion
-        if not Version(_module.__version__) >= Version(version):
-            error = "The version of {0!r} should be at least {1}."
-            raise ImportError(error.format(module, version))
+def trueish(value):
+    if not isinstance(value, str):
+        return bool(value)
+    else:
+        value = value.lower()
+        if value in ("y", "yes", "t", "true", "on", "1"):
+            return True
+        elif value in ("", "n", "no", "f", "false", "off", "0"):
+            return False
+        else:
+            raise TypeError("invalid bool value {0!r}, use 'true' or 'false'.")
 
+def import_CYTHON_REST_from_setup_cfg():
+    global CYTHON, REST
+    if os.path.isfile("setup.cfg"):
+        parser = ConfigParser.ConfigParser()
+        parser.read("setup.cfg")
+        try:
+            CYTHON = trueish(parser.get("global", "cython"))
+        except (ConfigParser.NoOptionError, ConfigParser.NoSectionError):
+            pass
+        try:
+            REST = trueish(parser.get("global", "rest"))
+        except (ConfigParser.NoOptionError, ConfigParser.NoSectionError):
+            pass
+
+import_CYTHON_REST_from_setup_cfg()
+
+#
+# Custom developer commands
+# ------------------------------------------------------------------------------
+#
 def make_extension():
     if CYTHON:
-        require("Cython")
+        pkg_resources.require("Cython")
         import Cython
         from Cython.Build import cythonize
         return cythonize("bitstream.pyx", include_dirs=[numpy.get_include()])
@@ -121,39 +148,35 @@ commands = dict(
     )
 )
 
+#
+# Setup
+# ------------------------------------------------------------------------------
+#
 if __name__ == "__main__":
 
-    # Check Numpy availability but do not try to install it.
-    require("numpy")
-
-    if "-c" in sys.argv:
-        sys.argv.remove("-c")
-        CYTHON = True
+    # CYTHON and REST options management (from command-line)
     if "--cython" in sys.argv:
         sys.argv.remove("--cython")
         CYTHON = True
-
-    contents = dict(
-      ext_modules = make_extension()
-    )
-
-    if "-r" in sys.argv:
-        sys.argv.remove("-r")
-        REST = True
     if "--rest" in sys.argv:
         sys.argv.remove("--rest")
         REST = True
+
+    # Execution of custom commands
+    contents = dict(
+      ext_modules = make_extension()
+    )
 
     if REST:
         make_rest()
     metadata["long_description"] = open("manual.rst").read()
 
+    # Assembly of setup arguments
     kwargs = {}
     kwargs.update(metadata)
     kwargs.update(contents)
     kwargs.update(commands)
 
-    print "*** sys.argv:", sys.argv
-    
+    # Setup    
     setuptools.setup(**kwargs)
 
