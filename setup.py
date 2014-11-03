@@ -25,7 +25,7 @@ import numpy
 
 metadata = dict(
   name = "bitstream",
-  version = "1.0.1",
+  version = "1.0.2-alpha.1",
   description = "A Binary Data Type with a Stream Interface",
   url = "https://github.com/boisgera/bitstream",
   author = u"Sébastien Boisgérault",
@@ -147,5 +147,8 @@ if __name__ == "__main__":
     kwargs.update(metadata)
     kwargs.update(contents)
     kwargs.update(commands)
+
+    print "setup:", kwargs
+
     setuptools.setup(**kwargs)
 
