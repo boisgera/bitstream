@@ -11,8 +11,14 @@ import os.path
 import sys
 import tempfile
 
-# Third-Party Libraries
+# Pip Package Manager
+try:
+    import pip
+except ImportError:
+    error = "pip is not installed, refer to <{url}> for instructions."
+    raise ImportError(error.format(url="http://pip.readthedocs.org"))
 import setuptools
+<<<<<<< HEAD
 import numpy
 
 # TODO: to build the library, numpy headers (arrayobject.h for example)
@@ -23,9 +29,24 @@ import numpy
 #       version >= 1.8 and headers location) and document why.
 
 
+import pkg_resources
+
+# Numpy
+try:
+    requirement = "numpy"
+    pkg_resources.require(requirement)
+    import numpy
+except pkg_resources.DistributionNotFound:
+    error = "{0!r} not available".format(requirement)
+    raise ImportError(error)
+
+#
+# Metadata
+# ------------------------------------------------------------------------------
+#
 metadata = dict(
   name = "bitstream",
-  version = "1.0.4",
+  version = "2.1.0-alpha",
   description = "A Binary Data Type with a Stream Interface",
   url = "https://github.com/boisgera/bitstream",
   author = u"Sébastien Boisgérault",
@@ -40,36 +61,54 @@ metadata = dict(
     ]
 )
 
+#
+# CYTHON and REST options management (from setup.cfg)
+# ------------------------------------------------------------------------------
+#
 CYTHON = None
 REST = None
 
-if os.path.isfile("setup.cfg"):
-    parser = ConfigParser.ConfigParser()
-    parser.read("setup.cfg")
-    try:
-        CYTHON = parser.getboolean("global", "cython")
-    except (ConfigParser.NoOptionError, ConfigParser.NoSectionError):
-        pass
-    try:
-        REST = parser.getboolean("global", "rest")
-    except (ConfigParser.NoOptionError, ConfigParser.NoSectionError):
-        pass
+setuptools.Distribution.global_options.extend([
+    ("cython", None, "compile Cython files"),
+    ("rest"  , None, "generate reST documentation")
+])
+>>>>>>> snapshot
 
-def require(module, version=None):
-    try:
-        _module = importlib.import_module(module)
-    except:
-        error = "The module {0!r} is not available."
-        raise ImportError(error.format(module))
-    if version is not None:
-        Version = distutils.version.LooseVersion
-        if not Version(_module.__version__) >= Version(version):
-            error = "The version of {0!r} should be at least {1}."
-            raise ImportError(error.format(module, version))
+def trueish(value):
+    if not isinstance(value, str):
+        return bool(value)
+    else:
+        value = value.lower()
+        if value in ("y", "yes", "t", "true", "on", "1"):
+            return True
+        elif value in ("", "n", "no", "f", "false", "off", "0"):
+            return False
+        else:
+            raise TypeError("invalid bool value {0!r}, use 'true' or 'false'.")
 
+def import_CYTHON_REST_from_setup_cfg():
+    global CYTHON, REST
+    if os.path.isfile("setup.cfg"):
+        parser = ConfigParser.ConfigParser()
+        parser.read("setup.cfg")
+        try:
+            CYTHON = trueish(parser.get("global", "cython"))
+        except (ConfigParser.NoOptionError, ConfigParser.NoSectionError):
+            pass
+        try:
+            REST = trueish(parser.get("global", "rest"))
+        except (ConfigParser.NoOptionError, ConfigParser.NoSectionError):
+            pass
+
+import_CYTHON_REST_from_setup_cfg()
+
+#
+# Custom developer commands
+# ------------------------------------------------------------------------------
+#
 def make_extension():
     if CYTHON:
-        require("Cython")
+        pkg_resources.require("Cython")
         import Cython
         from Cython.Build import cythonize
         return cythonize("bitstream.pyx", include_dirs=[numpy.get_include()])
@@ -122,31 +161,44 @@ commands = dict(
     )
 )
 
+#
+# Setup
+# ------------------------------------------------------------------------------
+#
 if __name__ == "__main__":
 
-    # Check Numpy availability but do not try to install it.
-    require("numpy")
+    # TODO: transform bitstream into a package, include bitstream.pxd as
+    # package data, provide some API to get the path of the pxd file
+    # (such as get_pxd or get_include ? find a project that already does that, 
+    # such as lxml). Then, in the cython packages that depend on the pxd files,
+    # install bitstream as a setup dependency, query the path of the pxd file,
+    # then specify the path with cythonize (i hope that the API allows it).
+    # UPDATE: go for get_include, lxml also uses this pattern (but returns
+    # a list, not a string like numpy)
 
+    # CYTHON and REST options management (from command-line)
     if "--cython" in sys.argv:
         sys.argv.remove("--cython")
         CYTHON = True
-
-    contents = dict(
-      ext_modules = make_extension()
-    )
-
     if "--rest" in sys.argv:
         sys.argv.remove("--rest")
         REST = True
+
+    # Execution of custom commands
+    contents = dict(
+      ext_modules = make_extension()
+    )
 
     if REST:
         make_rest()
     metadata["long_description"] = open("manual.rst").read()
 
+    # Assembly of setup arguments
     kwargs = {}
     kwargs.update(metadata)
     kwargs.update(contents)
     kwargs.update(commands)
 
+    # Setup    
     setuptools.setup(**kwargs)
 

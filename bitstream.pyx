@@ -44,7 +44,7 @@ of a type when the codec has options.
 # justify it). And we also need 'type' (as a type) in a isinstance ...
 import __builtin__
 cdef object __builtin__type = __builtin__.type
-
+import copy
 import doctest
 import hashlib
 import struct
@@ -97,31 +97,12 @@ cdef extern from "Python.h":
 #     the public keyword ... That would be a nice property ... but probably
 #     a performance and maintenance cost. KISS applies here.
 #
-# UPDATE: save / restore state will allow for a true exception mecanism, 
-#         without corruption, to take place, instead of a mere error handling.
 #
+# Update: above is partially obsolete: the snapshot effort is meant to
+#         allow for all potentially stream-corruptiing operations to be
+#         roll-backed, so that the mere error scheme can be converted to
+#         a robust exception scheme.
 
-# TODO: add `save` (returns a (read_offset, write_offset) state) and `restore`
-#       (with state as an argument) or `load` ? We leverage the fact in our
-#       stream model, the data is not immutable, but no information is lost,
-#       only added at the end, so we may always roll back if we need too.
-#
-#       These two methods shall enable a true exception management (not mere
-#       errors, when shit happens, we still have a usable state), AND at the
-#       same time, read-only streams. Maybe higher-level constructs (with
-#       context manager ?) could be useful here to exploit those two schemes.
-#       
-# UPDATE: if we want the save / restor NOT TO CRASH, we have to ensure of two
-#         things
-#
-#         - first that the state stores the id of the stream ... you can't
-#           restore a state that was not created by you.
-#
-#         - secondly, as restore + write break the immutability of the stream,
-#           save/restore pairs should only be applied in reverse order, with
-#           possible drops in the restore. That should be check by the stream.
-#           What I mean is that save 1, save 2, restore 2, restore 1 os OK,
-#           S1, S2, R1 is ok, but S1, S2, R1, S2 is not.
 #  
 # TODO: Consider using the Numpy C API instead of casting with array.
 #       (see <http://docs.scipy.org/doc/numpy/reference/c-api.array.html>)
@@ -151,7 +132,6 @@ cdef extern from "Python.h":
 #
 __author__ = u"Sébastien Boisgérault <Sebastien.Boisgerault@mines-paristech.fr>"
 __license__ = "MIT License"
-__version__ = "1.0.0"
 
 #
 # BitStream
@@ -203,20 +183,20 @@ cdef object one  = 1
 cdef class BitStream:
     """
     BitStream Class
-    """
-    cdef unsigned char *_bytes
-    cdef size_t _num_bytes
-    cdef unsigned long long _read_offset
-    cdef unsigned long long _write_offset
-
-    cdef dict readers    
-    cdef dict writers
-    
+    """    
     def __cinit__(self):
         self._read_offset = 0
         self._write_offset = 0
         self._num_bytes = 0
         self._bytes = NULL
+
+        cdef State state = State.__new__(State)
+        state._stream = self
+        state._read_offset = self._read_offset
+        state._write_offset = self._write_offset
+        state._id = self._state_id
+        self._states = [state]
+        self._state_id = 0
 
     def __init__(self, *args, **kwargs):
         if args or kwargs:
@@ -225,7 +205,7 @@ cdef class BitStream:
     def __len__(self):
         return self._write_offset - self._read_offset
 
-    cpdef int _extend(self, size_t num_bits) except -1:
+    cpdef int _extend(BitStream self, size_t num_bits) except -1:
         """
         Make room for `num_bits` extra bits into the stream.
 
@@ -249,7 +229,7 @@ cdef class BitStream:
 #       *kwargs and get the info (and validate the stuff ?). Does it
 #       destroy the cases where the function could be called as a C
 #       function ?
-    cpdef write(self, data, type=None):
+    cpdef write(BitStream self, data, type=None):
         cdef size_t length
         cdef int auto_detect = 0
         type_error = "unsupported type {0!r}."
@@ -316,7 +296,7 @@ cdef class BitStream:
                 writer = writer_factory(instance)
             writer(self, data)
 
-    cpdef read(self, type=None, n=None): 
+    cpdef read(BitStream self, type=None, n=None): 
         if (type is None or isinstance(type, int)) and n is None:
             n = type
             type = BitStream
@@ -372,7 +352,7 @@ cdef class BitStream:
             bools.append(bool(self._bytes[byte_index] & mask))
         return "".join([str(int(bool_)) for bool_ in bools])
 
-    cpdef copy(self, n=None):
+    cpdef copy(BitStream self, n=None):
         cdef unsigned long long read_offset = self._read_offset
         copy = read_bitstream(self, n)
         self._read_offset = read_offset
@@ -393,22 +373,81 @@ cdef class BitStream:
         bools  = copy.read(bool, len(copy))
         return hash((hashlib.sha1(uint8s).hexdigest(), tuple(bools)))
 
-    def __richcmp__(self, other, int operation):
+    def __richcmp__(BitStream self, other, int operation):
         # see http://docs.cython.org/src/userguide/special_methods.html
+        cdef boolean equal
         if operation not in (2, 3):
             raise NotImplementedError()
-        s1 = self.copy() # read_only would be better ...
-        s2 = other.copy() # test for type, 
-        equal = all(s1.read(numpy.uint8, len(s1) / 8) == s2.read(numpy.uint8, len(s2) / 8)) and\
-                (s1.read(bool, len(s1)) == s2.read(bool, len(s2)))
+        if not isinstance(other, BitStream):
+            equal = false
+        else:
+           s1 = self.copy() # read_only would be better ...
+           s2 = other.copy() # test for type, 
+           equal = all(s1.read(numpy.uint8, len(s1) / 8) == s2.read(numpy.uint8, len(s2) / 8)) and\
+                   (s1.read(bool, len(s1)) == s2.read(bool, len(s2)))
         if operation == 2:
             return equal
         else:
             return not equal
 
+    cpdef State save(BitStream self):
+        cdef State state
+        state = self._states[-1]
+        if state._read_offset != self._read_offset or \
+           state._write_offset != self._write_offset:
+            self._state_id = self._state_id + 1
+            # Fast instantiation (<http://docs.cython.org/src/userguide/extension_types.html>)
+            state = State.__new__(State)
+            # For some reason, setting the state data in constructors would
+            # trigger the (slow) conversion of these data to Python objects.
+            # That may have been corrected in late 0.19.x versions of Cython.
+            state._stream = self
+            state._read_offset = self._read_offset
+            state._write_offset = self._write_offset
+            state._id = self._state_id
+            self._states.append(state)
+        return state
+
+    cpdef restore(BitStream self, State state):
+        if self is not state._stream:
+            raise ValueError("the state does not belong to this stream.")
+        # The restore action may fail, so we work on a copy of the saved states.
+        states = copy.copy(self._states)
+        while states:
+            if state == <State>states[-1]:
+                self._read_offset  = state._read_offset
+                self._write_offset = state._write_offset
+                self._states = states
+                break
+            else:
+                states.pop()
+        else:
+            raise ValueError("this state is not saved in the stream.")
+
     def __dealloc__(self):
         free(self._bytes)
 
+#
+# Bitstream State
+# ------------------------------------------------------------------------------
+#
+
+cdef class State: # treat as opaque and immutable.
+
+    def __richcmp__(self, State other, int operation):
+        # see http://docs.cython.org/src/userguide/special_methods.html
+        cdef boolean equal
+        if operation not in (2, 3):
+            raise NotImplementedError()
+        # BUG: the state attribute access is not optimized ... Why ?
+        equal = self._stream is other._stream and \
+                self._read_offset == other._read_offset and \
+                self._write_offset == other._write_offset and \
+                self._id == other._id
+        if operation == 2:
+            return equal
+        else:
+            return not equal
 #
 # Bool Reader / Writer
 # ------------------------------------------------------------------------------
