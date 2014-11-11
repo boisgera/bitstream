@@ -18,7 +18,6 @@ except ImportError:
     error = "pip is not installed, refer to <{url}> for instructions."
     raise ImportError(error.format(url="http://pip.readthedocs.org"))
 import setuptools
-<<<<<<< HEAD
 import numpy
 
 # TODO: to build the library, numpy headers (arrayobject.h for example)
