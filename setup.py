@@ -161,6 +161,8 @@ if __name__ == "__main__":
     # such as lxml). Then, in the cython packages that depend on the pxd files,
     # install bitstream as a setup dependency, query the path of the pxd file,
     # then specify the path with cythonize (i hope that the API allows it).
+    # UPDATE: go for get_include, lxml also uses this pattern (but returns
+    # a list, not a string like numpy)
 
     # CYTHON and REST options management (from command-line)
     if "--cython" in sys.argv:
