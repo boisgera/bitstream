@@ -109,14 +109,15 @@ def make_extension():
         pkg_resources.require("Cython")
         import Cython
         from Cython.Build import cythonize
-        return cythonize("bitstream.pyx", include_dirs=[numpy.get_include()])
+        return cythonize("bitstream/__init__.pyx", 
+                          include_dirs=[numpy.get_include()])
     else:
-        if os.path.exists("bitstream.c"):
+        if os.path.exists("bitstream/__init__.c"):
             return [setuptools.Extension("bitstream", 
-                                         sources=["bitstream.c"],
+                                         sources=["bitstream/__init__.c"],
                                          include_dirs=[numpy.get_include()])]
         else:
-            error = "file not found: 'bitstream.c'"
+            error = "file not found: 'bitstream/__init__.c'"
             raise IOError(error)
 
 def make_rest():
@@ -185,6 +186,10 @@ if __name__ == "__main__":
     # Execution of custom commands
     contents = dict(
       ext_modules = make_extension()
+    )
+
+    data = dict(
+      package_data = {"bitstream": ["bitstream.pxd"]}
     )
 
     if REST:

@@ -1,7 +1,6 @@
 include manual.txt
 include manual.rst
 include benchmark.py
-include bitstream.pxd
 
 exclude setup.cfg
 
