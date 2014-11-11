@@ -71,7 +71,6 @@ setuptools.Distribution.global_options.extend([
     ("cython", None, "compile Cython files"),
     ("rest"  , None, "generate reST documentation")
 ])
->>>>>>> snapshot
 
 def trueish(value):
     if not isinstance(value, str):
