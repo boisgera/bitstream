@@ -181,22 +181,10 @@ cdef type ndarray = numpy.ndarray
 cdef object zero = 0
 cdef object one  = 1
 
-cdef class State
-
 cdef class BitStream:
     """
     BitStream Class
-    """
-    cdef unsigned char *_bytes
-    cdef size_t _num_bytes
-    cdef unsigned long long _read_offset
-    cdef unsigned long long _write_offset
-    cdef public list _states
-    cdef unsigned int _state_id
-
-    cdef dict readers    
-    cdef dict writers
-    
+    """    
     def __cinit__(self):
         self._read_offset = 0
         self._write_offset = 0
@@ -218,7 +206,7 @@ cdef class BitStream:
     def __len__(self):
         return self._write_offset - self._read_offset
 
-    cpdef int _extend(self, size_t num_bits) except -1:
+    cpdef int _extend(BitStream self, size_t num_bits) except -1:
         """
         Make room for `num_bits` extra bits into the stream.
 
@@ -242,7 +230,7 @@ cdef class BitStream:
 #       *kwargs and get the info (and validate the stuff ?). Does it
 #       destroy the cases where the function could be called as a C
 #       function ?
-    cpdef write(self, data, type=None):
+    cpdef write(BitStream self, data, type=None):
         cdef size_t length
         cdef int auto_detect = 0
         type_error = "unsupported type {0!r}."
@@ -309,7 +297,7 @@ cdef class BitStream:
                 writer = writer_factory(instance)
             writer(self, data)
 
-    cpdef read(self, type=None, n=None): 
+    cpdef read(BitStream self, type=None, n=None): 
         if (type is None or isinstance(type, int)) and n is None:
             n = type
             type = BitStream
@@ -365,7 +353,7 @@ cdef class BitStream:
             bools.append(bool(self._bytes[byte_index] & mask))
         return "".join([str(int(bool_)) for bool_ in bools])
 
-    cpdef copy(self, n=None):
+    cpdef copy(BitStream self, n=None):
         cdef unsigned long long read_offset = self._read_offset
         copy = read_bitstream(self, n)
         self._read_offset = read_offset
@@ -446,21 +434,6 @@ cdef class BitStream:
 #
 
 cdef class State: # treat as opaque and immutable.
-    cdef readonly BitStream _stream
-    cdef readonly unsigned long long _read_offset
-    cdef readonly unsigned long long _write_offset
-    cdef readonly unsigned int _id
-
-#    def __cinit__(self, BitStream stream, 
-#                        unsigned long long _read_offset, 
-#                        unsigned long long _write_offset, 
-#                        unsigned int _id):
-#        self._stream = stream
-#        self._read_offset = _read_offset
-#        self._write_offset = _write_offset
-#        self._id = _id
-
-# TODO: hash
 
     def __richcmp__(self, State other, int operation):
         # see http://docs.cython.org/src/userguide/special_methods.html
