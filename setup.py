@@ -45,7 +45,7 @@ except pkg_resources.DistributionNotFound:
 #
 metadata = dict(
   name = "bitstream",
-  version = "2.1.0-alpha.2",
+  version = "2.1.0-alpha.3",
   description = "A Binary Data Type with a Stream Interface",
   url = "https://github.com/boisgera/bitstream",
   author = u"Sébastien Boisgérault",
@@ -113,7 +113,7 @@ def make_extension():
                          include_path=[numpy.get_include()])
     else:
         if os.path.exists("bitstream/__init__.c"):
-            return [setuptools.Extension("bitstream", 
+            return [setuptools.Extension("bitstream.__init__", 
                                          sources=["bitstream/__init__.c"],
                                          include_dirs=[numpy.get_include()])]
         else:
