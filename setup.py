@@ -45,7 +45,7 @@ except pkg_resources.DistributionNotFound:
 #
 metadata = dict(
   name = "bitstream",
-  version = "2.1.0-alpha",
+  version = "2.1.0-alpha.1",
   description = "A Binary Data Type with a Stream Interface",
   url = "https://github.com/boisgera/bitstream",
   author = u"Sébastien Boisgérault",
@@ -109,8 +109,13 @@ def make_extension():
         pkg_resources.require("Cython")
         import Cython
         from Cython.Build import cythonize
-        return cythonize("bitstream/__init__.pyx", 
-                          include_dirs=[numpy.get_include()])
+        exts = cythonize("bitstream/__init__.pyx", 
+                          include_dirs=[numpy.get_include()]) # does NOT
+        # get included in the resulting extension ... (???) do it manually ?
+        print "***", exts[0].name #= "bitstream" # otherwise, this is __init__
+        # now, bitstream.so and __init__.so are deployed in the egg ... wtf ?
+        # Have a look at how the "lpdec" project is doing, that seems to work ...
+        return exts
     else:
         if os.path.exists("bitstream/__init__.c"):
             return [setuptools.Extension("bitstream", 
@@ -164,6 +169,10 @@ commands = dict(
 # Setup
 # ------------------------------------------------------------------------------
 #
+
+# BUG: there is still a conflict between the "package" version of bitstream
+# (that contains the package data) and the extension module.
+
 if __name__ == "__main__":
 
     # TODO: transform bitstream into a package, include bitstream.pxd as
@@ -184,12 +193,21 @@ if __name__ == "__main__":
         REST = True
 
     # Execution of custom commands
+
+    #ake_extension()
+
     contents = dict(
-      ext_modules = make_extension()
+      packages = ["bitstream"],
+      ext_modules = make_extension(),
+      zip_safe = False,
     )
 
     data = dict(
-      package_data = {"bitstream": ["bitstream.pxd"]}
+      package_data = {"bitstream": ["__init__.pxd"]}
+    )
+
+    requirements = dict(
+      install_requires = ["setuptools"]
     )
 
     if REST:
@@ -200,6 +218,7 @@ if __name__ == "__main__":
     kwargs = {}
     kwargs.update(metadata)
     kwargs.update(contents)
+    kwargs.update(data)
     kwargs.update(commands)
 
     # Setup    
