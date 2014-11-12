@@ -44,15 +44,21 @@ of a type when the codec has options.
 # justify it). And we also need 'type' (as a type) in a isinstance ...
 import __builtin__
 cdef object __builtin__type = __builtin__.type
+import atexit
 import copy
 import doctest
 import hashlib
+import os.path
+import shutil
 import struct
 import sys
+import tempfile
 import timeit
 
 # Third Party Libraries
 import numpy
+import setuptools
+import pkg_resources
 
 # Cython
 cimport cython
@@ -132,6 +138,29 @@ cdef extern from "Python.h":
 #
 __author__ = u"Sébastien Boisgérault <Sebastien.Boisgerault@mines-paristech.fr>"
 __license__ = "MIT License"
+
+#
+# Cython Interface
+# ------------------------------------------------------------------------------
+#
+
+_include = None
+
+def get_include():
+    "Return a path to a directory that contains the bitstream pxd file"
+    global _include
+    if _include is None:
+        original_pxd = pkg_resources.resource_filename("bitstream", "__init__.pxd")
+        _include = tempfile.mkdtemp()
+        shutil.copy(original_pxd, os.path.join(_include, "bitstream.pxd"))
+    return _include
+
+def _cleanup():
+    pkg_resources.cleanup_resources()
+    if _include is not None:
+        shutil.rmtree(_include)
+
+atexit.register(_cleanup)
 
 #
 # BitStream

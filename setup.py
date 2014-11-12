@@ -45,7 +45,7 @@ except pkg_resources.DistributionNotFound:
 #
 metadata = dict(
   name = "bitstream",
-  version = "2.1.0-alpha.1",
+  version = "2.1.0-alpha.2",
   description = "A Binary Data Type with a Stream Interface",
   url = "https://github.com/boisgera/bitstream",
   author = u"Sébastien Boisgérault",
@@ -109,13 +109,8 @@ def make_extension():
         pkg_resources.require("Cython")
         import Cython
         from Cython.Build import cythonize
-        exts = cythonize("bitstream/__init__.pyx", 
-                          include_dirs=[numpy.get_include()]) # does NOT
-        # get included in the resulting extension ... (???) do it manually ?
-        print "***", exts[0].name #= "bitstream" # otherwise, this is __init__
-        # now, bitstream.so and __init__.so are deployed in the egg ... wtf ?
-        # Have a look at how the "lpdec" project is doing, that seems to work ...
-        return exts
+        return cythonize("bitstream/__init__.pyx", 
+                         include_path=[numpy.get_include()])
     else:
         if os.path.exists("bitstream/__init__.c"):
             return [setuptools.Extension("bitstream", 
@@ -197,7 +192,7 @@ if __name__ == "__main__":
     #ake_extension()
 
     contents = dict(
-      packages = ["bitstream"],
+      packages = setuptools.find_packages(),
       ext_modules = make_extension(),
       zip_safe = False,
     )

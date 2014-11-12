@@ -1,3 +1,6 @@
+include bitstream/__init__.c
+include bitstream/__init__.pyx
+
 include manual.txt
 include manual.rst
 include benchmark.py
