@@ -7,5 +7,5 @@ before_install:
 install: 
   - sudo python setup.py --cython install
 script: 
-  - "python -m doctest manual.txt" 
+  - python -m doctest manual.txt
 
