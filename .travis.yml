@@ -8,7 +8,7 @@ before_install:
   - bash conda.sh -b -p conda
   - conda/bin/conda install -y numpy cython
 install: 
-  - "/conda/bin/python setup.py --cython install"
+  - "conda/bin/python setup.py --cython install"
 script: 
   - "conda/bin/python -m doctest manual.txt" 
 
