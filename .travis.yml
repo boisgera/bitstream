@@ -11,7 +11,5 @@ install:
   - sudo python setup.py --cython install
 
 script: 
-  - python -c "import bitstream; print bitstream"
-  - python -c "from bitstream import BitStream; print BitStream"
-  - python -m doctest manual.txt
+  - mkdir test && cd test && python -m doctest ../manual.txt
 
