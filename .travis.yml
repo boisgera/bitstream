@@ -13,5 +13,9 @@ install:
 
 script: 
   - ls
-  - mkdir test && cd test && python -m doctest ../manual.txt
+  - pwd
+  - cd /tmp && mkdir test && cd test && python -c "import bitstream"
+  - ls
+  - cd /tmp && mkdir test && cd test && python -c "from bitstream import BitStream"
+#  - mkdir test && cd test && python -m doctest ../manual.txt
 
