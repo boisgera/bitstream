@@ -1,29 +1,3 @@
-Binary Data Stream
-
-Overview
-================================================================================
-
-**TODO**
-
-Quickstart
-================================================================================
-
- 1. Install wish with pip ([instructions](installation)).
-
- 
-------
-
-
-Most of the features of bitstream are available via the `BitStream` class.
-
-    >>> from bitstream import BitStream
-
-The module is tightly integrated with the [NumPy][NumPy] library. 
-For convenience, we import all symbols from its top-level module.
-
-    >>> from numpy import *
-
-
 
 Overview of Bitstream Features
 ================================================================================ 
