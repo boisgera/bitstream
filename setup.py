@@ -109,8 +109,10 @@ def make_extension():
         pkg_resources.require("Cython")
         import Cython
         from Cython.Build import cythonize
-        return cythonize("bitstream/__init__.pyx", 
-                         include_path=[numpy.get_include()])
+        extensions = cythonize("bitstream/__init__.pyx", 
+                               include_path=[numpy.get_include()])
+        extensions[0].include_dirs=[numpy.get_include()]
+        return extensions
     else:
         if os.path.exists("bitstream/__init__.c"):
             return [setuptools.Extension("bitstream.__init__", 
