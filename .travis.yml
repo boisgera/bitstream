@@ -1,12 +1,17 @@
 language: python
+
 python:
   - "2.7"
+
 before_install:
   - sudo apt-get update 
   - sudo apt-get install -y python-numpy cython
+
 install: 
   - sudo python setup.py --cython install
+
 script: 
   - python -c "import bitstream; print bitstream"
+  - python -c "from bitstream import BitStream; print BitStream"
   - python -m doctest manual.txt
 
