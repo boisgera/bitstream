@@ -1,15 +1,15 @@
-sudo: required
+sudo: false
 dist: trusty
-language: python
-python:
-  - 2.7
+language: bash
 
 before_install:
-  - sudo apt-get update 
-  - sudo apt-get install -y python-pip python-numpy cython
+  - curl http://repo.continuum.io/miniconda/Miniconda3-3.7.0-Linux-x86_64.sh > conda.sh
+  - bash conda.sh -b -p /conda
+  - /conda/bin/conda install sudo apt-get install numpy cython
+  - export PATH=/conda/bin:$PATH
 
 install: 
-  - sudo python setup.py --cython install
+  - python setup.py --cython install
 
 script: 
   - ls
