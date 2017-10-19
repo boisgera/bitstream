@@ -4,7 +4,8 @@ python:
 before_install:
   - sudo apt-get update 
   - sudo apt-get install -y bash curl
-  - curl https://repo.continuum.io/miniconda/Miniconda2-latest-Linux-x86_64.sh | bash
+  - curl https://repo.continuum.io/miniconda/Miniconda2-latest-Linux-x86_64.sh > conda.sh
+  - bash conda.sh
   - export PATH="$HOME/miniconda/bin:$PATH"
   - conda install -y numpy
 install: 
