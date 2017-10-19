@@ -3,12 +3,9 @@ python:
   - "2.7"
 before_install:
   - sudo apt-get update 
-  - sudo apt-get install -y bash curl
-  - curl https://repo.continuum.io/miniconda/Miniconda2-latest-Linux-x86_64.sh > conda.sh
-  - bash conda.sh -b -p conda
-  - conda/bin/conda install -y numpy cython
+  - sudo apt-get install python2.7 python-numy cython
 install: 
-  - "conda/bin/python setup.py --cython install"
+  - "sudo python setup.py --cython install"
 script: 
-  - "conda/bin/python -m doctest manual.txt" 
+  - "python -m doctest manual.txt" 
 
