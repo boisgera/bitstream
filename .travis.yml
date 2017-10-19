@@ -7,6 +7,8 @@ before_install:
   - curl https://repo.continuum.io/miniconda/Miniconda2-latest-Linux-x86_64.sh > conda.sh
   - bash conda.sh -b
   - export PATH="$HOME/miniconda/bin:$PATH"
+  - echo $PATH
+  - which conda
   - conda install -y numpy
 install: 
   - "pip install ."
