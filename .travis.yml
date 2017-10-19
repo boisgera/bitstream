@@ -3,7 +3,7 @@ python:
   - "2.7"
 before_install:
   - sudo apt-get update 
-  - sudo apt-get install python2.7 python-numy cython
+  - sudo apt-get install -y python2.7 python-numy cython
 install: 
   - "sudo python setup.py --cython install"
 script: 
