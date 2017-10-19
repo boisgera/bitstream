@@ -7,5 +7,6 @@ before_install:
 install: 
   - sudo python setup.py --cython install
 script: 
+  - python -c "import bitstream; print bitstream"
   - python -m doctest manual.txt
 
