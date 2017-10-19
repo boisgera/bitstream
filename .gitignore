@@ -4,7 +4,6 @@
 *.c
 *.so
 *.rst
-*.html
 *.pdf
 *.egg-info
 /build
