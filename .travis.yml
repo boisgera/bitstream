@@ -4,9 +4,9 @@ language: bash
 
 before_install:
   - curl https://repo.continuum.io/miniconda/Miniconda2-latest-Linux-x86_64.sh > conda.sh
-  - bash conda.sh -b -p /conda
-  - /conda/bin/conda install numpy cython
-  - export PATH=/conda/bin:$PATH
+  - bash conda.sh -b -p $HOME/conda
+  - $HOME/conda/bin/conda install numpy cython
+  - export PATH=$HOME/conda/bin:$PATH
 
 install: 
   - python setup.py --cython install
