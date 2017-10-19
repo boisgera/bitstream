@@ -207,7 +207,7 @@ if __name__ == "__main__":
 
     if REST:
         make_rest()
-    if os.path.is_file("manual.rst"):
+    if os.path.isfile("manual.rst"):
         metadata["long_description"] = open("manual.rst").read()
 
     # Assembly of setup arguments
