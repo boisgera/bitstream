@@ -1,0 +1,23 @@
+site_name: BitStream
+
+docs_dir: mkdocs
+
+site_dir: docs
+
+pages:
+  - Getting Started: index.md
+#  - Reference: reference.md
+
+theme: "material" 
+
+markdown_extensions:
+  - admonition
+  - toc(permalink=true)
+  - footnotes
+
+
+
+repo_name: "bitstream"
+repo_url: "https://github.com/boisgera/bitstream"
+
+
