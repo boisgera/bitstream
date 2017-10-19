@@ -14,8 +14,9 @@ install:
 script: 
   - ls
   - pwd
-  - cd $HOME && ls && python -c "import bitstream"
-  - ls
-  - cd $HOME && ls && python -c "from bitstream import BitStream"
+  - cd $HOME && ls 
+  - cd $HOME && python -c "import bitstream"
+  - python -c "import sys; print sys.path"
+  - cd $HOME && && python -c "from bitstream import BitStream"
 #  - mkdir test && cd test && python -m doctest ../manual.txt
 
