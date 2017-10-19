@@ -5,13 +5,12 @@ before_install:
   - sudo apt-get update 
   - sudo apt-get install -y bash curl
   - curl https://repo.continuum.io/miniconda/Miniconda2-latest-Linux-x86_64.sh > conda.sh
-  - mkdir miniconda
-  - bash conda.sh -b -p miniconda
-  - miniconda/bin/conda install -y numpy
+  - bash conda.sh -b -p conda
+  - conda/bin/conda install -y numpy
   - pwd
   - ls
 install: 
   - "pip install ."
 script: 
-  - "miniconda/bin/python -m doctest manual.txt" 
+  - "conda/bin/python -m doctest manual.txt" 
 
