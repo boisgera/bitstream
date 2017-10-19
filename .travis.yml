@@ -10,6 +10,5 @@ before_install:
 install: 
   - "pip install ."
 script: 
-  - #export PATH="$HOME/miniconda/bin:$PATH"
-  - "python -m doctest manual.txt"
+  - "python -m doctest manual.txt" 
 
