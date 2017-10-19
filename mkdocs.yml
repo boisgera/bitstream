@@ -6,7 +6,7 @@ site_dir: docs
 
 pages:
   - Getting Started: index.md
-#  - Reference: reference.md
+  - Installation: installation.md
 
 theme: "material" 
 
