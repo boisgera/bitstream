@@ -17,6 +17,6 @@ script:
   - cd $HOME && ls 
   - cd $HOME && python -c "import bitstream"
   - python -c "import sys; print sys.path"
-  - cd $HOME && && python -c "from bitstream import BitStream"
+  - cd $HOME && python -c "from bitstream import BitStream"
 #  - mkdir test && cd test && python -m doctest ../manual.txt
 
