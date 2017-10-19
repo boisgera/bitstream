@@ -12,5 +12,5 @@ install:
   - python setup.py --cython install
 
 script: 
-  - python -m doctest -v manual.txt
+  - python -m doctest manual.txt
 
