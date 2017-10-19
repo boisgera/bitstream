@@ -8,8 +8,7 @@ before_install:
   - $HOME/conda/bin/conda install -y numpy cython
   - export PATH=$HOME/conda/bin:$PATH
 
-install: 
-  - python -c "import numpy; print numpy.get_include()"
+install:
   - python setup.py --cython install
 
 script: 
