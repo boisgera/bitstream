@@ -6,11 +6,9 @@ before_install:
   - sudo apt-get install -y bash curl
   - curl https://repo.continuum.io/miniconda/Miniconda2-latest-Linux-x86_64.sh > conda.sh
   - bash conda.sh -b -p conda
-  - conda/bin/conda install -y numpy
-  - pwd
-  - ls
+  - conda/bin/conda install -y numpy cython
 install: 
-  - "pip install ."
+  - "/conda/bin/python setup.py --cython install"
 script: 
   - "conda/bin/python -m doctest manual.txt" 
 
