@@ -1,137 +1,249 @@
 
-Snapshots (Bitstream state)
+Snapshots
 ================================================================================
 
-(random thought for the moment, fondations for the design of snapshots:)
+A stream is a simple model to deal with binary data,
+but sometimes you need more: you want to perform some lookahead without 
+changing the stream or you want to try some read/write operations 
+but go back to the initial state if they fail. 
+At this stage, you probably have copies of streams 
+everywhere and the stream interface seems very cumbersome.
 
-**TODO:** sort doc material vs dev comments, dispatch, polish.
-
-terms: snapshot (state ?), save, restore.
-
-
-**Goals:** 
-
-  - for the implementation and error API point of view: give a mechanism to roll
-    back all operations that may end up with a "corrupted" stream (stream
-    content has changed but cannot deliver what the read asked for), so
-    that the mere error scheme that we have now on reader can be upgraded
-    to a real exception handling mechansim: if a read fails, the stream
-    state hasn't changed.
-
-  - offer the user with read-only and on-demand roll-back features.
+Therefore, we provide snapshots, a simple solution for these
+use cases that doesn't require copies of streams:
+you can save the state of a stream at any 
+stage in a sequence of read/write operations and restore 
+any such state later if you need it.
 
 
-Add `save` (returns a (read_offset, write_offset) state) and `restore`
-(with state as an argument) or `load` ? We leverage the fact in our
-stream model, the data is not immutable, but no information is lost,
-only added at the end, so we may always roll back if we need too.
+Lookahead
+--------------------------------------------------------------------------------
 
-These two methods shall enable a true exception management (not mere
-errors, when shit happens, we still have a usable state), AND at the
-same time, read-only streams. Maybe higher-level constructs (with
-context manager ?) could be useful here to exploit those two schemes.
-       
-UPDATE: if we want the save / restor NOT TO CRASH, we have to ensure of two
-things
+The type of binary data can usually be identified by a specific header
+coded in its first few bytes.
+For example, [WAVE] audio can be detected with the function:
 
-  - first that the state stores the id of the stream ... you can't
-    restore a state that was not created by you.
+[WAVE]: https://en.wikipedia.org/wiki/WAV
 
-  - secondly, as restore + write break the immutability of the stream,
-    save/restore pairs should only be applied in reverse order, with
-    possible drops in the restore. That should be check by the stream.
-    What I mean is that save 1, save 2, restore 2, restore 1 os OK,
-    S1, S2, R1 is ok, but S1, S2, R1, S2 is not.
+    >>> from bitstream import BitStream, ReadError
 
-Design: `State` class with ref to the stream attribute, `read_offset`,
-`write_offset`, implements the comparison (?). Not that simple. The idea
-behind the comparison is that you should always be able to restore an
-OLDER snapshot but actually if you think of it, that's older in the 
-story of emission of snapshots. So you also have to embed a snapshot 
-number and base your comparison on that. As a consequence, bitstream
-instances have nothing to store but a snapshot number (the number of
-the snapshot that was emitted, or 0 if no snapshot was). No, this is
-more complex, requires some thinking. Need to track all restorable
-states in the stream ? Maybe ...
+    >>> def is_wave(stream):
+    ...    try:
+    ...        riff = stream.read(str, 4)
+    ...        _ = stream.read(str, 4)
+    ...        wave = stream.read(str, 4)
+    ...        return (riff == "RIFF") and (wave == "WAVE")
+    ...    except ReadError:
+    ...        return False
+    
+The contents of an empty single-channel 44.1 kHz WAVE audio file are for example
 
-**TODO.** basic doctest.
+    >>> wave = 'RIFF$\x00\x00\x00WAVEfmt \x10\x00\x00\x00\x01\x00\x01\x00D\xac\x00\x00\x88X\x01\x00\x02\x00\x10\x00data\x00\x00\x00\x00'
+
+The function `is_wave` above works as expected at first at first
+
+    >>> stream = BitStream(wave)
+    >>> is_wave(stream)
+    True
+
+but another attempt gives an incorrect answer:
+
+    >>> is_wave(stream)
+    False
+
+The explanation is simple: to identify the header of a WAVE file,
+we need to consume the first 12 bytes in the stream. 
+Since this header is missing from the stream afterwards, 
+the new attempt fails.
+
+To solve this issue, 
+it's possible to make `is_wave` perform a (partial) copy of the stream 
+and perform the check on the copy, leaving the initial 
+stream unchanged. 
+However in general this approach may be cumbersome;
+copies should also be avoided when possible for performance reasons.
+
+Bitstream also supports snapshots, 
+a better way to deal with lookaheads.
+With them you can:
+
+  - save the state of a stream at any time, 
+
+  - perform arbitrary operations on it and then 
+
+  - restore its initial state.
+
+The implementation of `is_wave` that does this is plain;
+we just make sure that whatever happens 
+(even an error in the processing) 
+the original state of the stream is restored at the end. 
+
+    >>> def is_wave(stream):
+    ...     snapshot = stream.save()
+    ...     try:
+    ...         riff = stream.read(str, 4)
+    ...         _ = stream.read(str, 4)
+    ...         wave = stream.read(str, 4)
+    ...         return (riff == "RIFF") and (wave == "WAVE")
+    ...     except ReadError:
+    ...         return False
+    ...     finally:
+    ...         stream.restore(snapshot)
+
+This version works as expected:
+
+    >>> wave = 'RIFF$\x00\x00\x00WAVEfmt \x10\x00\x00\x00\x01\x00\x01\x00D\xac\x00\x00\x88X\x01\x00\x02\x00\x10\x00data\x00\x00\x00\x00'
+    >>> stream = BitStream(wave)
+    >>> copy = stream.copy()
+    >>> is_wave(stream)
+    True
+    >>> stream == copy
+    True
+    >>> is_wave(stream)
+    True
+
+
+
+Exception Safety
+--------------------------------------------------------------------------------
+
+Consider the toy DNA reader below:
+
+    >>> def DNA_read(stream, n=1):
+    ...     DNA_bases = "ACGT"
+    ...     bases = []
+    ...     for i in range(n):
+    ...         base = stream.read(str, 1)
+    ...         if base not in DNA_bases:
+    ...             error = "invalid base {0!r}".format(base)
+    ...             raise ReadError(error)
+    ...         else:
+    ...             bases.append(base)
+    ...     return "".join(bases)
+
+
+It reads DNA sequences represented as strings of 
+`'A'`, `'C'`, `'G'` and `'T'` characters:
+
+    >>> dna = BitStream("GATA")
+    >>> DNA_read(dna, 4)
+    'GATA'
+
+If there is a `'U'` in the sequence, this is an error since
+the [uracil base](https://en.wikipedia.org/wiki/Nucleobase) 
+is only found in RNA.
+
+    >>> stream = BitStream("GAUTA") # invalid DNA sequence
+
+The DNA reader correctly rejects the code
+
+    >>> DNA_read(stream, 4)
+    Traceback (most recent call last):
+    ...
+    ReadError: invalid base 'U'
+
+but the initial stream is partially consumed in the process:
+
+    >>> stream.read(str)
+    'TA'
+
+This implementation therefore only provides some basic exception safety.
+A reader that preserves the original value of the stream when an error
+occurs would provide [strong exception safety](https://en.wikipedia.org/wiki/Exception_safety) instead.
+With snapshots, the modifications required to support this 
+are plain: we simply restore the original stream whenever an
+error occurs
+
+    >>> def DNA_read(stream, n=1):
+    ...     DNA_bases = "ACGT"
+    ...     snapshot = stream.save()
+    ...     try:
+    ...         bases = []
+    ...         for i in range(n):
+    ...             base = stream.read(str, 1)
+    ...             if base not in DNA_bases:
+    ...                 error = "invalid base {0!r}".format(base)
+    ...                 raise ReadError(error)
+    ...             else:
+    ...                 bases.append(base)
+    ...         return "".join(bases)
+    ...     except:
+    ...         stream.restore(snapshot)
+    ...         raise
+
+With this new version, reading an invalid DNA code still 
+raises an exception
+
+    >>> stream = BitStream("GAUTA") # invalid DNA sequence
+    >>> DNA_read(stream, 4)
+    Traceback (most recent call last):
+    ...
+    ReadError: invalid base 'U'
+
+but now the original stream is intact
+
+    >>> stream.read(str)
+    'GAUTA'
+
+
+Multiple Snapshots
+--------------------------------------------------------------------------------
+
+You can create snapshots of a stream at any stage between read/write operations.
+Multiple snapshots enable for example the implemention a hierarchy of readers 
+or writers that provide strong exception safety at every level.
+
+However arbitrary sequences of save and restore are not allowed:
+when a given snapshot is restored, the snapshots that were created 
+between the snapshot creation and before its restoration are forgotten.
+In other words, saves and restores can only be applied in reverse order.
+Of course it is perfectly valid to skip some of the restores in the process:
+you can always create additional snapshots and never use them.
+
+For example, you can take two snapshots `s0` then `s1` of a stream
+between write operations
 
     >>> stream = BitStream()
     >>> s0 = stream.save()
     >>> stream.write("A")
     >>> s1 = stream.save()
     >>> stream.write("B")
-    >>> s2 = stream.save()
+    >>> stream == BitStream("AB")
+    True
+
+restore `s1`
+
     >>> stream.restore(s1)
     >>> stream == BitStream("A")
     True
-    >>> stream.restore(s2) # doctest: +ELLIPSIS
-    Traceback (most recent call last):
-    ...
-    ValueError: ...
-    >>> stream.write("C")
-    >>> stream == BitStream("AC")
-    True
-    >>> s3 = stream.save()
-    >>> stream.restore(s1)
-    >>> stream == BitStream("A")
-    True
+
+and then `s0`
+
     >>> stream.restore(s0)
     >>> stream == BitStream("")
     True
 
-Most useful patterns: 
+You can also make the same snapshots 
 
-**Avoid copies.** Do read/write stuff on a stream and when you're done, 
-restore the original stream intact. Here the snapshot approach avoids a 
-copy of the bitstream. The pattern is a `try/finally` with a snapshot
-restore in the finally clause.
-
-    >>> stream = BitStream("ABC")
-    >>> snapshot = stream.save()
-    >>> try:
-    ...     # turn "ABC" into "BCD"
-    ...     _ = stream.read(str, 1)
-    ...     stream.write("D")
-    ... finally:
-    ...     stream.restore(snapshot)
-    >>> stream == BitStream("ABC")
+    >>> stream = BitStream()
+    >>> s0 = stream.save()
+    >>> stream.write("A")
+    >>> s1 = stream.save()
+    >>> stream.write("B")
+    >>> stream == BitStream("AB")
     True
 
-If an exception can be raised during the read/write, the stream is still 
-restored in the original state.
+and directly restore `s0`
 
-    >>> from bitstream import ReadError
-    >>> stream = BitStream("ABC")
-    >>> snapshot = stream.save()
-    >>> try:
-    ...     # read too much data
-    ...     _ = stream.read(str, 4)
-    ... except ReadError:
-    ...     pass
-    ... finally:
-    ...     stream.restore(snapshot)
-    >>> stream == BitStream("ABC")
+    >>> stream.restore(s0)
+    >>> stream == BitStream("")
     True
 
-Remark: the pattern breaks if during the actions, an earlier snapshot is restored.
+but then `s1` cannot be used anymore
 
-**Support true exceptions in readers.** Som reading actions may fail, but you
-are not able to tell beforehand, you have to start a sequence of smaller
-reads before you know of the big read call is going to work. A reader with a
-proper exception support will restore the orginal state of the stream before 
-raising the exception if something goes wrong. Typically, that means a reader
-code with the structure:
+    >>> stream.restore(s1) # doctest: +ELLIPSIS
+    Traceback (most recent call last):
+    ...
+    ValueError: ...
 
-    >>> def reader(stream, n=None):
-    ...     snapshot = stream.save()
-    ...     try:
-    ...         pass # do what you have to do.
-    ...     except ReadError: 
-    ...         stream.restore(snapshot)
-    ...         raise
 
-Make convenience functions (with context managers) for those use cases ?
-For the "light-weight copy" that would be easy (under what name ?) but 
-for the reader, that's not obvious, the reader developer may be willing
-to analyze the error and customize the error message before a re-raise ...
