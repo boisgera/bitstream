@@ -326,8 +326,10 @@ cdef class BitStream:
             writer(self, data)
 
     cpdef read(BitStream self, type=None, n=None): 
-        if (type is None or isinstance(type, int)) and n is None:
+        if isinstance(type, int) and n is None:
             n = type
+            type = None
+        if type is None:
             type = BitStream
 
         # find the appropriate reader
