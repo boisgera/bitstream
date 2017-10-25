@@ -40,7 +40,7 @@ The contents of an empty single-channel 44.1 kHz WAVE audio file are for example
 
     >>> wave = 'RIFF$\x00\x00\x00WAVEfmt \x10\x00\x00\x00\x01\x00\x01\x00D\xac\x00\x00\x88X\x01\x00\x02\x00\x10\x00data\x00\x00\x00\x00'
 
-The function `is_wave` above works as expected at first at first
+The function `is_wave` above works as expected at first
 
     >>> stream = BitStream(wave)
     >>> is_wave(stream)

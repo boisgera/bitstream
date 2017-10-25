@@ -3,8 +3,14 @@
 Built-in Readers and Writers
 ================================================================================
 
+    >>> from bitstream import BitStream
+    >>> from numpy import *
+
+
 Bools
 --------------------------------------------------------------------------------
+
+
 
 Write single bits to a bitstream with the arguments `True` and `False`:
 
@@ -14,7 +20,16 @@ Write single bits to a bitstream with the arguments `True` and `False`:
     >>> stream
     01
 
-Lists of booleans may be used too write multiple bits at once:
+Read them back in the same order with
+
+    >>> stream.read(bool)
+    False
+    >>> stream.read(bool)
+    True
+    >>> stream
+    <BLANKLINE>
+
+Write multiple bits at once with lists of bools:
 
     >>> stream = BitStream()
     >>> stream.write([], bool)
@@ -28,8 +43,7 @@ Lists of booleans may be used too write multiple bits at once:
     >>> stream
     0101
 
-The second argument to the `write` method -- the type information -- can 
-also be specified with the keyword argument `type`:
+Alternatively, specify the data type `bool` as a a keyword argument:
 
     >>> stream = BitStream()
     >>> stream.write(False, type=bool)
@@ -37,7 +51,7 @@ also be specified with the keyword argument `type`:
     >>> stream
     01
 
-For single bools or lists of bools, the type information is optional:
+For single bools or lists of bools, this type information is optional:
 
     >>> stream = BitStream()
     >>> stream.write(False)
@@ -48,6 +62,32 @@ For single bools or lists of bools, the type information is optional:
     >>> stream.write([False, True])
     >>> stream
     010101
+
+To read one boolean from a stream, do
+
+    >>> stream.read(bool)
+    False
+    >>> stream
+    10101
+
+and to read several booleans, use the second method argument
+
+    >>> stream.read(bool, 2)
+    [True, False]
+    >>> stream
+    101
+
+Since the booleans are returned in a list when the second argument 
+differs from the default value (which is `None`), 
+`stream.read(bool, 1)` is not same as `stream.read(bool)`:
+
+    >>> copy = stream.copy()
+    >>> stream.read(bool, 1)
+    [True]
+    >>> copy.read(bool)
+    True
+
+-----
 
 Numpy `bool_` scalars or one-dimensional arrays can be used instead:
 
@@ -82,58 +122,10 @@ For such data, the type information is also optional:
     >>> stream
     010101
 
-Python and Numpy numeric types are also valid arguments: 
+Actually, many more types can be used as booleans 
+when the type information is explicit.
+For example, Python and Numpy numeric types are valid arguments: 
 zero is considered false and nonzero numbers are considered true.
-
-
-**Q:** Use a predicate instead (non-zero) ? and check iff ?
-
-    >>> small_integers = range(0, 64)
-    >>> stream = BitStream()
-    >>> for integer in small_integers:
-    ...     stream.write(integer, bool)
-    >>> stream
-    0111111111111111111111111111111111111111111111111111111111111111
-    >>> stream = BitStream()
-    >>> for integer in small_integers:
-    ...     stream.write(-integer, bool)
-    >>> stream
-    0111111111111111111111111111111111111111111111111111111111111111
-
-    >>> large_integers = [2**i for i in range(6, 64)]
-    >>> stream = BitStream()
-    >>> for integer in large_integers:
-    ...     stream.write(integer, bool)
-    >>> stream
-    1111111111111111111111111111111111111111111111111111111111
-    >>> stream = BitStream()
-    >>> for integer in large_integers:
-    ...     stream.write(-integer, bool)
-    >>> stream
-    1111111111111111111111111111111111111111111111111111111111
-
-**TODO:** use iinfo(type).min/max
-
-**TODO:** write `sample(type, r)` iterator.
-
-    >>> def irange(start, stop, r=1.0):
-    ...     i = 0
-    ...     while i < stop:
-    ...         yield i
-    ...         i = max(i+1, int(i*r))
-
-    >>> unsigned = [uint8, uint16, uint32]
-    >>> for integer_type in unsigned:
-    ...     _min, _max = iinfo(integer_type).min, iinfo(integer_type).max
-    ...     for i in irange(_min, _max + 1, r=1.001):
-    ...         integer = integer_type(i)
-    ...         if integer and BitStream(integer, bool) != BitStream(True):
-    ...             type_name = integer_type.__name__
-    ...             print "Failure for {0}({1})".format(type_name, integer)
-
-
-
-
 
     >>> stream = BitStream()
     >>> stream.write(0.0, bool)
@@ -145,17 +137,10 @@ zero is considered false and nonzero numbers are considered true.
     >>> stream
     011011
 
-**TODO:** arrays of numeric type (non-bools), written as bools
-
------
-
-**TODO:** Mark all following behaviors as undefined ? Probably safer ...
-
-Actually, any single data written as a bool, is conceptually cast into a bool 
-first, with the semantics of the `bool` constructor.
-List and one-dimensional numpy array arguments are considered holders of 
+Strings are also valid arguments, with a boolean value of `True` unless
+they are empty.
+One-dimensional lists and numpy arrays are considered holders of 
 multiple data, each of which is converted to bool.
-Any other sequence type (strings, tuples, etc.) is considered single data.
 
     >>> bool("")
     False
@@ -182,6 +167,9 @@ Any other sequence type (strings, tuples, etc.) is considered single data.
     >>> stream
     0111
 
+Any other sequence (strings, tuples, lists nested in lists, etc.) 
+is considered as a single datum.
+
     >>> stream = BitStream()
     >>> stream.write(    (), bool)
     >>> stream.write(  (0,), bool)
@@ -194,6 +182,10 @@ Any other sequence type (strings, tuples, etc.) is considered single data.
     >>> stream
     011
 
+More generally, arbitrary custom "bool-like" instances, 
+which have a `__nonzero__` method to handle the conversion 
+to boolean, can also be used:
+
     >>> class BoolLike(object):
     ...     def __init__(self, value):
     ...         self.value = bool(value)
@@ -201,6 +193,7 @@ Any other sequence type (strings, tuples, etc.) is considered single data.
     ...         return self.value
     >>> false = BoolLike(False)
     >>> true = BoolLike(True)
+
     >>> stream = BitStream()
     >>> stream.write(false, bool)
     >>> stream.write(true, bool)
@@ -209,16 +202,127 @@ Any other sequence type (strings, tuples, etc.) is considered single data.
     0101
 
 
-TODO: 
+BitStreams
+--------------------------------------------------------------------------------
 
-  - direct call to `write_bool` (import the symbol first)
-  - reader tests
+A lists of bool is not the most efficient way to represent a binary stream.
+The best type is ... an instance of `BitStream` of course! 
+
+Consider the stream
+
+    >>> stream = BitStream()
+    >>> stream.write(8 * [True], bool)
+    >>> stream
+    11111111
+
+To read 2 bits out of `stream` as a bitstream, use
+
+    >>> stream.read(BitStream, 2)
+    11
+
+Since this is a common use case, the `BitStream` type is assumed by default:
+
+    >>> new_stream = stream.read(n=2)
+    >>> type(new_stream) is BitStream
+    True
+    >>> new_stream
+    11
+
+The simpler code below also works:
+
+    >>> new_stream = stream.read(2)
+    >>> type(new_stream) is BitStream
+    True
+    >>> new_stream
+    11
+
+When the number of items to read is also specified (`n=None`),
+the read empties the stream:
+
+    >>> stream.read()
+    11
+    >>> stream
+    <BLANKLINE>
+
+
+Strings
+--------------------------------------------------------------------------------
+
+In Python 2.7, strings are the structure of choice to represent 
+bytes in memory.
+Their type is `str` (or equivalently `bytes` which is an alias).
+Fortunately, it's straightforward to convert strings to 
+bitstreams: create a stream from the string `"ABC"` with
+
+    >>> stream = BitStream("ABC")
+
+To be totally explicit, the code above is equivalent to:
+
+    >>> stream = BitStream()
+    >>> stream.write("ABC", str)
+
+Now, the content of the stream is
+
+    >>> stream
+    010000010100001001000011
+
+It is the binary representation
+of the ASCII codes of the string characters,
+as unsigned 8-bit integers
+(see [Integers](#integers) for more details):
+
+    >>> char_codes = [ord(char) for char in "ABC"]
+    >>> char_codes
+    [65, 66, 67]
+    >>> stream == BitStream(char_codes, uint8)
+    True
+
+Now as usual, any number of characters
+
+    >>> stream.read(str, 1)
+    'A'
+
+Without an explicit number of characters, the bitstream is emptied
+
+    >>> stream.read(str)
+    'BC'
+
+but that works only if the remaining number of bits is a multiple of 8.
+
+    >>> stream = BitStream(42 * [True])
+    >>> stream.read(str) # doctest: +ELLIPSIS
+    Traceback (most recent call last):
+    ...
+    ReadError: ...
+
+To accept up to seven trailing bits instead, use the more explicit code:
+
+    >>> stream = BitStream(42 * [True])
+    >>> n = len(stream) // 8
+    >>> n
+    5
+    >>> stream.read(str, n)
+    '\xff\xff\xff\xff\xff'
+    >>> stream
+    11
 
 
 Integers
 --------------------------------------------------------------------------------
 
-**TODO**
+  - start with `uint8`
+
+  - then `int8` and two's complement scheme & reference
+
+  - then talk about endianness (the concept), 
+    our default choice (are we really portable? check)
+    and how to change it if that's not what you want.
+
+Supported types:
+
+  - `uint8`, `uint16`, `uint32`, 
+
+  - `int8`, `int16`, `int32`,
 
 
 Floating-Point Numbers
@@ -249,3 +353,9 @@ The byte order is big endian:
     
     >>> BitStream(struct.pack(">d", pi)) == BitStream(pi)
     True
+
+
+
+
+
+
