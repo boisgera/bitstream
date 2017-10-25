@@ -31,7 +31,7 @@
     
     
       
-        <title>Built-in Types - BitStream</title>
+        <title>Built-in Readers/Writers - BitStream</title>
       
     
     
@@ -91,7 +91,7 @@
             
               
             
-            Built-in Types
+            Built-in Readers/Writers
           
         </span>
       </div>
@@ -258,11 +258,11 @@
     
     
       <label class="md-nav__link md-nav__link--active" for="toc">
-        Built-in Types
+        Built-in Readers/Writers
       </label>
     
-    <a href="./" title="Built-in Types" class="md-nav__link md-nav__link--active">
-      Built-in Types
+    <a href="./" title="Built-in Readers/Writers" class="md-nav__link md-nav__link--active">
+      Built-in Readers/Writers
     </a>
     
       
@@ -278,6 +278,20 @@
         <li class="md-nav__item">
   <a href="#bools" title="Bools" class="md-nav__link">
     Bools
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#bitstreams" title="BitStreams" class="md-nav__link">
+    BitStreams
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#strings" title="Strings" class="md-nav__link">
+    Strings
   </a>
   
 </li>
@@ -311,8 +325,8 @@
 
 
   <li class="md-nav__item">
-    <a href="../custom/" title="Custom Types" class="md-nav__link">
-      Custom Types
+    <a href="../custom/" title="Custom Readers/Writers" class="md-nav__link">
+      Custom Readers/Writers
     </a>
   </li>
 
@@ -369,6 +383,20 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#bitstreams" title="BitStreams" class="md-nav__link">
+    BitStreams
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#strings" title="Strings" class="md-nav__link">
+    Strings
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#integers" title="Integers" class="md-nav__link">
     Integers
   </a>
@@ -398,6 +426,9 @@
                 
                 
                 <h1 id="built-in-readers-and-writers">Built-in Readers and Writers<a class="headerlink" href="#built-in-readers-and-writers" title="Permanent link">&para;</a></h1>
+<pre><code>&gt;&gt;&gt; from bitstream import BitStream
+&gt;&gt;&gt; from numpy import *
+</code></pre>
 <h2 id="bools">Bools<a class="headerlink" href="#bools" title="Permanent link">&para;</a></h2>
 <p>Write single bits to a bitstream with the arguments <code>True</code> and <code>False</code>:</p>
 <pre><code>&gt;&gt;&gt; stream = BitStream()
@@ -406,7 +437,15 @@
 &gt;&gt;&gt; stream
 01
 </code></pre>
-<p>Lists of booleans may be used too write multiple bits at once:</p>
+<p>Read them back in the same order with</p>
+<pre><code>&gt;&gt;&gt; stream.read(bool)
+False
+&gt;&gt;&gt; stream.read(bool)
+True
+&gt;&gt;&gt; stream
+&lt;BLANKLINE&gt;
+</code></pre>
+<p>Write multiple bits at once with lists of bools:</p>
 <pre><code>&gt;&gt;&gt; stream = BitStream()
 &gt;&gt;&gt; stream.write([], bool)
 &gt;&gt;&gt; stream
@@ -419,15 +458,14 @@
 &gt;&gt;&gt; stream
 0101
 </code></pre>
-<p>The second argument to the <code>write</code> method -- the type information -- can 
-also be specified with the keyword argument <code>type</code>:</p>
+<p>Alternatively, specify the data type <code>bool</code> as a a keyword argument:</p>
 <pre><code>&gt;&gt;&gt; stream = BitStream()
 &gt;&gt;&gt; stream.write(False, type=bool)
 &gt;&gt;&gt; stream.write(True , type=bool)
 &gt;&gt;&gt; stream
 01
 </code></pre>
-<p>For single bools or lists of bools, the type information is optional:</p>
+<p>For single bools or lists of bools, this type information is optional:</p>
 <pre><code>&gt;&gt;&gt; stream = BitStream()
 &gt;&gt;&gt; stream.write(False)
 &gt;&gt;&gt; stream.write(True)
@@ -438,6 +476,28 @@ also be specified with the keyword argument <code>type</code>:</p>
 &gt;&gt;&gt; stream
 010101
 </code></pre>
+<p>To read one boolean from a stream, do</p>
+<pre><code>&gt;&gt;&gt; stream.read(bool)
+False
+&gt;&gt;&gt; stream
+10101
+</code></pre>
+<p>and to read several booleans, use the second method argument</p>
+<pre><code>&gt;&gt;&gt; stream.read(bool, 2)
+[True, False]
+&gt;&gt;&gt; stream
+101
+</code></pre>
+<p>Since the booleans are returned in a list when the second argument 
+differs from the default value (which is <code>None</code>), 
+<code>stream.read(bool, 1)</code> is not same as <code>stream.read(bool)</code>:</p>
+<pre><code>&gt;&gt;&gt; copy = stream.copy()
+&gt;&gt;&gt; stream.read(bool, 1)
+[True]
+&gt;&gt;&gt; copy.read(bool)
+True
+</code></pre>
+<hr />
 <p>Numpy <code>bool_</code> scalars or one-dimensional arrays can be used instead:</p>
 <pre><code>&gt;&gt;&gt; bool_
 &lt;type 'numpy.bool_'&gt;
@@ -469,55 +529,11 @@ also be specified with the keyword argument <code>type</code>:</p>
 &gt;&gt;&gt; stream
 010101
 </code></pre>
-<p>Python and Numpy numeric types are also valid arguments: 
+<p>Actually, many more types can be used as booleans 
+when the type information is explicit.
+For example, Python and Numpy numeric types are valid arguments: 
 zero is considered false and nonzero numbers are considered true.</p>
-<p><strong>Q:</strong> Use a predicate instead (non-zero) ? and check iff ?</p>
-<pre><code>&gt;&gt;&gt; small_integers = range(0, 64)
-&gt;&gt;&gt; stream = BitStream()
-&gt;&gt;&gt; for integer in small_integers:
-...     stream.write(integer, bool)
-&gt;&gt;&gt; stream
-0111111111111111111111111111111111111111111111111111111111111111
-&gt;&gt;&gt; stream = BitStream()
-&gt;&gt;&gt; for integer in small_integers:
-...     stream.write(-integer, bool)
-&gt;&gt;&gt; stream
-0111111111111111111111111111111111111111111111111111111111111111
-
-&gt;&gt;&gt; large_integers = [2**i for i in range(6, 64)]
-&gt;&gt;&gt; stream = BitStream()
-&gt;&gt;&gt; for integer in large_integers:
-...     stream.write(integer, bool)
-&gt;&gt;&gt; stream
-1111111111111111111111111111111111111111111111111111111111
-&gt;&gt;&gt; stream = BitStream()
-&gt;&gt;&gt; for integer in large_integers:
-...     stream.write(-integer, bool)
-&gt;&gt;&gt; stream
-1111111111111111111111111111111111111111111111111111111111
-</code></pre>
-<p><strong>TODO:</strong> use iinfo(type).min/max</p>
-<p><strong>TODO:</strong> write <code>sample(type, r)</code> iterator.</p>
-<pre><code>&gt;&gt;&gt; def irange(start, stop, r=1.0):
-...     i = 0
-...     while i &lt; stop:
-...         yield i
-...         i = max(i+1, int(i*r))
-
-&gt;&gt;&gt; unsigned = [uint8, uint16, uint32]
-&gt;&gt;&gt; for integer_type in unsigned:
-...     _min, _max = iinfo(integer_type).min, iinfo(integer_type).max
-...     for i in irange(_min, _max + 1, r=1.001):
-...         integer = integer_type(i)
-...         if integer and BitStream(integer, bool) != BitStream(True):
-...             type_name = integer_type.__name__
-...             print "Failure for {0}({1})".format(type_name, integer)
-
-
-
-
-
-&gt;&gt;&gt; stream = BitStream()
+<pre><code>&gt;&gt;&gt; stream = BitStream()
 &gt;&gt;&gt; stream.write(0.0, bool)
 &gt;&gt;&gt; stream.write(1.0, bool)
 &gt;&gt;&gt; stream.write(pi , bool)
@@ -527,14 +543,10 @@ zero is considered false and nonzero numbers are considered true.</p>
 &gt;&gt;&gt; stream
 011011
 </code></pre>
-<p><strong>TODO:</strong> arrays of numeric type (non-bools), written as bools</p>
-<hr />
-<p><strong>TODO:</strong> Mark all following behaviors as undefined ? Probably safer ...</p>
-<p>Actually, any single data written as a bool, is conceptually cast into a bool 
-first, with the semantics of the <code>bool</code> constructor.
-List and one-dimensional numpy array arguments are considered holders of 
-multiple data, each of which is converted to bool.
-Any other sequence type (strings, tuples, etc.) is considered single data.</p>
+<p>Strings are also valid arguments, with a boolean value of <code>True</code> unless
+they are empty.
+One-dimensional lists and numpy arrays are considered holders of 
+multiple data, each of which is converted to bool.</p>
 <pre><code>&gt;&gt;&gt; bool("")
 False
 &gt;&gt;&gt; bool(" ")
@@ -559,8 +571,10 @@ True
 &gt;&gt;&gt; stream.write(array(["", " " , "A", "AAA"]), bool)
 &gt;&gt;&gt; stream
 0111
-
-&gt;&gt;&gt; stream = BitStream()
+</code></pre>
+<p>Any other sequence (strings, tuples, lists nested in lists, etc.) 
+is considered as a single datum.</p>
+<pre><code>&gt;&gt;&gt; stream = BitStream()
 &gt;&gt;&gt; stream.write(    (), bool)
 &gt;&gt;&gt; stream.write(  (0,), bool)
 &gt;&gt;&gt; stream.write((0, 0), bool)
@@ -571,14 +585,18 @@ True
 &gt;&gt;&gt; stream.write([[], [0], [0, 0]], bool)
 &gt;&gt;&gt; stream
 011
-
-&gt;&gt;&gt; class BoolLike(object):
+</code></pre>
+<p>More generally, arbitrary custom "bool-like" instances, 
+which have a <code>__nonzero__</code> method to handle the conversion 
+to boolean, can also be used:</p>
+<pre><code>&gt;&gt;&gt; class BoolLike(object):
 ...     def __init__(self, value):
 ...         self.value = bool(value)
 ...     def __nonzero__(self):
 ...         return self.value
 &gt;&gt;&gt; false = BoolLike(False)
 &gt;&gt;&gt; true = BoolLike(True)
+
 &gt;&gt;&gt; stream = BitStream()
 &gt;&gt;&gt; stream.write(false, bool)
 &gt;&gt;&gt; stream.write(true, bool)
@@ -586,13 +604,114 @@ True
 &gt;&gt;&gt; stream
 0101
 </code></pre>
-<p>TODO: </p>
-<ul>
-<li>direct call to <code>write_bool</code> (import the symbol first)</li>
-<li>reader tests</li>
-</ul>
+<h2 id="bitstreams">BitStreams<a class="headerlink" href="#bitstreams" title="Permanent link">&para;</a></h2>
+<p>A lists of bool is not the most efficient way to represent a binary stream.
+The best type is ... an instance of <code>BitStream</code> of course! </p>
+<p>Consider the stream</p>
+<pre><code>&gt;&gt;&gt; stream = BitStream()
+&gt;&gt;&gt; stream.write(8 * [True], bool)
+&gt;&gt;&gt; stream
+11111111
+</code></pre>
+<p>To read 2 bits out of <code>stream</code> as a bitstream, use</p>
+<pre><code>&gt;&gt;&gt; stream.read(BitStream, 2)
+11
+</code></pre>
+<p>Since this is a common use case, the <code>BitStream</code> type is assumed by default:</p>
+<pre><code>&gt;&gt;&gt; new_stream = stream.read(n=2)
+&gt;&gt;&gt; type(new_stream) is BitStream
+True
+&gt;&gt;&gt; new_stream
+11
+</code></pre>
+<p>The simpler code below also works:</p>
+<pre><code>&gt;&gt;&gt; new_stream = stream.read(2)
+&gt;&gt;&gt; type(new_stream) is BitStream
+True
+&gt;&gt;&gt; new_stream
+11
+</code></pre>
+<p>When the number of items to read is also specified (<code>n=None</code>),
+the read empties the stream:</p>
+<pre><code>&gt;&gt;&gt; stream.read()
+11
+&gt;&gt;&gt; stream
+&lt;BLANKLINE&gt;
+</code></pre>
+<h2 id="strings">Strings<a class="headerlink" href="#strings" title="Permanent link">&para;</a></h2>
+<p>In Python 2.7, strings are the structure of choice to represent 
+bytes in memory.
+Their type is <code>str</code> (or equivalently <code>bytes</code> which is an alias).
+Fortunately, it's straightforward to convert strings to 
+bitstreams: create a stream from the string <code>"ABC"</code> with</p>
+<pre><code>&gt;&gt;&gt; stream = BitStream("ABC")
+</code></pre>
+<p>To be totally explicit, the code above is equivalent to:</p>
+<pre><code>&gt;&gt;&gt; stream = BitStream()
+&gt;&gt;&gt; stream.write("ABC", str)
+</code></pre>
+<p>Now, the content of the stream is</p>
+<pre><code>&gt;&gt;&gt; stream
+010000010100001001000011
+</code></pre>
+<p>It is the binary representation
+of the ASCII codes of the string characters,
+as unsigned 8-bit integers
+(see <a href="#integers">Integers</a> for more details):</p>
+<pre><code>&gt;&gt;&gt; char_codes = [ord(char) for char in "ABC"]
+&gt;&gt;&gt; char_codes
+[65, 66, 67]
+&gt;&gt;&gt; stream == BitStream(char_codes, uint8)
+True
+</code></pre>
+<p>Now as usual, any number of characters</p>
+<pre><code>&gt;&gt;&gt; stream.read(str, 1)
+'A'
+</code></pre>
+<p>Without an explicit number of characters, the bitstream is emptied</p>
+<pre><code>&gt;&gt;&gt; stream.read(str)
+'BC'
+</code></pre>
+<p>but that works only if the remaining number of bits is a multiple of 8.</p>
+<pre><code>&gt;&gt;&gt; stream = BitStream(42 * [True])
+&gt;&gt;&gt; stream.read(str) # doctest: +ELLIPSIS
+Traceback (most recent call last):
+...
+ReadError: ...
+</code></pre>
+<p>To accept up to seven trailing bits instead, use the more explicit code:</p>
+<pre><code>&gt;&gt;&gt; stream = BitStream(42 * [True])
+&gt;&gt;&gt; n = len(stream) // 8
+&gt;&gt;&gt; n
+5
+&gt;&gt;&gt; stream.read(str, n)
+'\xff\xff\xff\xff\xff'
+&gt;&gt;&gt; stream
+11
+</code></pre>
 <h2 id="integers">Integers<a class="headerlink" href="#integers" title="Permanent link">&para;</a></h2>
-<p><strong>TODO</strong></p>
+<ul>
+<li>
+<p>start with <code>uint8</code></p>
+</li>
+<li>
+<p>then <code>int8</code> and two's complement scheme &amp; reference</p>
+</li>
+<li>
+<p>then talk about endianness (the concept), 
+    our default choice (are we really portable? check)
+    and how to change it if that's not what you want.</p>
+</li>
+</ul>
+<p>Supported types:</p>
+<ul>
+<li>
+<p><code>uint8</code>, <code>uint16</code>, <code>uint32</code>, </p>
+</li>
+<li>
+<p><code>int8</code>, <code>int16</code>, <code>int32</code>,</p>
+</li>
+</ul>
 <h2 id="floating-point-numbers">Floating-Point Numbers<a class="headerlink" href="#floating-point-numbers" title="Permanent link">&para;</a></h2>
 <pre><code>&gt;&gt;&gt; import struct
 &gt;&gt;&gt; struct.pack("&gt;d", pi)
@@ -652,13 +771,13 @@ True
           </a>
         
         
-          <a href="../custom/" title="Custom Types" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
+          <a href="../custom/" title="Custom Readers/Writers" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
             <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
               <span class="md-flex__ellipsis">
                 <span class="md-footer-nav__direction">
                   Next
                 </span>
-                Custom Types
+                Custom Readers/Writers
               </span>
             </div>
             <div class="md-flex__cell md-flex__cell--shrink">
