@@ -9,7 +9,7 @@ pages:
   - Quickstart: index.md
   - Installation: installation.md
   - Basics: basics.md
-  - Built-in Readers/Writers: types.md
+  - Built-in Types: types.md
   - Custom Readers/Writers: custom.md
   - Snapshots: snapshots.md
 #  - API:

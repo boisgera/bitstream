@@ -1,7 +1,11 @@
 
 
-Built-in Readers and Writers
+Built-in Types
 ================================================================================
+
+Bitstream reads and writes work out-of-the-box for many Python data types.
+It is also tightly integrated with [NumPy](http://www.numpy.org/),
+since this is the library of choice to deals with arrays of numeric data.
 
     >>> from bitstream import BitStream
     >>> from numpy import *
@@ -9,8 +13,6 @@ Built-in Readers and Writers
 
 Bools
 --------------------------------------------------------------------------------
-
-
 
 Write single bits to a bitstream with the arguments `True` and `False`:
 
@@ -252,42 +254,47 @@ In Python 2.7, strings are the structure of choice to represent
 bytes in memory.
 Their type is `str` (or equivalently `bytes` which is an alias).
 Fortunately, it's straightforward to convert strings to 
-bitstreams: create a stream from the string `"ABC"` with
+bitstreams: create a stream from the string `"ABCD"` with
 
-    >>> stream = BitStream("ABC")
+    >>> stream = BitStream("ABCD")
 
 To be totally explicit, the code above is equivalent to:
 
     >>> stream = BitStream()
-    >>> stream.write("ABC", str)
+    >>> stream.write("ABCDE", str)
 
 Now, the content of the stream is
 
     >>> stream
-    010000010100001001000011
+    0100000101000010010000110100010001000101
 
 It is the binary representation
 of the ASCII codes of the string characters,
 as unsigned 8-bit integers
 (see [Integers](#integers) for more details):
 
-    >>> char_codes = [ord(char) for char in "ABC"]
+    >>> char_codes = [ord(char) for char in "ABCDE"]
     >>> char_codes
-    [65, 66, 67]
+    [65, 66, 67, 68, 69]
     >>> stream == BitStream(char_codes, uint8)
     True
 
-Now as usual, any number of characters
+There is no "single character" type in Python: 
+characters are represented as strings of length 1.
+To read one or several characters from a bitstream, 
+use the `read` method with the `str` type:
 
     >>> stream.read(str, 1)
     'A'
+    >>> stream.read(str, 2)
+    'BC'
 
 Without an explicit number of characters, the bitstream is emptied
 
     >>> stream.read(str)
-    'BC'
+    'DE'
 
-but that works only if the remaining number of bits is a multiple of 8.
+but that works only if the bitstream contains a multiple of 8 bits.
 
     >>> stream = BitStream(42 * [True])
     >>> stream.read(str) # doctest: +ELLIPSIS
@@ -310,27 +317,134 @@ To accept up to seven trailing bits instead, use the more explicit code:
 Integers
 --------------------------------------------------------------------------------
 
-  - start with `uint8`
+First, let's clear something out: 
+since Python integers can be of arbitrary size 
+and there is not a unique convenient and commonly accepted
+representation for such integers[^1],
+you cannot create a bitstream from Python integers by default.
 
-  - then `int8` and two's complement scheme & reference
+    >>> BitStream(1)
+    Traceback (most recent call last):
+    ...
+    TypeError: unsupported type 'int'.
 
-  - then talk about endianness (the concept), 
-    our default choice (are we really portable? check)
-    and how to change it if that's not what you want.
+    >>> BitStream(2**100)
+    Traceback (most recent call last):
+    ...
+    TypeError: unsupported type 'long'.
 
-Supported types:
+    >>> BitStream("A").read(int)
+    Traceback (most recent call last):
+    ...
+    TypeError: unsupported type 'int'.
 
-  - `uint8`, `uint16`, `uint32`, 
+[^1]: 
+    Why not simply use the binary decomposition of integers? 
+    For example, since
 
-  - `int8`, `int16`, `int32`,
+        >>> 13 == 1*2**3 + 1*2**2 + 0*2**1 + 1*2**0
+        True
+
+    you may be tempted to not represent `13` as 
+
+        >>> BitStream([True, True, False, True])
+        1101
+
+    But this scheme is ambiguous if we consider 
+    sequences of integers: `1101` could represent the integer
+    `13` but also `[1,5]` or `[3,1]` or `[3,0,1]`, etc.
+
+    
+
+
+
+
+You need to specify somehow an integer type that determines 
+what binary representation should be used. For example,
+to represent `1` as an unsigned 8bit integer:
+
+    >>> BitStream(1, uint8)
+    00000001
+    >>> BitStream(uint8(1))
+    00000001
+
+For integer sequences, there are even more ways 
+to specify the integer type:
+
+    >>> BitStream([1,2,3], uint8)
+    000000010000001000000011
+    >>> BitStream([uint8(1), uint8(2), uint8(3)])
+    000000010000001000000011
+    >>> BitStream(array([1, 2, 3], dtype=uint8))
+    000000010000001000000011
+    
+Bitstream supports six integer types from numpy:
+
+  - unsigned integers: `uint8`, `uint16`, `uint32`
+
+  - signed integers: `int8`, `int16`, `int32`
+
+The representation of unsigned integers is based on their 
+decomposition as powers of 2. For example, since
+
+     >>> 13 ==  1*2**3 + 1*2**2 + 0*2**1 + 1*2**0
+     True
+
+we have
+
+     >>> BitStream(13, uint8)
+     00001101
+
+In this scheme, only unsigned integers in the range 0-255 can be represented 
+as 8bit integers. 
+Out-of-bounds integers are accepted, 
+but mapped to the correct range by a modulo `2**8` operation. 
+Numpy follows this convention
+
+     >>> 500 % 2**8
+     244
+     >>> uint8(500)
+     244
+
+and so does bitstream
+
+     >>> BitStream(500, uint8)
+     11110100
+     >>> BitStream(244, uint8)
+     11110100
+     >>> BitStream(500, uint8).read(uint8)
+     244
+
+The representation of 16bit and 32bit unsigned integers 
+follows the same approach
+
+    >>> BitStream(2**10, uint16)
+    0000010000000000
+    >>> BitStream(uint16(2**10))
+    0000010000000000
+
+For the readers that know about this, we use the [big-endian](https://en.wikipedia.org/wiki/Endianness) representation by default for multi-byte
+integers. If you want to use the little-endian convention instead,
+NumPy provides the method `newbyteorder` for this:
+
+    >>> BitStream(uint16(2**10).newbyteorder())
+    0000000000000100
+
+Finally, for signed integers, we use the [two's complement](https://en.wikipedia.org/wiki/Signed_number_representations) representation
+
+    >>> BitStream(0, int8)
+    00000000
+    >>> BitStream(1, int8)
+    00000001
+    >>> BitStream(-1, int8)
+    11111111
 
 
 Floating-Point Numbers
 --------------------------------------------------------------------------------
 
-    >>> import struct
-    >>> struct.pack(">d", pi)
-    '@\t!\xfbTD-\x18'
+Bitstream supports natively the IEE754 double-precision floating-point numbers,
+which have a well-defined binary representation (see e.g. [What every computer scientist should know about binary arithmetic](https://orion.math.iastate.edu/alex/502/doc/p5-goldberg.pdf)).
 
     >>> stream = BitStream()
     >>> stream.write(0.0)
@@ -344,17 +458,28 @@ Floating-Point Numbers
     >>> all(output == arange(10.0))
     True
 
+Python built-in `float` type and NumPy `float64` types may be used interchangeably:
+
     >>> BitStream(1.0) == BitStream(1.0, float) == BitStream(1.0, float64)
     True
+
+Scalar, lists and arrays of floats are supported:
+
     >>> BitStream(1.0) == BitStream([1.0]) == BitStream(ones(1))
     True
 
 The byte order is big endian:
-    
-    >>> BitStream(struct.pack(">d", pi)) == BitStream(pi)
+
+    >>> import struct
+    >>> PI_BE = struct.pack(">d", pi)
+    >>> PI_BE
+    '@\t!\xfbTD-\x18'
+    >>> BitStream(pi) == BitStream(PI_BE)
     True
 
-
+The NumPy `newbyteorder` method should be used beforeand
+(on a `float64` or an array of floats) 
+to get a little-endian representation instead.
 
 
 
