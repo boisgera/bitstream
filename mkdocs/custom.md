@@ -2,17 +2,75 @@
 Custom Writers and Readers
 ================================================================================
 
-    >>> import bitstream
+This section explains what to do if you want bitstream to manage a data type which is not supported natively, 
+or if you want to use an alternative encoding for a supported type.
 
-Definition and Registration of Writers and Readers
+    >>> import bitstream
+    >>> from bitstream import BitStream
+
+We use the example of the base-2 numeral representation of unsigned integers.
+Bitstream only supports unsigned integers but only of fixed size (8, 16 or 32 bit long) by default (see [the Integers section in Built-in Types](../types/#integers)), but it's rather easy
+to write your own writer and reader functions for the general case.
+ 
+
+Definition
 --------------------------------------------------------------------------------
 
-Let's define a writer for the binary representation of natural numbers:
+To fully integrate your custom type into bitstream, you will need
+to define writer and reader functions. 
+The signature of a writer should be
 
-    >>> def write_integer(stream, data):
+    def writer(stream, data)
+
+where
+
+  - `stream` is a `BitStream` instance,
+
+  - the type of `data` is writer-dependent[^valid].
+
+[^valid]:
+    A writer should specify what is a valid `data`.
+    Usually, it is: a given data type, maybe the data type
+    that can be safely converted to the data type
+    and often sequences (lists, arrays, etc.) of the given
+    type.
+
+Invalid writer data should raise a `ValueError`, `TypeError` or 
+`bitstream.WriteError` exception when the data is invalid.
+
+
+
+The signature of a reader should be
+
+    def reader(stream, n=None)
+
+where
+
+  - `stream` is a `BitStream` instance,
+
+  - `n` is a non-negative integer (or `None`).
+
+The semantics of `read(stream, n)` is loosely "read
+`n` items out of `stream`" when `n` is an integer
+and of `read(stream)`
+
+Readers may support a subset of the possible values of `n`;
+for example only `n=1` is allowed, or only `n=None`.
+
+If a reader call does not respect this, 
+a `NotImplementedError` or a `ValueError` exception 
+should be raised. 
+If instead the `read` fails because there is not enough 
+data in the stream or more generally if the binary data
+is inconsistent with the reader logic, a 
+`bitstream.ReadError` should be raised.
+
+Let's define a writer for the binary representation of unsigned integers:
+
+    >>> def write_uint(stream, data):
     ...     if isinstance(data, list):
     ...         for integer in data:
-    ...             write_integer(stream, integer)
+    ...             write_uint(stream, integer)
     ...     else:
     ...         integer = int(data)
     ...         if integer < 0:
@@ -28,34 +86,24 @@ Let's define a writer for the binary representation of natural numbers:
 We can check that this writer behaves as expected:
 
     >>> stream = BitStream()
-    >>> write_integer(stream, 42)
+    >>> write_uint(stream, 42)
     >>> stream
     101010
-    >>> write_integer(stream, [1, 2, 3])
+    >>> write_uint(stream, [1, 2, 3])
     >>> stream
     10101011011
 
-Then, we can associate it to the type `int`:
 
-    >>> bitstream.register(int, writer=write_integer)
 
-After this step, `BitStream` will redirect all data of type `int` to this writer:
+In the case of unsigned integers, we decide to:
 
-    >>> BitStream(42)
-    101010
-    >>> BitStream([1, 2, 3])
-    11011
+  - use list to holds integers[^arrays] when `n` is given,
 
-If the type information is explicit, other kind of data can use this writer too:
+  - by default (`n=None`) return a single integer
 
-    >>> BitStream(uint8(42), int)
-    101010
-    >>> BitStream("42", int)
-    101010
+A possible implementation of the reader is:
 
-A possible implementation of the corresponding reader is given by:
-
-    >>> def read_integer(stream, n=None):
+    >>> def read_uint(stream, n=None):
     ...     if n is not None:
     ...         error = "unsupported argument n"
     ...         raise NotImplementedError(error)
@@ -67,24 +115,84 @@ A possible implementation of the corresponding reader is given by:
     ...                 integer += 1
     ...     return integer
 
-    >>> read_integer(BitStream(42))
+    >>> stream = BitStream()
+    >>> write_uint(stream, 42)
+    >>> read_uint(stream)
     42
 
-Once this reader is registered with
+[^arrays]:
+   NumPy arrays would be another option,
+   but the only arrays that can hold arbitrary large integers 
+   have the `object` data type which provide little
+   benefits over lists.
 
-    >>> bitstream.register(int, reader=read_integer)
 
-the calls to `read_integer` can be made through the `read` method of `BitStream`.
+Registration
+--------------------------------------------------------------------------------
 
-    >>> BitStream(42).read(int)
+To fully integrate unsigned integers into bitstream, 
+we need to associate a type identifier to reader and writer, 
+a process that associates them to a type.
+This type identifier is usually a type,
+typically a user-defined type 
+with an empty definition:
+
+    >>> class uint(object):
+    ...     pass
+
+Once the type `uint` has been associated to the unsigned integer writer
+
+    >>> bitstream.register(uint, writer=write_uint)
+
+we can use the `write` method of `BitStream` to encode unsigned integers
+
+    >>> stream = BitStream()
+    >>> stream.write(42, uint)
+    >>> stream
+    101010
+
+    >>> stream = BitStream()
+    >>> stream.write([2, 2, 2], uint)
+    >>> stream
+    101010
+
+and also the shorter former using the `BitStream` constructor
+
+    >>> BitStream(42, uint)
+    101010
+    >>> BitStream([2, 2, 2], uint)
+    101010
+
+Once the reader is registered
+
+    >>> bitstream.register(uint, reader=read_uint)
+
+we can also use the `read` method of `BitStream`:
+
+    >>> BitStream(42, uint).read(uint)
     42
 
-In all readers, the second argument of readers, named `n`, 
-represents the number of values to read from the stream. 
-Here, this argument is not supported, instead any call to this reader 
-interprets the complete stream content as a single value.
+Here, the `uint` type was merely an identifier for our reader and writer,
+but "real" types can be used too. If you write some data whose type has
+been associated to a writer, you don't need to specify explicitly the
+type information.
 
-Writer and Reader Factories
+For example, if we also associate our writer with Python integers:
+
+    >>> bitstream.register(int, writer=write_uint)
+    >>> bitstream.register(long, writer=write_uint)
+
+then every Python integer will be implicitly written to stream with 
+the `write_uint` writer
+
+    >>> BitStream(42)
+    101010
+    >>> BitStream([2, 2, 2])
+    101010
+
+
+
+Factories
 --------------------------------------------------------------------------------
 
 We actually had a legitimate reason not to support the number of values argument 
