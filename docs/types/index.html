@@ -31,7 +31,7 @@
     
     
       
-        <title>Built-in Readers/Writers - BitStream</title>
+        <title>Built-in Types - BitStream</title>
       
     
     
@@ -91,7 +91,7 @@
             
               
             
-            Built-in Readers/Writers
+            Built-in Types
           
         </span>
       </div>
@@ -258,11 +258,11 @@
     
     
       <label class="md-nav__link md-nav__link--active" for="toc">
-        Built-in Readers/Writers
+        Built-in Types
       </label>
     
-    <a href="./" title="Built-in Readers/Writers" class="md-nav__link md-nav__link--active">
-      Built-in Readers/Writers
+    <a href="./" title="Built-in Types" class="md-nav__link md-nav__link--active">
+      Built-in Types
     </a>
     
       
@@ -425,7 +425,10 @@
               
                 
                 
-                <h1 id="built-in-readers-and-writers">Built-in Readers and Writers<a class="headerlink" href="#built-in-readers-and-writers" title="Permanent link">&para;</a></h1>
+                <h1 id="built-in-types">Built-in Types<a class="headerlink" href="#built-in-types" title="Permanent link">&para;</a></h1>
+<p>Bitstream reads and writes work out-of-the-box for many Python data types.
+It is also tightly integrated with <a href="http://www.numpy.org/">NumPy</a>,
+since this is the library of choice to deals with arrays of numeric data.</p>
 <pre><code>&gt;&gt;&gt; from bitstream import BitStream
 &gt;&gt;&gt; from numpy import *
 </code></pre>
@@ -643,36 +646,41 @@ the read empties the stream:</p>
 bytes in memory.
 Their type is <code>str</code> (or equivalently <code>bytes</code> which is an alias).
 Fortunately, it's straightforward to convert strings to 
-bitstreams: create a stream from the string <code>"ABC"</code> with</p>
-<pre><code>&gt;&gt;&gt; stream = BitStream("ABC")
+bitstreams: create a stream from the string <code>"ABCD"</code> with</p>
+<pre><code>&gt;&gt;&gt; stream = BitStream("ABCD")
 </code></pre>
 <p>To be totally explicit, the code above is equivalent to:</p>
 <pre><code>&gt;&gt;&gt; stream = BitStream()
-&gt;&gt;&gt; stream.write("ABC", str)
+&gt;&gt;&gt; stream.write("ABCDE", str)
 </code></pre>
 <p>Now, the content of the stream is</p>
 <pre><code>&gt;&gt;&gt; stream
-010000010100001001000011
+0100000101000010010000110100010001000101
 </code></pre>
 <p>It is the binary representation
 of the ASCII codes of the string characters,
 as unsigned 8-bit integers
 (see <a href="#integers">Integers</a> for more details):</p>
-<pre><code>&gt;&gt;&gt; char_codes = [ord(char) for char in "ABC"]
+<pre><code>&gt;&gt;&gt; char_codes = [ord(char) for char in "ABCDE"]
 &gt;&gt;&gt; char_codes
-[65, 66, 67]
+[65, 66, 67, 68, 69]
 &gt;&gt;&gt; stream == BitStream(char_codes, uint8)
 True
 </code></pre>
-<p>Now as usual, any number of characters</p>
+<p>There is no "single character" type in Python: 
+characters are represented as strings of length 1.
+To read one or several characters from a bitstream, 
+use the <code>read</code> method with the <code>str</code> type:</p>
 <pre><code>&gt;&gt;&gt; stream.read(str, 1)
 'A'
+&gt;&gt;&gt; stream.read(str, 2)
+'BC'
 </code></pre>
 <p>Without an explicit number of characters, the bitstream is emptied</p>
 <pre><code>&gt;&gt;&gt; stream.read(str)
-'BC'
+'DE'
 </code></pre>
-<p>but that works only if the remaining number of bits is a multiple of 8.</p>
+<p>but that works only if the bitstream contains a multiple of 8 bits.</p>
 <pre><code>&gt;&gt;&gt; stream = BitStream(42 * [True])
 &gt;&gt;&gt; stream.read(str) # doctest: +ELLIPSIS
 Traceback (most recent call last):
@@ -690,34 +698,104 @@ ReadError: ...
 11
 </code></pre>
 <h2 id="integers">Integers<a class="headerlink" href="#integers" title="Permanent link">&para;</a></h2>
-<ul>
-<li>
-<p>start with <code>uint8</code></p>
-</li>
-<li>
-<p>then <code>int8</code> and two's complement scheme &amp; reference</p>
-</li>
-<li>
-<p>then talk about endianness (the concept), 
-    our default choice (are we really portable? check)
-    and how to change it if that's not what you want.</p>
-</li>
-</ul>
-<p>Supported types:</p>
-<ul>
-<li>
-<p><code>uint8</code>, <code>uint16</code>, <code>uint32</code>, </p>
-</li>
-<li>
-<p><code>int8</code>, <code>int16</code>, <code>int32</code>,</p>
-</li>
-</ul>
-<h2 id="floating-point-numbers">Floating-Point Numbers<a class="headerlink" href="#floating-point-numbers" title="Permanent link">&para;</a></h2>
-<pre><code>&gt;&gt;&gt; import struct
-&gt;&gt;&gt; struct.pack("&gt;d", pi)
-'@\t!\xfbTD-\x18'
+<p>First, let's clear something out: 
+since Python integers can be of arbitrary size 
+and there is not a unique convenient and commonly accepted
+representation for such integers<sup id="fnref:1"><a class="footnote-ref" href="#fn:1" rel="footnote">1</a></sup>,
+you cannot create a bitstream from Python integers by default.</p>
+<pre><code>&gt;&gt;&gt; BitStream(1)
+Traceback (most recent call last):
+...
+TypeError: unsupported type 'int'.
 
-&gt;&gt;&gt; stream = BitStream()
+&gt;&gt;&gt; BitStream(2**100)
+Traceback (most recent call last):
+...
+TypeError: unsupported type 'long'.
+
+&gt;&gt;&gt; BitStream("A").read(int)
+Traceback (most recent call last):
+...
+TypeError: unsupported type 'int'.
+</code></pre>
+<p>You need to specify somehow an integer type that determines 
+what binary representation should be used. For example,
+to represent <code>1</code> as an unsigned 8bit integer:</p>
+<pre><code>&gt;&gt;&gt; BitStream(1, uint8)
+00000001
+&gt;&gt;&gt; BitStream(uint8(1))
+00000001
+</code></pre>
+<p>For integer sequences, there are even more ways 
+to specify the integer type:</p>
+<pre><code>&gt;&gt;&gt; BitStream([1,2,3], uint8)
+000000010000001000000011
+&gt;&gt;&gt; BitStream([uint8(1), uint8(2), uint8(3)])
+000000010000001000000011
+&gt;&gt;&gt; BitStream(array([1, 2, 3], dtype=uint8))
+000000010000001000000011
+</code></pre>
+<p>Bitstream supports six integer types from numpy:</p>
+<ul>
+<li>
+<p>unsigned integers: <code>uint8</code>, <code>uint16</code>, <code>uint32</code></p>
+</li>
+<li>
+<p>signed integers: <code>int8</code>, <code>int16</code>, <code>int32</code></p>
+</li>
+</ul>
+<p>The representation of unsigned integers is based on their 
+decomposition as powers of 2. For example, since</p>
+<pre><code> &gt;&gt;&gt; 13 ==  1*2**3 + 1*2**2 + 0*2**1 + 1*2**0
+ True
+</code></pre>
+<p>we have</p>
+<pre><code> &gt;&gt;&gt; BitStream(13, uint8)
+ 00001101
+</code></pre>
+<p>In this scheme, only unsigned integers in the range 0-255 can be represented 
+as 8bit integers. 
+Out-of-bounds integers are accepted, 
+but mapped to the correct range by a modulo <code>2**8</code> operation. 
+Numpy follows this convention</p>
+<pre><code> &gt;&gt;&gt; 500 % 2**8
+ 244
+ &gt;&gt;&gt; uint8(500)
+ 244
+</code></pre>
+<p>and so does bitstream</p>
+<pre><code> &gt;&gt;&gt; BitStream(500, uint8)
+ 11110100
+ &gt;&gt;&gt; BitStream(244, uint8)
+ 11110100
+ &gt;&gt;&gt; BitStream(500, uint8).read(uint8)
+ 244
+</code></pre>
+<p>The representation of 16bit and 32bit unsigned integers 
+follows the same approach</p>
+<pre><code>&gt;&gt;&gt; BitStream(2**10, uint16)
+0000010000000000
+&gt;&gt;&gt; BitStream(uint16(2**10))
+0000010000000000
+</code></pre>
+<p>For the readers that know about this, we use the <a href="https://en.wikipedia.org/wiki/Endianness">big-endian</a> representation by default for multi-byte
+integers. If you want to use the little-endian convention instead,
+NumPy provides the method <code>newbyteorder</code> for this:</p>
+<pre><code>&gt;&gt;&gt; BitStream(uint16(2**10).newbyteorder())
+0000000000000100
+</code></pre>
+<p>Finally, for signed integers, we use the <a href="https://en.wikipedia.org/wiki/Signed_number_representations">two's complement</a> representation</p>
+<pre><code>&gt;&gt;&gt; BitStream(0, int8)
+00000000
+&gt;&gt;&gt; BitStream(1, int8)
+00000001
+&gt;&gt;&gt; BitStream(-1, int8)
+11111111
+</code></pre>
+<h2 id="floating-point-numbers">Floating-Point Numbers<a class="headerlink" href="#floating-point-numbers" title="Permanent link">&para;</a></h2>
+<p>Bitstream supports natively the IEE754 double-precision floating-point numbers,
+which have a well-defined binary representation (see e.g. <a href="https://orion.math.iastate.edu/alex/502/doc/p5-goldberg.pdf">What every computer scientist should know about binary arithmetic</a>).</p>
+<pre><code>&gt;&gt;&gt; stream = BitStream()
 &gt;&gt;&gt; stream.write(0.0)
 &gt;&gt;&gt; stream.write([1.0, 2.0, 3.0])
 &gt;&gt;&gt; stream.write(arange(4.0, 10.0))
@@ -728,16 +806,45 @@ ReadError: ...
 &lt;type 'numpy.ndarray'&gt;
 &gt;&gt;&gt; all(output == arange(10.0))
 True
-
-&gt;&gt;&gt; BitStream(1.0) == BitStream(1.0, float) == BitStream(1.0, float64)
+</code></pre>
+<p>Python built-in <code>float</code> type and NumPy <code>float64</code> types may be used interchangeably:</p>
+<pre><code>&gt;&gt;&gt; BitStream(1.0) == BitStream(1.0, float) == BitStream(1.0, float64)
 True
-&gt;&gt;&gt; BitStream(1.0) == BitStream([1.0]) == BitStream(ones(1))
+</code></pre>
+<p>Scalar, lists and arrays of floats are supported:</p>
+<pre><code>&gt;&gt;&gt; BitStream(1.0) == BitStream([1.0]) == BitStream(ones(1))
 True
 </code></pre>
 <p>The byte order is big endian:</p>
-<pre><code>&gt;&gt;&gt; BitStream(struct.pack("&gt;d", pi)) == BitStream(pi)
+<pre><code>&gt;&gt;&gt; import struct
+&gt;&gt;&gt; PI_BE = struct.pack("&gt;d", pi)
+&gt;&gt;&gt; PI_BE
+'@\t!\xfbTD-\x18'
+&gt;&gt;&gt; BitStream(pi) == BitStream(PI_BE)
 True
 </code></pre>
+<p>The NumPy <code>newbyteorder</code> method should be used beforeand
+(on a <code>float64</code> or an array of floats) 
+to get a little-endian representation instead.</p>
+<div class="footnote">
+<hr />
+<ol>
+<li id="fn:1">
+<p>Why not simply use the binary decomposition of integers? 
+For example, since</p>
+<pre><code>&gt;&gt;&gt; 13 == 1*2**3 + 1*2**2 + 0*2**1 + 1*2**0
+True
+</code></pre>
+<p>you may be tempted to not represent <code>13</code> as </p>
+<pre><code>&gt;&gt;&gt; BitStream([True, True, False, True])
+1101
+</code></pre>
+<p>But this scheme is ambiguous if we consider 
+sequences of integers: <code>1101</code> could represent the integer
+<code>13</code> but also <code>[1,5]</code> or <code>[3,1]</code> or <code>[3,0,1]</code>, etc.&#160;<a class="footnote-backref" href="#fnref:1" rev="footnote" title="Jump back to footnote 1 in the text">&#8617;</a></p>
+</li>
+</ol>
+</div>
                 
                   
                 
