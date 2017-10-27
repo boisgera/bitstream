@@ -398,56 +398,54 @@
                 
                 
                 <h1 id="custom-writers-and-readers">Custom Writers and Readers<a class="headerlink" href="#custom-writers-and-readers" title="Permanent link">&para;</a></h1>
-<p>This section explains what to do if you want bitstream to manage a data type which is not supported natively, 
-or if you want to use an alternative encoding for a supported type.</p>
+<p>This section explains how to deal with a data type or a binary coding 
+that bitstream does not support natively: how to define bitstream 
+writer and reader functions and register them so that your custom
+types behave like native ones.</p>
 <pre><code>&gt;&gt;&gt; import bitstream
 &gt;&gt;&gt; from bitstream import BitStream
 </code></pre>
-<p>We use the example of the base-2 numeral representation of unsigned integers.
-Bitstream only supports unsigned integers but only of fixed size (8, 16 or 32 bit long) by default (see <a href="../../types/#integers">the Integers section in Built-in Types</a>), but it's rather easy
-to write your own writer and reader functions for the general case.</p>
+<p>We use the example of representation of unsigned integers 
+as binary numbers;
+out of the box, bitstream only supports unsigned integers of fixed size 
+(refer to <a href="../../types/#integers">Built-in Types / Integers</a> for details).</p>
 <h2 id="definition">Definition<a class="headerlink" href="#definition" title="Permanent link">&para;</a></h2>
-<p>To fully integrate your custom type into bitstream, you will need
-to define writer and reader functions. 
-The signature of a writer should be</p>
+<p>For every type of data that we want bitstream to support, 
+we need to specify at least one writer function that
+encodes the data as a bitstream and one reader function
+that decodes data out of bitstreams.</p>
+<p>The signature of writers is</p>
 <pre><code>def writer(stream, data)
 </code></pre>
 <p>where</p>
-<ul>
+<ol>
 <li>
 <p><code>stream</code> is a <code>BitStream</code> instance,</p>
 </li>
 <li>
-<p>the type of <code>data</code> is writer-dependent<sup id="fnref:valid"><a class="footnote-ref" href="#fn:valid" rel="footnote">1</a></sup>.</p>
+<p>the type of <code>data</code> is writer-dependent.</p>
 </li>
-</ul>
-<p>Invalid writer data should raise a <code>ValueError</code>, <code>TypeError</code> or 
-<code>bitstream.WriteError</code> exception when the data is invalid.</p>
-<p>The signature of a reader should be</p>
-<pre><code>def reader(stream, n=None)
-</code></pre>
-<p>where</p>
+</ol>
+<p>A writer is totally free to specify what is a valid <code>data</code>,
+but it is sensible to accept:</p>
 <ul>
 <li>
-<p><code>stream</code> is a <code>BitStream</code> instance,</p>
+<p>instances of a reference data type (or some of these instances),</p>
 </li>
 <li>
-<p><code>n</code> is a non-negative integer (or <code>None</code>).</p>
+<p>data that can be safely converted to the reference data type,</p>
+</li>
+<li>
+<p>sequences (lists, arrays, etc.) of the reference type (or assimilated).</p>
 </li>
 </ul>
-<p>The semantics of <code>read(stream, n)</code> is loosely "read
-<code>n</code> items out of <code>stream</code>" when <code>n</code> is an integer
-and of <code>read(stream)</code></p>
-<p>Readers may support a subset of the possible values of <code>n</code>;
-for example only <code>n=1</code> is allowed, or only <code>n=None</code>.</p>
-<p>If a reader call does not respect this, 
-a <code>NotImplementedError</code> or a <code>ValueError</code> exception 
-should be raised. 
-If instead the <code>read</code> fails because there is not enough 
-data in the stream or more generally if the binary data
-is inconsistent with the reader logic, a 
-<code>bitstream.ReadError</code> should be raised.</p>
-<p>Let's define a writer for the binary representation of unsigned integers:</p>
+<p>A writer should raise an exception (<code>ValueError</code> or <code>TypeError</code>) 
+when the data is invalid.</p>
+<hr />
+<p>To write unsigned integers as binary numbers for example,
+we can consider as valid anything any non-negative integer-like
+data (defined as anything that the constructor <code>int</code> accepts) 
+as well as lists of such data.</p>
 <pre><code>&gt;&gt;&gt; def write_uint(stream, data):
 ...     if isinstance(data, list):
 ...         for integer in data:
@@ -464,7 +462,7 @@ is inconsistent with the reader logic, a
 ...         bools.reverse()
 ...         stream.write(bools, bool)
 </code></pre>
-<p>We can check that this writer behaves as expected:</p>
+<p>This writer behaves as expected:</p>
 <pre><code>&gt;&gt;&gt; stream = BitStream()
 &gt;&gt;&gt; write_uint(stream, 42)
 &gt;&gt;&gt; stream
@@ -472,21 +470,63 @@ is inconsistent with the reader logic, a
 &gt;&gt;&gt; write_uint(stream, [1, 2, 3])
 &gt;&gt;&gt; stream
 10101011011
+&gt;&gt;&gt; write_uint(stream, -1)
+Traceback (most recent call last):
+...
+ValueError: negative integers cannot be encoded
+&gt;&gt;&gt; write_uint(stream, {})
+Traceback (most recent call last):
+...
+TypeError: int() argument must be a string or a number, not 'dict'
 </code></pre>
-<p>In the case of unsigned integers, we decide to:</p>
+<hr />
+<p>The signature of readers is:</p>
+<pre><code>def reader(stream, n=None)
+</code></pre>
+<p>where</p>
 <ul>
 <li>
-<p>use list to holds integers<sup id="fnref:arrays"><a class="footnote-ref" href="#fn:arrays" rel="footnote">2</a></sup> when <code>n</code> is given,</p>
+<p><code>stream</code> is a <code>BitStream</code> instance,</p>
 </li>
 <li>
-<p>by default (<code>n=None</code>) return a single integer</p>
+<p><code>n</code> is a non-negative integer (or <code>None</code>).</p>
 </li>
 </ul>
-<p>A possible implementation of the reader is:</p>
+<p>The call <code>read(stream, n)</code> should read <code>n</code> data items 
+out of <code>stream</code> when <code>n</code> is an integer. 
+However, bitstream does not require a specific type of container 
+(list, array, string, etc.), the choice is all yours;
+for consistency however, you should pick a type of container
+that your writer supports.</p>
+<p>The semantics of call <code>read(stream)</code> (when <code>n=None</code>) is up to you; 
+for most of built-in types, it returns a single (unboxed) datum of
+the stream but there are sometimes good reasons to decide otherwise
+(see for example <a href="../../types/#strings">strings</a>).
+The support for this default case is not mandatory.</p>
+<p>Actually, readers may support only a subset of the possible values of <code>n</code>;
+for example they may allow only <code>n=1</code> and <code>n=None</code>.
+If a reader is called with an invalid value of <code>n</code>,
+a <code>ValueError</code> or <code>TypeError</code> exception should be raised. 
+If instead the <code>read</code> fails because there is not enough 
+data in the stream or more generally if the binary data
+cannot be decoded, a <code>ReadError</code> (from <code>bitstream</code>) should 
+be raised.</p>
+<hr />
+<p>When we represent unsigned integers as binary numbers,
+while we can write multiple integers in the same stream,
+we cannot read unambiguously multiple integers from the 
+stream: the code is not <em>self-delimiting</em>. 
+For example <code>110</code> can be split as <code>1</code> then <code>10</code>
+and code for the integers <code>1</code> and <code>2</code> but also 
+as <code>11</code> and <code>0</code> which represent the integers <code>3</code> and <code>0</code>.</p>
+<p>Thus, we design a reader that reads the whole stream as a single 
+integer: we support only the cases <code>n=1</code> 
+and for convenience the default <code>n=None</code> with the same result.</p>
+<p>A possible implementation of this reader is:</p>
 <pre><code>&gt;&gt;&gt; def read_uint(stream, n=None):
-...     if n is not None:
-...         error = "unsupported argument n"
-...         raise NotImplementedError(error)
+...     if n is not None and not n == 1:
+...         error = "unsupported argument n = {0!r}".format(n)
+...         raise ValueError(error)
 ...     else:
 ...         integer = 0
 ...         for _ in range(len(stream)):
@@ -494,19 +534,33 @@ is inconsistent with the reader logic, a
 ...             if stream.read(bool):
 ...                 integer += 1
 ...     return integer
-
-&gt;&gt;&gt; stream = BitStream()
+</code></pre>
+<p>It behaves as expected:</p>
+<pre><code>&gt;&gt;&gt; stream = BitStream()
 &gt;&gt;&gt; write_uint(stream, 42)
 &gt;&gt;&gt; read_uint(stream)
 42
+&gt;&gt;&gt; write_uint(stream, [1, 2, 3]) 
+&gt;&gt;&gt; read_uint(stream)
+27
+&gt;&gt;&gt; len(stream)
+0
+&gt;&gt;&gt; write_uint(stream, 42)
+&gt;&gt;&gt; read_uint(stream, 1)
+42
+&gt;&gt;&gt; write_uint(stream, 42)
+&gt;&gt;&gt; read_uint(stream, 2)
+Traceback (most recent call last):
+...
+ValueError: unsupported argument n = 2
 </code></pre>
 <h2 id="registration">Registration<a class="headerlink" href="#registration" title="Permanent link">&para;</a></h2>
 <p>To fully integrate unsigned integers into bitstream, 
-we need to associate a type identifier to reader and writer, 
-a process that associates them to a type.
-This type identifier is usually a type,
-typically a user-defined type 
-with an empty definition:</p>
+you need to associate a unique type identifier to 
+the reader and/or writer, 
+This type identifier is usually a type;
+a user-defined type with an empty 
+definition will do:</p>
 <pre><code>&gt;&gt;&gt; class uint(object):
 ...     pass
 </code></pre>
@@ -538,14 +592,14 @@ with an empty definition:</p>
 42
 </code></pre>
 <p>Here, the <code>uint</code> type was merely an identifier for our reader and writer,
-but "real" types can be used too. If you write some data whose type has
-been associated to a writer, you don't need to specify explicitly the
-type information.</p>
+but "real" types can be used too. If you write some data whose type is
+the type identifier of a writer, you don't need to specify explicitly the
+type identifier in writes.</p>
 <p>For example, if we also associate our writer with Python integers:</p>
 <pre><code>&gt;&gt;&gt; bitstream.register(int, writer=write_uint)
 &gt;&gt;&gt; bitstream.register(long, writer=write_uint)
 </code></pre>
-<p>then every Python integer will be implicitly written to stream with 
+<p>then every Python integer will be automatically encoded with 
 the <code>write_uint</code> writer</p>
 <pre><code>&gt;&gt;&gt; BitStream(42)
 101010
@@ -553,34 +607,23 @@ the <code>write_uint</code> writer</p>
 101010
 </code></pre>
 <h2 id="factories">Factories<a class="headerlink" href="#factories" title="Permanent link">&para;</a></h2>
-<p>We actually had a legitimate reason not to support the number of values argument 
-in the binary representation reader. Indeed, when the binary representation 
-is used to code sequence of integers instead of a single integer, it becomes 
-ambiguous: the same bitstream may represent several sequences of integers. 
-For example, we have:</p>
-<pre><code>&gt;&gt;&gt; BitStream(255)
-11111111
-&gt;&gt;&gt; BitStream([15, 15])
-11111111
-&gt;&gt;&gt; BitStream([3, 7, 3, 1])
-11111111
-&gt;&gt;&gt; BitStream([3, 3, 3, 3])
-11111111
-</code></pre>
-<p>We say that this code is not <em>self-delimiting</em>, as there is no way to know 
-where is the boundary between the bits coding for different integers. </p>
-<p>For natural numbers with known bounds, we may solve this problem by setting
-a number of bits to be used for each integer. However, to do that, we
-would have to define and register a new writer for every possible number
-of bits. Instead, we register a single but configurable writer, defined
+<p>The coding of arbitrary unsigned integers as binary numbers 
+doesn't allow us to represent unambiguously multiple numbers in a stream. However, if there is a known bound on the integers we use, we can
+assign a sufficient numbers of bits to each integer, pad the
+binary numbers with enough zeros of the left to use the same
+number of bits and this code is self-delimiting.</p>
+<p>However, to do that, we would have to define and register a new writer 
+for every possible number of bits. 
+Instead, we may register a single but configurable writer, defined
 by a writer factory.</p>
-<p>Let's define a type tag <code>uint</code> whose instances hold a number of bits:</p>
+<p>Let's define a type identifier factory <code>uint</code> whose instances 
+hold a number of bits:</p>
 <pre><code>&gt;&gt;&gt; class uint(object):
 ...     def __init__(self, num_bits):
 ...         self.num_bits = num_bits
 </code></pre>
-<p>Then, we define a factory that given a <code>uint</code> instance, 
-returns a stream writer:</p>
+<p>Then, we define a writer factory: given an instance of <code>uint</code>, 
+it returns a stream writer:</p>
 <pre><code>&gt;&gt;&gt; def write_uint_factory(instance):
 ...     num_bits = instance.num_bits
 ...     def write_uint(stream, data):
@@ -603,7 +646,7 @@ returns a stream writer:</p>
 <p>Finally, we register this writer factory with <code>bitstream</code>:</p>
 <pre><code>&gt;&gt;&gt; bitstream.register(uint, writer=write_uint_factory)
 </code></pre>
-<p>To select a writer, we use the proper instance of type tag:</p>
+<p>To select a writer, we use the appropriate type identifier:</p>
 <pre><code>&gt;&gt;&gt; BitStream(255, uint(8))
 11111111
 &gt;&gt;&gt; BitStream(255, uint(16))
@@ -613,8 +656,8 @@ returns a stream writer:</p>
 &gt;&gt;&gt; BitStream(0, uint(16))
 0000000000000000
 </code></pre>
-<p><strong>TODO: reader, give details, comment.</strong></p>
-<pre><code>&gt;&gt;&gt; def read_uint_factory(instance): # use the name factory ?
+<p>The definition of a reader factory is similar:</p>
+<pre><code>&gt;&gt;&gt; def read_uint_factory(instance):
 ...     num_bits = instance.num_bits
 ...     def read_uint(stream, n=None):
 ...         if n is None:
@@ -628,10 +671,12 @@ returns a stream writer:</p>
 ...             integers = [read_uint(stream) for _ in range(n)]
 ...             return integers
 ...     return read_uint
-
-&gt;&gt;&gt; bitstream.register(uint, reader=read_uint_factory)
-
-&gt;&gt;&gt; stream = BitStream([0, 1, 2, 3, 4], uint(8))
+</code></pre>
+<p>Once the reader factory is registered</p>
+<pre><code>&gt;&gt;&gt; bitstream.register(uint, reader=read_uint_factory)
+</code></pre>
+<p>we can use the family of type identifiers in reads too:</p>
+<pre><code>&gt;&gt;&gt; stream = BitStream([0, 1, 2, 3, 4], uint(8))
 &gt;&gt;&gt; stream.read(uint(8))
 0
 &gt;&gt;&gt; stream.read(uint(8), 1)
@@ -639,24 +684,6 @@ returns a stream writer:</p>
 &gt;&gt;&gt; stream.read(uint(8), 3)
 [2, 3, 4]
 </code></pre>
-<div class="footnote">
-<hr />
-<ol>
-<li id="fn:valid">
-<p>A writer should specify what is a valid <code>data</code>.
-Usually, it is: a given data type, maybe the data type
-that can be safely converted to the data type
-and often sequences (lists, arrays, etc.) of the given
-type.&#160;<a class="footnote-backref" href="#fnref:valid" rev="footnote" title="Jump back to footnote 1 in the text">&#8617;</a></p>
-</li>
-<li id="fn:arrays">
-<p>NumPy arrays would be another option,
-   but the only arrays that can hold arbitrary large integers 
-   have the <code>object</code> data type which provide little
-   benefits over lists.&#160;<a class="footnote-backref" href="#fnref:arrays" rev="footnote" title="Jump back to footnote 2 in the text">&#8617;</a></p>
-</li>
-</ol>
-</div>
                 
                   
                 
