@@ -333,8 +333,8 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#length-comparison" title="Length / Comparison" class="md-nav__link">
-    Length / Comparison
+  <a href="#length-and-comparison" title="Length and Comparison" class="md-nav__link">
+    Length and Comparison
   </a>
   
 </li>
@@ -423,8 +423,8 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#length-comparison" title="Length / Comparison" class="md-nav__link">
-    Length / Comparison
+  <a href="#length-and-comparison" title="Length and Comparison" class="md-nav__link">
+    Length and Comparison
   </a>
   
 </li>
@@ -468,8 +468,7 @@
                 
                 
                 <h1 id="api">API<a class="headerlink" href="#api" title="Permanent link">&para;</a></h1>
-<p>In the following code samples, we assume that all symbols of 
-NumPy and BitStream are available:</p>
+<p>We assume in the sequel that all symbols of NumPy and BitStream are available:</p>
 <pre><code>&gt;&gt;&gt; from numpy import *
 &gt;&gt;&gt; from bitstream import *
 </code></pre>
@@ -511,8 +510,7 @@ array([108, 111], dtype=uint8)
 010000010100001001000011
 </code></pre></details><h2 id="copy">Copy<a class="headerlink" href="#copy" title="Permanent link">&para;</a></h2>
 <p>Bitstreams can be copied non-destructively with <code>BitStream.copy</code>. 
-They also support the interface required by the standard library 
-<code>copy</code> module.</p>
+They also support the interface required by the standard library <code>copy</code> module.</p>
 <details class="note"><summary><code>BitStream.copy(self, n=None)</code></summary><p>Copy (partially or totally) the stream.</p><p>Copies do not consume the stream they read.</p><p><h5>Arguments</h5></p><ul><li><p><code>n</code>: unsigned integer of <code>None</code>.</p><p>The number of bits to copy from the start of the stream. 
 The full stream is copied if <code>n</code> is None.</p></li></ul><p><h5>Returns</h5></p><ul><li><code>stream</code>: a bitstream.</li></ul><p><h5>Raises</h5></p><ul><li><code>ReadError</code> if <code>n</code> is larger than the length of the stream.</li></ul><p><h5>Usage</h5></p><pre><code>&gt;&gt;&gt; stream = BitStream("A")
 &gt;&gt;&gt; stream
@@ -546,11 +544,53 @@ The full stream is copied if <code>n</code> is None.</p></li></ul><p><h5>Returns
 01000001
 &gt;&gt;&gt; stream
 01000001
-</code></pre></details><h2 id="length-comparison">Length / Comparison<a class="headerlink" href="#length-comparison" title="Permanent link">&para;</a></h2>
-<details class="note"><summary><code>BitStream.__len__(self, other)</code></summary></details><details class="note"><summary><code>BitStream.__cmp__(self, other)</code></summary></details><details class="note"><summary><code>BitStream.__hash__(self)</code></summary></details><h2 id="custom-types">Custom Types<a class="headerlink" href="#custom-types" title="Permanent link">&para;</a></h2>
-<p>Define new binary coding schemes. See also: <a href="../../custom">Custom Types</a>.</p>
+</code></pre></details><h2 id="length-and-comparison">Length and Comparison<a class="headerlink" href="#length-and-comparison" title="Permanent link">&para;</a></h2>
+<details class="note"><summary><code>BitStream.__len__(self, other)</code></summary><p>Return the bitstream length in bits.</p><p><h5>Usage</h5></p><pre><code>&gt;&gt;&gt; stream = BitStream([True, False])
+&gt;&gt;&gt; len(stream) 
+2
+
+&gt;&gt;&gt; stream = BitStream("ABC")
+&gt;&gt;&gt; len(stream)
+24
+&gt;&gt;&gt; len(stream) // 8
+3
+&gt;&gt;&gt; len(stream) % 8
+0
+</code></pre></details><details class="note"><summary><code>BitStream.__eq__(self, other)</code></summary><p>Equality operator</p><p><h5>Usage</h5></p><pre><code>&gt;&gt;&gt; BitStream(True) == BitStream(True)
+True
+&gt;&gt;&gt; BitStream(True) == BitStream([True])
+True
+&gt;&gt;&gt; BitStream(True) == BitStream(False)
+False
+&gt;&gt;&gt; BitStream(True) == BitStream([True, False])
+False
+
+&gt;&gt;&gt; ord("A")
+65
+&gt;&gt;&gt; BitStream("A") == BitStream(65, uint8)
+True
+&gt;&gt;&gt; BitStream("A") == BitStream(66, uint8)
+False
+</code></pre></details><details class="note"><summary><code>BitStream.__ne__(self, other)</code></summary><p>Inequality operator</p><p><h5>Usage</h5></p><pre><code>&gt;&gt;&gt; BitStream(True) != BitStream(True)
+False
+&gt;&gt;&gt; BitStream(True) != BitStream([True])
+False
+&gt;&gt;&gt; BitStream(True) != BitStream(False)
+True
+&gt;&gt;&gt; BitStream(True) != BitStream([True, False])
+True
+
+&gt;&gt;&gt; ord("A")
+65
+&gt;&gt;&gt; BitStream("A") != BitStream(65, uint8)
+False
+&gt;&gt;&gt; BitStream("A") != BitStream(66, uint8)
+True
+</code></pre></details><details class="note"><summary><code>BitStream.__hash__(self)</code></summary><p>Compute a bitstream hash </p><p>The computed hash is consistent with the equality operator.</p></details><h2 id="custom-types">Custom Types<a class="headerlink" href="#custom-types" title="Permanent link">&para;</a></h2>
+<p>User-defined binary codecs can be bound to type identifiers.
+See also: <a href="../../custom">Custom Types</a>.</p>
 <details class="note"><summary><code>register(type, reader=None, writer=None)</code></summary><p>Register a binary encoding (and/or) decoding.</p><ul><li><p><code>type</code> is a type identifier (type or "type tag").</p></li><li><p><code>reader</code> is a function with signature <code>reader(stream, n=None)</code>.</p></li><li><p><code>writer</code> is a function with signature <code>writer(stream, data)</code>.</p></li></ul></details><h2 id="exceptions">Exceptions<a class="headerlink" href="#exceptions" title="Permanent link">&para;</a></h2>
-<details class="note"><summary><code>ReadError</code></summary></details><details class="note"><summary><code>WriteError</code></summary></details><h2 id="snapshots">Snapshots<a class="headerlink" href="#snapshots" title="Permanent link">&para;</a></h2>
+<details class="note"><summary><code>ReadError</code></summary><p>Exception raised when a binary decoding is impossible.</p></details><details class="note"><summary><code>WriteError</code></summary><p>Exception raised when a binary encoding is impossible.</p></details><h2 id="snapshots">Snapshots<a class="headerlink" href="#snapshots" title="Permanent link">&para;</a></h2>
 <p>Save and restore stream states. See also: <a href="../../snapshots">Snapshots</a>.</p>
 <details class="note"><summary><code>State</code></summary><p>The (opaque) type of stream state.</p></details><details class="note"><summary><code>BitStream.save(self)</code></summary><p>Return a <code>State</code> instance</p></details><details class="note"><summary><code>BitStream.restore(self, state)</code></summary><p>Restore a previous stream state.</p><p>Raise a <code>ValueError</code> if the state is invalid.</p></details>
                 

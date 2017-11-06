@@ -134,8 +134,7 @@ Copy
 --------------------------------------------------------------------------------
 
 Bitstreams can be copied non-destructively with `BitStream.copy`. 
-They also support the interface required by the standard library 
-`copy` module.
+They also support the interface required by the standard library `copy` module.
 
 
 ??? note "`BitStream.copy(self, n=None)`"
@@ -206,20 +205,81 @@ They also support the interface required by the standard library
         01000001
 
 
-Length / Comparison
+Length and Comparison
 --------------------------------------------------------------------------------
 
 ??? note "`BitStream.__len__(self, other)`"
+    Return the bitstream length in bits.
 
-??? note "`BitStream.__cmp__(self, other)`"
+    <h5>Usage</h5>
+
+        >>> stream = BitStream([True, False])
+        >>> len(stream) 
+        2
+
+        >>> stream = BitStream("ABC")
+        >>> len(stream)
+        24
+        >>> len(stream) // 8
+        3
+        >>> len(stream) % 8
+        0
+
+
+??? note "`BitStream.__eq__(self, other)`"
+    Equality operator
+
+    <h5>Usage</h5>
+
+        >>> BitStream(True) == BitStream(True)
+        True
+        >>> BitStream(True) == BitStream([True])
+        True
+        >>> BitStream(True) == BitStream(False)
+        False
+        >>> BitStream(True) == BitStream([True, False])
+        False
+
+        >>> ord("A")
+        65
+        >>> BitStream("A") == BitStream(65, uint8)
+        True
+        >>> BitStream("A") == BitStream(66, uint8)
+        False
+  
+
+??? note "`BitStream.__ne__(self, other)`"
+    Inequality operator
+
+    <h5>Usage</h5>
+
+        >>> BitStream(True) != BitStream(True)
+        False
+        >>> BitStream(True) != BitStream([True])
+        False
+        >>> BitStream(True) != BitStream(False)
+        True
+        >>> BitStream(True) != BitStream([True, False])
+        True
+
+        >>> ord("A")
+        65
+        >>> BitStream("A") != BitStream(65, uint8)
+        False
+        >>> BitStream("A") != BitStream(66, uint8)
+        True
 
 ??? note "`BitStream.__hash__(self)`"
+    Compute a bitstream hash 
+
+    The computed hash is consistent with the equality operator.
 
 
 Custom Types
 --------------------------------------------------------------------------------
 
-Define new binary coding schemes. See also: [Custom Types](../custom).
+User-defined binary codecs can be bound to type identifiers.
+See also: [Custom Types](../custom).
 
 ??? note "`register(type, reader=None, writer=None)`"
     Register a binary encoding (and/or) decoding.
@@ -231,13 +291,14 @@ Define new binary coding schemes. See also: [Custom Types](../custom).
       - `writer` is a function with signature `writer(stream, data)`.
 
 
-
 Exceptions
 --------------------------------------------------------------------------------
 
 ??? note "`ReadError`"
+    Exception raised when a binary decoding is impossible.
 
 ??? note "`WriteError`"
+    Exception raised when a binary encoding is impossible.
 
 
 Snapshots

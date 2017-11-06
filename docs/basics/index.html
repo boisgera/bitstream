@@ -343,7 +343,10 @@
                 
                 
                 <h1 id="overview-of-bitstream-features">Overview of Bitstream Features<a class="headerlink" href="#overview-of-bitstream-features" title="Permanent link">&para;</a></h1>
-<pre><code>&gt;&gt;&gt; stream = BitStream()
+<pre><code>&gt;&gt;&gt; from numpy import *
+&gt;&gt;&gt; from bitstream import *
+
+&gt;&gt;&gt; stream = BitStream()
 &gt;&gt;&gt; stream
 &lt;BLANKLINE&gt;
 &gt;&gt;&gt; stream.write(True, bool)
