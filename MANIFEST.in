@@ -1,8 +1,7 @@
-include bitstream/__init__.c
-include bitstream/__init__.pyx
+include src/bitstream/__init__.pxd
+include src/bitstream/__init__.pyx
+include src/bitstream/__init__.c
 
-include manual.txt
-include manual.rst
 include benchmark.py
 
 exclude setup.cfg

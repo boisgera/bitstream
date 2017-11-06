@@ -2,8 +2,7 @@
 API
 ================================================================================
 
-In the following code samples, 
-we assume that all symbols of NumPy and BitStream are available:
+We assume in the sequel that all symbols of NumPy and BitStream are available:
 
     >>> from numpy import *
     >>> from bitstream import *
