@@ -2,6 +2,9 @@
 Overview of Bitstream Features
 ================================================================================ 
 
+    >>> from numpy import *
+    >>> from bitstream import *
+
     >>> stream = BitStream()
     >>> stream
     <BLANKLINE>
