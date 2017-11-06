@@ -1,5 +1,5 @@
 
-Custom Writers and Readers
+Custom Types
 ================================================================================
 
 This section explains how to deal with a data type or a binary coding 

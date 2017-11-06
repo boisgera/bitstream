@@ -31,7 +31,7 @@
     
     
       
-        <title>Snapshots - BitStream</title>
+        <title>API - BitStream</title>
       
     
     
@@ -91,7 +91,7 @@
             
               
             
-            Snapshots
+            API
           
         </span>
       </div>
@@ -271,6 +271,18 @@
       
       
 
+
+  <li class="md-nav__item">
+    <a href="../snapshots/" title="Snapshots" class="md-nav__link">
+      Snapshots
+    </a>
+  </li>
+
+    
+      
+      
+      
+
   
 
 
@@ -282,11 +294,11 @@
     
     
       <label class="md-nav__link md-nav__link--active" for="toc">
-        Snapshots
+        API
       </label>
     
-    <a href="./" title="Snapshots" class="md-nav__link md-nav__link--active">
-      Snapshots
+    <a href="./" title="API" class="md-nav__link md-nav__link--active">
+      API
     </a>
     
       
@@ -300,22 +312,50 @@
     <ul class="md-nav__list" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#lookahead" title="Lookahead" class="md-nav__link">
-    Lookahead
+  <a href="#create-read-write" title="Create / Read / Write" class="md-nav__link">
+    Create / Read / Write
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#exception-safety" title="Exception Safety" class="md-nav__link">
-    Exception Safety
+  <a href="#string-representation" title="String Representation" class="md-nav__link">
+    String Representation
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#multiple-snapshots" title="Multiple Snapshots" class="md-nav__link">
-    Multiple Snapshots
+  <a href="#copy" title="Copy" class="md-nav__link">
+    Copy
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#length-comparison" title="Length / Comparison" class="md-nav__link">
+    Length / Comparison
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#custom-types" title="Custom Types" class="md-nav__link">
+    Custom Types
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#exceptions" title="Exceptions" class="md-nav__link">
+    Exceptions
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#snapshots" title="Snapshots" class="md-nav__link">
+    Snapshots
   </a>
   
 </li>
@@ -326,18 +366,6 @@
   
 </nav>
     
-  </li>
-
-    
-      
-      
-      
-
-
-  <li class="md-nav__item">
-    <a href="../API/" title="API" class="md-nav__link">
-      API
-    </a>
   </li>
 
     
@@ -374,22 +402,50 @@
     <ul class="md-nav__list" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#lookahead" title="Lookahead" class="md-nav__link">
-    Lookahead
+  <a href="#create-read-write" title="Create / Read / Write" class="md-nav__link">
+    Create / Read / Write
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#exception-safety" title="Exception Safety" class="md-nav__link">
-    Exception Safety
+  <a href="#string-representation" title="String Representation" class="md-nav__link">
+    String Representation
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#multiple-snapshots" title="Multiple Snapshots" class="md-nav__link">
-    Multiple Snapshots
+  <a href="#copy" title="Copy" class="md-nav__link">
+    Copy
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#length-comparison" title="Length / Comparison" class="md-nav__link">
+    Length / Comparison
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#custom-types" title="Custom Types" class="md-nav__link">
+    Custom Types
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#exceptions" title="Exceptions" class="md-nav__link">
+    Exceptions
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#snapshots" title="Snapshots" class="md-nav__link">
+    Snapshots
   </a>
   
 </li>
@@ -408,219 +464,95 @@
             <article class="md-content__inner md-typeset">
               
                 
-                  <a href="https://github.com/boisgera/bitstream/edit/master/docs/snapshots.md" title="Edit this page" class="md-icon md-content__icon">&#xE3C9;</a>
+                  <a href="https://github.com/boisgera/bitstream/edit/master/docs/API.md" title="Edit this page" class="md-icon md-content__icon">&#xE3C9;</a>
                 
                 
-                <h1 id="snapshots">Snapshots<a class="headerlink" href="#snapshots" title="Permanent link">&para;</a></h1>
-<p>A stream is a simple model to deal with binary data,
-but sometimes you need more: you want to perform some lookahead without 
-changing the stream or you want to try some read/write operations 
-but go back to the initial state if they fail. 
-At this stage, you probably have copies of streams 
-everywhere and the stream interface seems very cumbersome.</p>
-<p>Therefore, we provide snapshots, a simple solution for these
-use cases that doesn't require copies of streams:
-you can save the state of a stream at any 
-stage in a sequence of read/write operations and restore 
-any such state later if you need it.</p>
-<h2 id="lookahead">Lookahead<a class="headerlink" href="#lookahead" title="Permanent link">&para;</a></h2>
-<p>The type of binary data can usually be identified by a specific header
-coded in its first few bytes.
-For example, <a href="https://en.wikipedia.org/wiki/WAV">WAVE</a> audio can be detected with the function:</p>
-<pre><code>&gt;&gt;&gt; from bitstream import BitStream, ReadError
-
-&gt;&gt;&gt; def is_wave(stream):
-...    try:
-...        riff = stream.read(str, 4)
-...        _ = stream.read(str, 4)
-...        wave = stream.read(str, 4)
-...        return (riff == "RIFF") and (wave == "WAVE")
-...    except ReadError:
-...        return False
+                <h1 id="api">API<a class="headerlink" href="#api" title="Permanent link">&para;</a></h1>
+<p>In the following code samples, we assume that all symbols of 
+NumPy and BitStream are available:</p>
+<pre><code>&gt;&gt;&gt; from numpy import *
+&gt;&gt;&gt; from bitstream import *
 </code></pre>
-<p>The contents of an empty single-channel 44.1 kHz WAVE audio file are for example</p>
-<pre><code>&gt;&gt;&gt; wave = 'RIFF$\x00\x00\x00WAVEfmt \x10\x00\x00\x00\x01\x00\x01\x00D\xac\x00\x00\x88X\x01\x00\x02\x00\x10\x00data\x00\x00\x00\x00'
-</code></pre>
-<p>The function <code>is_wave</code> above works as expected at first</p>
-<pre><code>&gt;&gt;&gt; stream = BitStream(wave)
-&gt;&gt;&gt; is_wave(stream)
-True
-</code></pre>
-<p>but another attempt gives an incorrect answer:</p>
-<pre><code>&gt;&gt;&gt; is_wave(stream)
+<h2 id="create-read-write">Create / Read / Write<a class="headerlink" href="#create-read-write" title="Permanent link">&para;</a></h2>
+<details class="note"><summary><code>BitStream(...)</code></summary><p>Create a BitStream.</p><p><h5>Arguments</h5></p><ul><li><p>without arguments, <code>BitStream()</code> creates an empty bitstream.</p></li><li><p>with arguments, <code>BitStream(*args, **kwargs)</code>
+    also forwards 
+    the arguments to the <code>write</code> method.</p></li></ul><p><h5>Usage</h5></p><pre><code>&gt;&gt;&gt; stream = BitStream()
+&gt;&gt;&gt; stream = BitStream([False, True])
+&gt;&gt;&gt; stream = BitStream("Hello", str)
+&gt;&gt;&gt; stream = BitStream(42, uint8)
+</code></pre></details><details class="note"><summary><code>BitStream.write(self, data, type=None)</code></summary><p>Append <code>data</code> at the end of the stream.</p><p><h5>Arguments</h5></p><ul><li><p><code>data</code> is the data to be encoded.</p><p>Its type should be consistent with the <code>type</code> argument.</p></li><li><p><code>type</code> is a type identifier (such as <code>bool</code>, <code>str</code>, <code>int8</code>, etc.).</p><p>It is optional if <code>data</code> is an instance
+of a registered type or for
+lists and 1d NumPy arrays of such 
+instances.</p></li></ul><p><h5>Usage</h5></p><pre><code>&gt;&gt;&gt; stream = BitStream()
+&gt;&gt;&gt; stream.write(True, bool)       # explicit bool type
+&gt;&gt;&gt; stream.write(False)            # implicit bool type
+&gt;&gt;&gt; stream.write(3*[False], bool)  # list (explicit type)
+&gt;&gt;&gt; stream.write(3*[True])         # list (implicit type)
+&gt;&gt;&gt; stream.write("AB", str)        # string
+&gt;&gt;&gt; stream.write(-128, int8)       # signed 8 bit integer
+</code></pre><p><h5>See also</h5></p><ul><li><p><a href="../../types">Builtin Types</a></p></li><li><p><a href="../../custom">Custom Types</a></p></li></ul></details><details class="note"><summary><code>BitStream.read(self, type=None, n=None)</code></summary><p>Consume and return <code>n</code> items of <code>data</code> from the start of the stream.</p><p><h5>Arguments</h5></p><ul><li><p><code>type</code>: type identifier (such as <code>bool</code>, <code>str</code>, <code>int8</code>, etc.)</p><p>If <code>type</code> is <code>None</code> a bitstream is returned.</p></li><li><p><code>n</code>: number of items to read</p><p>For most types, <code>n=None</code> reads one item, 
+but some types use a different convention.</p></li></ul><p><h5>Returns</h5></p><ul><li><p><code>data</code>: <code>n</code> items of data</p><p>The type of data depends on <code>type</code> and <code>n</code>.</p></li></ul><p><h5>Usage</h5></p><pre><code>&gt;&gt;&gt; stream = BitStream("Hello World!")
+&gt;&gt;&gt; stream.read(str, 2)
+'He'
+&gt;&gt;&gt; stream.read(bool)
 False
-</code></pre>
-<p>The explanation is simple: to identify the header of a WAVE file,
-we need to consume the first 12 bytes in the stream. 
-Since this header is missing from the stream afterwards, 
-the new attempt fails.</p>
-<p>To solve this issue, 
-it's possible to make <code>is_wave</code> perform a (partial) copy of the stream 
-and perform the check on the copy, leaving the initial 
-stream unchanged. 
-However in general this approach may be cumbersome;
-copies should also be avoided when possible for performance reasons.</p>
-<p>Bitstream also supports snapshots, 
-a better way to deal with lookaheads.
-With them you can:</p>
-<ul>
-<li>
-<p>save the state of a stream at any time, </p>
-</li>
-<li>
-<p>perform arbitrary operations on it and then </p>
-</li>
-<li>
-<p>restore its initial state.</p>
-</li>
-</ul>
-<p>The implementation of <code>is_wave</code> that does this is plain;
-we just make sure that whatever happens 
-(even an error in the processing) 
-the original state of the stream is restored at the end. </p>
-<pre><code>&gt;&gt;&gt; def is_wave(stream):
-...     snapshot = stream.save()
-...     try:
-...         riff = stream.read(str, 4)
-...         _ = stream.read(str, 4)
-...         wave = stream.read(str, 4)
-...         return (riff == "RIFF") and (wave == "WAVE")
-...     except ReadError:
-...         return False
-...     finally:
-...         stream.restore(snapshot)
-</code></pre>
-<p>This version works as expected:</p>
-<pre><code>&gt;&gt;&gt; wave = 'RIFF$\x00\x00\x00WAVEfmt \x10\x00\x00\x00\x01\x00\x01\x00D\xac\x00\x00\x88X\x01\x00\x02\x00\x10\x00data\x00\x00\x00\x00'
-&gt;&gt;&gt; stream = BitStream(wave)
+&gt;&gt;&gt; stream.read(bool, 7)
+[True, True, False, True, True, False, False]
+&gt;&gt;&gt; stream.read(uint8, 2)
+array([108, 111], dtype=uint8)
+&gt;&gt;&gt; stream.read(uint8)
+32
+&gt;&gt;&gt; stream.read(str)
+'World!'
+</code></pre><p><h5>See also</h5></p><ul><li><p><a href="../../types">Builtin Types</a></p></li><li><p><a href="../../custom">Custom Types</a></p></li></ul></details><h2 id="string-representation">String Representation<a class="headerlink" href="#string-representation" title="Permanent link">&para;</a></h2>
+<details class="note"><summary><code>BitStream.__str__(self)</code></summary><p>Represent the stream as a string of <code>'0'</code> and <code>'1'</code>.</p><p><h5>Usage</h5></p><pre><code>&gt;&gt;&gt; print BitStream("ABC")
+010000010100001001000011
+</code></pre></details><details class="note"><summary><code>BitStream.__repr__(self)</code></summary><p>Represent the stream as a string of <code>'0'</code> and <code>'1'</code>.</p><p><h5>Usage</h5></p><pre><code>&gt;&gt;&gt; BitStream("ABC")
+010000010100001001000011
+</code></pre></details><h2 id="copy">Copy<a class="headerlink" href="#copy" title="Permanent link">&para;</a></h2>
+<p>Bitstreams can be copied non-destructively with <code>BitStream.copy</code>. 
+They also support the interface required by the standard library 
+<code>copy</code> module.</p>
+<details class="note"><summary><code>BitStream.copy(self, n=None)</code></summary><p>Copy (partially or totally) the stream.</p><p>Copies do not consume the stream they read.</p><p><h5>Arguments</h5></p><ul><li><p><code>n</code>: unsigned integer of <code>None</code>.</p><p>The number of bits to copy from the start of the stream. 
+The full stream is copied if <code>n</code> is None.</p></li></ul><p><h5>Returns</h5></p><ul><li><code>stream</code>: a bitstream.</li></ul><p><h5>Raises</h5></p><ul><li><code>ReadError</code> if <code>n</code> is larger than the length of the stream.</li></ul><p><h5>Usage</h5></p><pre><code>&gt;&gt;&gt; stream = BitStream("A")
+&gt;&gt;&gt; stream
+01000001
 &gt;&gt;&gt; copy = stream.copy()
-&gt;&gt;&gt; is_wave(stream)
-True
-&gt;&gt;&gt; stream == copy
-True
-&gt;&gt;&gt; is_wave(stream)
-True
-</code></pre>
-<h2 id="exception-safety">Exception Safety<a class="headerlink" href="#exception-safety" title="Permanent link">&para;</a></h2>
-<p>Consider the toy DNA reader below:</p>
-<pre><code>&gt;&gt;&gt; def DNA_read(stream, n=1):
-...     DNA_bases = "ACGT"
-...     bases = []
-...     for i in range(n):
-...         base = stream.read(str, 1)
-...         if base not in DNA_bases:
-...             error = "invalid base {0!r}".format(base)
-...             raise ReadError(error)
-...         else:
-...             bases.append(base)
-...     return "".join(bases)
-</code></pre>
-<p>It reads DNA sequences represented as strings of 
-<code>'A'</code>, <code>'C'</code>, <code>'G'</code> and <code>'T'</code> characters:</p>
-<pre><code>&gt;&gt;&gt; dna = BitStream("GATA")
-&gt;&gt;&gt; DNA_read(dna, 4)
-'GATA'
-</code></pre>
-<p>If there is a <code>'U'</code> in the sequence, this is an error since
-the <a href="https://en.wikipedia.org/wiki/Nucleobase">uracil base</a> 
-is only found in RNA.</p>
-<pre><code>&gt;&gt;&gt; stream = BitStream("GAUTA") # invalid DNA sequence
-</code></pre>
-<p>The DNA reader correctly rejects the code</p>
-<pre><code>&gt;&gt;&gt; DNA_read(stream, 4)
-Traceback (most recent call last):
-...
-ReadError: invalid base 'U'
-</code></pre>
-<p>but the initial stream is partially consumed in the process:</p>
-<pre><code>&gt;&gt;&gt; stream.read(str)
-'TA'
-</code></pre>
-<p>This implementation therefore only provides some basic exception safety.
-A reader that preserves the original value of the stream when an error
-occurs would provide <a href="https://en.wikipedia.org/wiki/Exception_safety">strong exception safety</a> instead.
-With snapshots, the modifications required to support this 
-are plain: we simply restore the original stream whenever an
-error occurs</p>
-<pre><code>&gt;&gt;&gt; def DNA_read(stream, n=1):
-...     DNA_bases = "ACGT"
-...     snapshot = stream.save()
-...     try:
-...         bases = []
-...         for i in range(n):
-...             base = stream.read(str, 1)
-...             if base not in DNA_bases:
-...                 error = "invalid base {0!r}".format(base)
-...                 raise ReadError(error)
-...             else:
-...                 bases.append(base)
-...         return "".join(bases)
-...     except:
-...         stream.restore(snapshot)
-...         raise
-</code></pre>
-<p>With this new version, reading an invalid DNA code still 
-raises an exception</p>
-<pre><code>&gt;&gt;&gt; stream = BitStream("GAUTA") # invalid DNA sequence
-&gt;&gt;&gt; DNA_read(stream, 4)
-Traceback (most recent call last):
-...
-ReadError: invalid base 'U'
-</code></pre>
-<p>but now the original stream is intact</p>
-<pre><code>&gt;&gt;&gt; stream.read(str)
-'GAUTA'
-</code></pre>
-<h2 id="multiple-snapshots">Multiple Snapshots<a class="headerlink" href="#multiple-snapshots" title="Permanent link">&para;</a></h2>
-<p>You can create snapshots of a stream at any stage between read/write operations.
-Multiple snapshots enable for example the implemention a hierarchy of readers 
-or writers that provide strong exception safety at every level.</p>
-<p>However arbitrary sequences of save and restore are not allowed:
-when a given snapshot is restored, the snapshots that were created 
-between the snapshot creation and before its restoration are forgotten.
-In other words, saves and restores can only be applied in reverse order.
-Of course it is perfectly valid to skip some of the restores in the process:
-you can always create additional snapshots and never use them.</p>
-<p>For example, you can take two snapshots <code>s0</code> then <code>s1</code> of a stream
-between write operations</p>
-<pre><code>&gt;&gt;&gt; stream = BitStream()
-&gt;&gt;&gt; s0 = stream.save()
-&gt;&gt;&gt; stream.write("A")
-&gt;&gt;&gt; s1 = stream.save()
-&gt;&gt;&gt; stream.write("B")
-&gt;&gt;&gt; stream == BitStream("AB")
-True
-</code></pre>
-<p>restore <code>s1</code></p>
-<pre><code>&gt;&gt;&gt; stream.restore(s1)
-&gt;&gt;&gt; stream == BitStream("A")
-True
-</code></pre>
-<p>and then <code>s0</code></p>
-<pre><code>&gt;&gt;&gt; stream.restore(s0)
-&gt;&gt;&gt; stream == BitStream("")
-True
-</code></pre>
-<p>You can also make the same snapshots </p>
-<pre><code>&gt;&gt;&gt; stream = BitStream()
-&gt;&gt;&gt; s0 = stream.save()
-&gt;&gt;&gt; stream.write("A")
-&gt;&gt;&gt; s1 = stream.save()
-&gt;&gt;&gt; stream.write("B")
-&gt;&gt;&gt; stream == BitStream("AB")
-True
-</code></pre>
-<p>and directly restore <code>s0</code></p>
-<pre><code>&gt;&gt;&gt; stream.restore(s0)
-&gt;&gt;&gt; stream == BitStream("")
-True
-</code></pre>
-<p>but then <code>s1</code> cannot be used anymore</p>
-<pre><code>&gt;&gt;&gt; stream.restore(s1) # doctest: +ELLIPSIS
-Traceback (most recent call last):
-...
-ValueError: ...
-</code></pre>
+&gt;&gt;&gt; copy
+01000001
+&gt;&gt;&gt; stream
+01000001
+&gt;&gt;&gt; stream.copy(4)
+0100
+&gt;&gt;&gt; stream
+01000001
+&gt;&gt;&gt; stream.read(BitStream, 4)
+0100
+&gt;&gt;&gt; stream
+0001
+</code></pre></details><details class="note"><summary><code>BitStream.__copy__(self)</code></summary><p>Bitstream shallow copy.</p><p><h5>Usage</h5></p><pre><code>&gt;&gt;&gt; from copy import copy
+&gt;&gt;&gt; stream = BitStream("A")
+&gt;&gt;&gt; stream
+01000001
+&gt;&gt;&gt; copy(stream)
+01000001
+&gt;&gt;&gt; stream
+01000001
+</code></pre></details><details class="note"><summary><code>BitStream.__deepcopy__(self, memo)</code></summary><p>Bitstream deep copy.</p><p><h5>Usage</h5></p><pre><code>&gt;&gt;&gt; from copy import deepcopy
+&gt;&gt;&gt; stream = BitStream("A")
+&gt;&gt;&gt; stream
+01000001
+&gt;&gt;&gt; deepcopy(stream)
+01000001
+&gt;&gt;&gt; stream
+01000001
+</code></pre></details><h2 id="length-comparison">Length / Comparison<a class="headerlink" href="#length-comparison" title="Permanent link">&para;</a></h2>
+<details class="note"><summary><code>BitStream.__len__(self, other)</code></summary></details><details class="note"><summary><code>BitStream.__cmp__(self, other)</code></summary></details><details class="note"><summary><code>BitStream.__hash__(self)</code></summary></details><h2 id="custom-types">Custom Types<a class="headerlink" href="#custom-types" title="Permanent link">&para;</a></h2>
+<p>Define new binary coding schemes. See also: <a href="../../custom">Custom Types</a>.</p>
+<details class="note"><summary><code>register(type, reader=None, writer=None)</code></summary><p>Register a binary encoding (and/or) decoding.</p><ul><li><p><code>type</code> is a type identifier (type or "type tag").</p></li><li><p><code>reader</code> is a function with signature <code>reader(stream, n=None)</code>.</p></li><li><p><code>writer</code> is a function with signature <code>writer(stream, data)</code>.</p></li></ul></details><h2 id="exceptions">Exceptions<a class="headerlink" href="#exceptions" title="Permanent link">&para;</a></h2>
+<details class="note"><summary><code>ReadError</code></summary></details><details class="note"><summary><code>WriteError</code></summary></details><h2 id="snapshots">Snapshots<a class="headerlink" href="#snapshots" title="Permanent link">&para;</a></h2>
+<p>Save and restore stream states. See also: <a href="../../snapshots">Snapshots</a>.</p>
+<details class="note"><summary><code>State</code></summary><p>The (opaque) type of stream state.</p></details><details class="note"><summary><code>BitStream.save(self)</code></summary><p>Return a <code>State</code> instance</p></details><details class="note"><summary><code>BitStream.restore(self, state)</code></summary><p>Restore a previous stream state.</p><p>Raise a <code>ValueError</code> if the state is invalid.</p></details>
                 
                   
                 
@@ -639,7 +571,7 @@ ValueError: ...
     <div class="md-footer-nav">
       <nav class="md-footer-nav__inner md-grid">
         
-          <a href="../custom/" title="Custom Types" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel="prev">
+          <a href="../snapshots/" title="Snapshots" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel="prev">
             <div class="md-flex__cell md-flex__cell--shrink">
               <i class="md-icon md-icon--arrow-back md-footer-nav__button"></i>
             </div>
@@ -648,19 +580,19 @@ ValueError: ...
                 <span class="md-footer-nav__direction">
                   Previous
                 </span>
-                Custom Types
+                Snapshots
               </span>
             </div>
           </a>
         
         
-          <a href="../API/" title="API" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
+          <a href="../contribute/" title="Contribute" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
             <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
               <span class="md-flex__ellipsis">
                 <span class="md-footer-nav__direction">
                   Next
                 </span>
-                API
+                Contribute
               </span>
             </div>
             <div class="md-flex__cell md-flex__cell--shrink">

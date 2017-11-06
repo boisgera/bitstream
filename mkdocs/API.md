@@ -1,0 +1,262 @@
+
+API
+================================================================================
+
+In the following code samples, we assume that all symbols of 
+NumPy and BitStream are available:
+
+    >>> from numpy import *
+    >>> from bitstream import *
+
+
+Create / Read / Write
+--------------------------------------------------------------------------------
+
+??? note "`BitStream(...)`"
+    Create a BitStream.
+
+    <h5>Arguments</h5>
+    
+      - without arguments, `BitStream()` creates an empty bitstream.
+
+      - with arguments, `BitStream(*args, **kwargs)`
+        also forwards 
+        the arguments to the `write` method.
+
+    <h5>Usage</h5>
+
+        >>> stream = BitStream()
+        >>> stream = BitStream([False, True])
+        >>> stream = BitStream("Hello", str)
+        >>> stream = BitStream(42, uint8)
+
+
+??? note "`BitStream.write(self, data, type=None)`"
+    Append `data` at the end of the stream.
+
+    <h5>Arguments</h5>
+
+      - `data` is the data to be encoded.
+
+        Its type should be consistent with the `type` argument.
+
+      - `type` is a type identifier (such as `bool`, `str`, `int8`, etc.).
+
+        It is optional if `data` is an instance
+        of a registered type or for
+        lists and 1d NumPy arrays of such 
+        instances.
+
+    <h5>Usage</h5>
+
+        >>> stream = BitStream()
+        >>> stream.write(True, bool)       # explicit bool type
+        >>> stream.write(False)            # implicit bool type
+        >>> stream.write(3*[False], bool)  # list (explicit type)
+        >>> stream.write(3*[True])         # list (implicit type)
+        >>> stream.write("AB", str)        # string
+        >>> stream.write(-128, int8)       # signed 8 bit integer
+
+    <h5>See also</h5>
+
+      - [Builtin Types](../types)
+
+      - [Custom Types](../custom)
+
+
+
+??? note "`BitStream.read(self, type=None, n=None)`"
+    Consume and return `n` items of `data` from the start of the stream.
+
+    <h5>Arguments</h5>
+
+      - `type`: type identifier (such as `bool`, `str`, `int8`, etc.)
+     
+        If `type` is `None` a bitstream is returned.
+
+      - `n`: number of items to read
+
+        For most types, `n=None` reads one item, 
+        but some types use a different convention.
+
+    <h5>Returns</h5>
+
+      - `data`: `n` items of data
+
+        The type of data depends on `type` and `n`.
+
+    <h5>Usage</h5>
+
+        >>> stream = BitStream("Hello World!")
+        >>> stream.read(str, 2)
+        'He'
+        >>> stream.read(bool)
+        False
+        >>> stream.read(bool, 7)
+        [True, True, False, True, True, False, False]
+        >>> stream.read(uint8, 2)
+        array([108, 111], dtype=uint8)
+        >>> stream.read(uint8)
+        32
+        >>> stream.read(str)
+        'World!'
+
+    <h5>See also</h5>
+
+      - [Builtin Types](../types)
+
+      - [Custom Types](../custom)
+
+
+
+String Representation
+--------------------------------------------------------------------------------
+
+??? note "`BitStream.__str__(self)`"
+    Represent the stream as a string of `'0'` and `'1'`.
+
+    <h5>Usage</h5>
+
+        >>> print BitStream("ABC")
+        010000010100001001000011
+
+
+
+??? note "`BitStream.__repr__(self)`"
+    Represent the stream as a string of `'0'` and `'1'`.
+
+    <h5>Usage</h5>
+
+        >>> BitStream("ABC")
+        010000010100001001000011
+
+
+Copy
+--------------------------------------------------------------------------------
+
+Bitstreams can be copied non-destructively with `BitStream.copy`. 
+They also support the interface required by the standard library 
+`copy` module.
+
+
+??? note "`BitStream.copy(self, n=None)`"
+    Copy (partially or totally) the stream.
+
+    Copies do not consume the stream they read.
+
+    <h5>Arguments</h5>
+
+      - `n`: unsigned integer of `None`.
+
+        The number of bits to copy from the start of the stream. 
+        The full stream is copied if `n` is None.
+
+    <h5>Returns</h5>
+
+      - `stream`: a bitstream.
+
+    <h5>Raises</h5>
+
+      - `ReadError` if `n` is larger than the length of the stream.
+
+    <h5>Usage</h5>
+
+        >>> stream = BitStream("A")
+        >>> stream
+        01000001
+        >>> copy = stream.copy()
+        >>> copy
+        01000001
+        >>> stream
+        01000001
+        >>> stream.copy(4)
+        0100
+        >>> stream
+        01000001
+        >>> stream.read(BitStream, 4)
+        0100
+        >>> stream
+        0001
+
+??? note "`BitStream.__copy__(self)`"
+    Bitstream shallow copy.
+
+    <h5>Usage</h5>
+
+        >>> from copy import copy
+        >>> stream = BitStream("A")
+        >>> stream
+        01000001
+        >>> copy(stream)
+        01000001
+        >>> stream
+        01000001
+
+??? note "`BitStream.__deepcopy__(self, memo)`"
+    Bitstream deep copy.
+
+    <h5>Usage</h5>
+
+        >>> from copy import deepcopy
+        >>> stream = BitStream("A")
+        >>> stream
+        01000001
+        >>> deepcopy(stream)
+        01000001
+        >>> stream
+        01000001
+
+
+Length / Comparison
+--------------------------------------------------------------------------------
+
+??? note "`BitStream.__len__(self, other)`"
+
+??? note "`BitStream.__cmp__(self, other)`"
+
+??? note "`BitStream.__hash__(self)`"
+
+
+Custom Types
+--------------------------------------------------------------------------------
+
+Define new binary coding schemes. See also: [Custom Types](../custom).
+
+??? note "`register(type, reader=None, writer=None)`"
+    Register a binary encoding (and/or) decoding.
+
+      - `type` is a type identifier (type or "type tag").
+
+      - `reader` is a function with signature `reader(stream, n=None)`.
+
+      - `writer` is a function with signature `writer(stream, data)`.
+
+
+
+Exceptions
+--------------------------------------------------------------------------------
+
+??? note "`ReadError`"
+
+??? note "`WriteError`"
+
+
+Snapshots
+--------------------------------------------------------------------------------
+
+Save and restore stream states. See also: [Snapshots](../snapshots).
+
+??? note "`State`"
+    The (opaque) type of stream state.
+
+??? note "`BitStream.save(self)`"
+
+    Return a `State` instance
+
+??? note "`BitStream.restore(self, state)`"
+
+    Restore a previous stream state.
+
+    Raise a `ValueError` if the state is invalid.
+
+

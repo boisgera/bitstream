@@ -10,9 +10,9 @@ pages:
   - Installation: installation.md
   - Basics: basics.md
   - Built-in Types: types.md
-  - Custom Readers/Writers: custom.md
+  - Custom Types: custom.md
   - Snapshots: snapshots.md
-#  - API:
+  - API: API.md
   - Contribute: contribute.md
 
 
@@ -22,6 +22,8 @@ markdown_extensions:
   - admonition
   - toc(permalink=true)
   - footnotes
+  - pymdownx.details
+  - pymdownx.superfences
 
 
 
