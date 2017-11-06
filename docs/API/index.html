@@ -495,7 +495,7 @@
 &gt;&gt;&gt; stream = BitStream("Hello", str)
 &gt;&gt;&gt; stream = BitStream(42, uint8)
 </code></pre><p><h5>See also</h5></p><ul><li><a href="#read-write">Read / Write</a></li></ul></details><h2 id="read-write">Read / Write<a class="headerlink" href="#read-write" title="Permanent link">&para;</a></h2>
-<details class="note"><summary><code>BitStream.write(self, data, type=None)</code></summary><p>Enconde <code>data</code> and append it to the stream.</p><p><h5>Arguments</h5></p><ul><li><p><code>data</code> is the data to be encoded.</p><p>Its type should be consistent with the <code>type</code> argument.</p></li><li><p><code>type</code> is a type identifier (such as <code>bool</code>, <code>str</code>, <code>int8</code>, etc.).</p><p>It is optional if <code>data</code> is an instance
+<details class="note"><summary><code>BitStream.write(self, data, type=None)</code></summary><p>Encode <code>data</code> and append it to the stream.</p><p><h5>Arguments</h5></p><ul><li><p><code>data</code> is the data to be encoded.</p><p>Its type should be consistent with the <code>type</code> argument.</p></li><li><p><code>type</code> is a type identifier (such as <code>bool</code>, <code>str</code>, <code>int8</code>, etc.).</p><p>It is optional if <code>data</code> is an instance
 of a registered type or a
 list or 1d NumPy array of such 
 instances.</p></li></ul><p><h5>Usage</h5></p><pre><code>&gt;&gt;&gt; stream = BitStream()

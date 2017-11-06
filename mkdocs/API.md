@@ -39,7 +39,7 @@ Read / Write
 --------------------------------------------------------------------------------
 
 ??? note "`BitStream.write(self, data, type=None)`"
-    Enconde `data` and append it to the stream.
+    Encode `data` and append it to the stream.
 
     <h5>Arguments</h5>
 
