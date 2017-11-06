@@ -8,11 +8,13 @@ We assume in the sequel that all symbols of NumPy and BitStream are available:
     >>> from bitstream import *
 
 
-Create / Read / Write
+Constructor
 --------------------------------------------------------------------------------
 
+Most of the library features are available through the `BitStream` class:
+
 ??? note "`BitStream(...)`"
-    Create a BitStream.
+    BitStream class / constructor.
 
     <h5>Arguments</h5>
     
@@ -29,9 +31,15 @@ Create / Read / Write
         >>> stream = BitStream("Hello", str)
         >>> stream = BitStream(42, uint8)
 
+    <h5>See also</h5>
+
+      - [Read / Write](#read-write)
+
+Read / Write
+--------------------------------------------------------------------------------
 
 ??? note "`BitStream.write(self, data, type=None)`"
-    Append `data` at the end of the stream.
+    Enconde `data` and append it to the stream.
 
     <h5>Arguments</h5>
 
@@ -42,8 +50,8 @@ Create / Read / Write
       - `type` is a type identifier (such as `bool`, `str`, `int8`, etc.).
 
         It is optional if `data` is an instance
-        of a registered type or for
-        lists and 1d NumPy arrays of such 
+        of a registered type or a
+        list or 1d NumPy array of such 
         instances.
 
     <h5>Usage</h5>
@@ -65,7 +73,7 @@ Create / Read / Write
 
 
 ??? note "`BitStream.read(self, type=None, n=None)`"
-    Consume and return `n` items of `data` from the start of the stream.
+    Decode and consume `n` items of `data` from the start of the stream.
 
     <h5>Arguments</h5>
 
@@ -279,7 +287,7 @@ Custom Types
 --------------------------------------------------------------------------------
 
 User-defined binary codecs can be bound to type identifiers.
-See also: [Custom Types](../custom).
+For details, refer to [Custom Types](../custom).
 
 ??? note "`register(type, reader=None, writer=None)`"
     Register a binary encoding (and/or) decoding.
@@ -304,7 +312,8 @@ Exceptions
 Snapshots
 --------------------------------------------------------------------------------
 
-Save and restore stream states. See also: [Snapshots](../snapshots).
+Save and restore stream states. 
+For details, refer to [Snapshots](../snapshots).
 
 ??? note "`State`"
     The (opaque) type of stream state.
