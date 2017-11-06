@@ -20,7 +20,7 @@ Python 3
 --------------------------------------------------------------------------------
 
 !!! warning
-    Wish does not support Python 3 (yet).
+    Wish does not support Python 3.
 
 If you want to install bitstream (for Python 2) 
 but `pip` refers to your Python 3 interpreter

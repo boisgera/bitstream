@@ -32,7 +32,7 @@
         }, 
         {
             "location": "/installation/", 
-            "text": "Python 2\n\n\nBitstream supports Python 2.7.\nMake sure that the \npip\n package installer is available \nfor this version of the interpreter\n\n\n$ pip --version\npip 9.0.1 from /usr/local/lib/python2.7/dist-packages (python 2.7)\n\n\n\nand install wish\n\n\n$ pip install wish\n\n\n\nPython 3\n\n\n\n\nWarning\n\n\nWish does not support Python 3 (yet).\n\n\n\n\nIf you want to install bitstream (for Python 2) \nbut \npip\n refers to your Python 3 interpreter\n\n\n$ pip --version\npip 9.0.1 from /usr/local/lib/python3.5/dist-packages (python 3.5)\n\n\n\nthen you may have a version of pip for Python 2 installed.\nIt may be named \npip2\n or \npip2.7\n; you can use it to install wish.\nOtherwise, refer to your Python 2 interpreter explicitly: \nif it is named \npython\n\n\n$ python --version\nPython 2.7.12\n\n\n\nthen install pip for Python 2 with\n\n\n$ python -m pip install --upgrade pip\n\n\n\nand finally install bitstream\n\n\n$ python -m pip install bitstream", 
+            "text": "Python 2\n\n\nBitstream supports Python 2.7.\nMake sure that the \npip\n package installer is available \nfor this version of the interpreter\n\n\n$ pip --version\npip 9.0.1 from /usr/local/lib/python2.7/dist-packages (python 2.7)\n\n\n\nand install wish\n\n\n$ pip install wish\n\n\n\nPython 3\n\n\n\n\nWarning\n\n\nWish does not support Python 3.\n\n\n\n\nIf you want to install bitstream (for Python 2) \nbut \npip\n refers to your Python 3 interpreter\n\n\n$ pip --version\npip 9.0.1 from /usr/local/lib/python3.5/dist-packages (python 3.5)\n\n\n\nthen you may have a version of pip for Python 2 installed.\nIt may be named \npip2\n or \npip2.7\n; you can use it to install wish.\nOtherwise, refer to your Python 2 interpreter explicitly: \nif it is named \npython\n\n\n$ python --version\nPython 2.7.12\n\n\n\nthen install pip for Python 2 with\n\n\n$ python -m pip install --upgrade pip\n\n\n\nand finally install bitstream\n\n\n$ python -m pip install bitstream", 
             "title": "Installation"
         }, 
         {
@@ -42,7 +42,7 @@
         }, 
         {
             "location": "/installation/#python-3", 
-            "text": "Warning  Wish does not support Python 3 (yet).   If you want to install bitstream (for Python 2) \nbut  pip  refers to your Python 3 interpreter  $ pip --version\npip 9.0.1 from /usr/local/lib/python3.5/dist-packages (python 3.5)  then you may have a version of pip for Python 2 installed.\nIt may be named  pip2  or  pip2.7 ; you can use it to install wish.\nOtherwise, refer to your Python 2 interpreter explicitly: \nif it is named  python  $ python --version\nPython 2.7.12  then install pip for Python 2 with  $ python -m pip install --upgrade pip  and finally install bitstream  $ python -m pip install bitstream", 
+            "text": "Warning  Wish does not support Python 3.   If you want to install bitstream (for Python 2) \nbut  pip  refers to your Python 3 interpreter  $ pip --version\npip 9.0.1 from /usr/local/lib/python3.5/dist-packages (python 3.5)  then you may have a version of pip for Python 2 installed.\nIt may be named  pip2  or  pip2.7 ; you can use it to install wish.\nOtherwise, refer to your Python 2 interpreter explicitly: \nif it is named  python  $ python --version\nPython 2.7.12  then install pip for Python 2 with  $ python -m pip install --upgrade pip  and finally install bitstream  $ python -m pip install bitstream", 
             "title": "Python 3"
         }, 
         {
