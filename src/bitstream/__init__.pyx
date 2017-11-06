@@ -2,46 +2,10 @@
 # coding: utf-8
 
 """
-Binary Data Toolkit
-
-### Overview
-
-Create a binary stream with:
-
-    stream = BitStream()
-    
-Write data into the stream with:
-
-    stream.write(data, type)
-
-Read data from the stream with:
-
-    data = stream.read(type, n)
- 
-### About Types   
-    
-#### Supported Types
-
-  - `bool`,
-  - `str`,
-  - `uint8`, `uint16`, `uint32`, 
-  - `int8`, `int16`, `int32`,
-  - `float` (`float64`),
-  - `bitstream`.
-
-#### Custom Types    
-    
-The `type` parameter in `read` and `write` may be either a type or an instance
-of a type when the codec has options.
-
+Binary Data for Humans: <http://boisgera.github.io/bitstream/>
 """
 
 # Standard Python 2.7 Library 
-
-# Unfortunately, this renaming of type deoptimizes its management by Cython
-# (as a builtin). The alternative is to use Py_TYPE macro magic, but 
-# I am unsure about reference counting (and whether the extra perf does
-# justify it). And we also need 'type' (as a type) in a isinstance ...
 import __builtin__
 cdef object __builtin__type = __builtin__.type
 import atexit
@@ -68,82 +32,16 @@ from libc.string cimport memcpy
 from cpython cimport bool as boolean, Py_INCREF, Py_DECREF, PyObject, PyObject_GetIter, PyErr_Clear
 cdef extern from "Python.h":
     int _PyFloat_Pack8 (double, unsigned char *, int) except -1
-    # PyObject* Py_TYPE(object)
-#
-# TODO
-# ------------------------------------------------------------------------------
-#
-# Implement a more simpler and more easily implementable read policy: in every
-# case (but for str), unless n is inf, we should read the read n as read exactly
-# n values (or 1, and unboxed when n is None). When n is inf, that means read
-# everything, up to the end of the stream. If each case, if it can't be achieved
-# (not enough data, or reading invalid code, or can't get to the end of the
-# stream for n=inf), a ReadError should be raised. 
-#
-# Today, there is a mix where n=None is not forgiving but n > len(data) is for
-# example. That makes usage of this API a mess. Also, the "try until u can't"
-# has severe issues when it comes to beginning to decode, then realizing in the
-# middle that we can't anymore, because we have altered the original stream.
-# So the trailing bits if any in this case are corrupted anyway ; imposing the
-# end of the stream is simpler. If there was a ReadError raised, the original
-# stream is considered borked, it could be corrupted (partially read).
-#
-# A consequence of that policy: the interpretation of a raised ReadError is
-# always clear from the context: either we can't manage to read n data from
-# a stream (eos or invalid coding, which is kind of equivalent: there is simply
-# just not enough proper data encoded in the stream) or if n=inf, the read is
-# not exact (trailing bits would be left).
 
-# Rk: the ReadError policy has to be explained type by type with respect to
-#     one characteristic: is the stream unaltered when the read fails or not ?
-#     The best is NOT to give any guarantee in this respect ... Arf, unless we
-#     can easily do it (?). Nah not really easily, we need to get the start 
-#     offset (internal ! Can't be done from Python code ?), memorize it and 
-#     rollback if there is a problem ... It can be done if I decide so, with
-#     the public keyword ... That would be a nice property ... but probably
-#     a performance and maintenance cost. KISS applies here.
-#
-#
-# Update: above is partially obsolete: the snapshot effort is meant to
-#         allow for all potentially stream-corruptiing operations to be
-#         roll-backed, so that the mere error scheme can be converted to
-#         a robust exception scheme.
 
-#  
-# TODO: Consider using the Numpy C API instead of casting with array.
-#       (see <http://docs.scipy.org/doc/numpy/reference/c-api.array.html>)
-#       This is actually 2/3 of the times spent in writing of ndarray-like data.
-#
-# TODO: get rid of inf. Semantics are unclear, use cases are poor.
-#
-# TODO: define pxd interface files for faster calls from Cython modules ?
-#
-# ------------------------------------------------------------------------------
-# The attributes `_read_offset` and `_write_offset` are probably a stupid 
-# way to represent the bit pointers. (I don't even know the size of `long long` is long ...). 
-# I have no idea how the library behaves if we try to use it with very large (~500 Mo)
-# bitstreams. We should "hit the wall" 8 times to early due to the
-# offset representation.
-#
-# The smart/tight representation is probably a pair (byte_offset, bit offset) 
-# with size_t / unsigned char types. And anyway we compute this pair over
-# and over in all readers/writers, the refactored code should be as simple
-# as the previous one, except for the need to have a small overflow management
-# with the bit offset (something that should probably be inlined).
-#
-
-#
 # Metadata
 # ------------------------------------------------------------------------------
-#
 __author__ = u"Sébastien Boisgérault <Sebastien.Boisgerault@mines-paristech.fr>"
 __license__ = "MIT License"
 
-#
-# Cython Interface
-# ------------------------------------------------------------------------------
-#
 
+# Cython Interface (pxd file)
+# ------------------------------------------------------------------------------
 _include = None
 
 def get_include():
@@ -162,11 +60,9 @@ def _cleanup():
 
 atexit.register(_cleanup)
 
-#
-# BitStream
-# ------------------------------------------------------------------------------
-#
 
+# Allocation helpers
+# ------------------------------------------------------------------------------
 cdef unsigned char *byte_array_malloc(size_t size):
     cdef unsigned char *_bytes 
     _bytes = <unsigned char *>malloc(size * sizeof(unsigned char))
@@ -178,11 +74,7 @@ cdef unsigned char *byte_array_malloc(size_t size):
 cdef byte_array_free(unsigned char *_bytes):
     free(_bytes)
 
-class ReadError(Exception):
-    pass
 
-class WriteError(Exception):
-    pass
 
 cdef dict _readers = {}
 cdef dict _writers = {}
@@ -209,6 +101,9 @@ cdef type ndarray = numpy.ndarray
 cdef object zero = 0
 cdef object one  = 1
 
+
+# BitStream
+# ------------------------------------------------------------------------------
 cdef class BitStream:
     """
     BitStream class / constructor
@@ -228,12 +123,6 @@ cdef class BitStream:
         >>> stream = BitStream([False, True])
         >>> stream = BitStream("Hello", str)
         >>> stream = BitStream(42, uint8)
-
-    See also
-    ----------------------------------------------------------------------------
-
-      - Read / Write
-
     """    
     def __cinit__(self):
         self._read_offset = 0
@@ -252,9 +141,6 @@ cdef class BitStream:
     def __init__(self, *args, **kwargs):
         if args or kwargs:
             self.write(*args, **kwargs)
-
-    def __len__(self):
-        return self._write_offset - self._read_offset
 
     cpdef int _extend(BitStream self, size_t num_bits) except -1:
         """
@@ -281,6 +167,34 @@ cdef class BitStream:
 #       destroy the cases where the function could be called as a C
 #       function ?
     cpdef write(BitStream self, data, type=None):
+        """
+        Encode `data` and append it to the stream.
+
+        Arguments
+        ------------------------------------------------------------------------
+
+          - `data` is the data to be encoded.
+
+            Its type should be consistent with the `type` argument.
+
+          - `type` is a type identifier (such as `bool`, `str`, `int8`, etc.).
+
+            It is optional if `data` is an instance
+            of a registered type or a
+            list or 1d NumPy array of such 
+            instances.
+
+        Usage
+        ------------------------------------------------------------------------
+
+            >>> stream = BitStream()
+            >>> stream.write(True, bool)       # explicit bool type
+            >>> stream.write(False)            # implicit bool type
+            >>> stream.write(3*[False], bool)  # list (explicit type)
+            >>> stream.write(3*[True])         # list (implicit type)
+            >>> stream.write("AB", str)        # string
+            >>> stream.write(-128, int8)       # signed 8 bit integer
+        """
         cdef size_t length
         cdef int auto_detect = 0
         type_error = "unsupported type {0!r}."
@@ -348,6 +262,45 @@ cdef class BitStream:
             writer(self, data)
 
     cpdef read(BitStream self, type=None, n=None): 
+        """
+        Decode and consume `n` items of `data` from the start of the stream.
+
+        Arguments
+        ------------------------------------------------------------------------
+
+          - `type`: type identifier (such as `bool`, `str`, `int8`, etc.)
+         
+            If `type` is `None` a bitstream is returned.
+
+          - `n`: number of items to read
+
+            For most types, `n=None` reads one item, 
+            but some types use a different convention.
+
+        Returns
+        ------------------------------------------------------------------------
+
+          - `data`: `n` items of data
+
+            The type of data depends on `type` and `n`.
+
+        Usage
+        ------------------------------------------------------------------------
+
+            >>> stream = BitStream("Hello World!")
+            >>> stream.read(str, 2)
+            'He'
+            >>> stream.read(bool)
+            False
+            >>> stream.read(bool, 7)
+            [True, True, False, True, True, False, False]
+            >>> stream.read(uint8, 2)
+            array([108, 111], dtype=uint8)
+            >>> stream.read(uint8)
+            32
+            >>> stream.read(str)
+            'World!'
+        """
         if isinstance(type, int) and n is None:
             n = type
             type = None
@@ -397,6 +350,15 @@ cdef class BitStream:
                 return reader(self, n)
 
     def __str__(self):
+        """
+        Represent the stream as a string of `'0'` and `'1'`.
+
+        Usage
+        ------------------------------------------------------------------------
+
+            >>> print BitStream("ABC")
+            010000010100001001000011
+        """
         bools = []
         len_ = self._write_offset - self._read_offset
         for i in range(len_):
@@ -405,28 +367,163 @@ cdef class BitStream:
             bools.append(bool(self._bytes[byte_index] & mask))
         return "".join([str(int(bool_)) for bool_ in bools])
 
+    def __repr__(self):
+        """
+        Represent the stream as a string of `'0'` and `'1'`.
+
+        Usage
+        ------------------------------------------------------------------------
+
+            >>> BitStream("ABC")
+            010000010100001001000011
+        """
+        return str(self)
+
+    # Copy Methods
+    # --------------------------------------------------------------------------
     cpdef copy(BitStream self, n=None):
+        """
+        Copy (partially or totally) the stream.
+
+        Copies do not consume the stream they read.
+
+        Arguments
+        ------------------------------------------------------------------------
+
+          - `n`: unsigned integer of `None`.
+
+            The number of bits to copy from the start of the stream. 
+            The full stream is copied if `n` is None.
+
+        Returns
+        ------------------------------------------------------------------------
+
+          - `stream`: a bitstream.
+
+        Raises
+        ------------------------------------------------------------------------
+
+          - `ReadError` if `n` is larger than the length of the stream.
+
+        Usage
+        ------------------------------------------------------------------------
+
+            >>> stream = BitStream("A")
+            >>> stream
+            01000001
+            >>> copy = stream.copy()
+            >>> copy
+            01000001
+            >>> stream
+            01000001
+            >>> stream.copy(4)
+            0100
+            >>> stream
+            01000001
+            >>> stream.read(BitStream, 4)
+            0100
+            >>> stream
+            0001
+        """
         cdef unsigned long long read_offset = self._read_offset
         copy = read_bitstream(self, n)
         self._read_offset = read_offset
         return copy
 
     def __copy__(self):
+        """
+        Bitstream shallow copy.
+
+        Usage
+        ------------------------------------------------------------------------
+
+            >>> from copy import copy
+            >>> stream = BitStream("A")
+            >>> stream
+            01000001
+            >>> copy(stream)
+            01000001
+            >>> stream
+            01000001
+        """
         return self.copy()
     
     def __deepcopy__(self, memo):
+        """
+        Bitstream deep copy.
+
+        Usage
+        ------------------------------------------------------------------------
+
+            >>> from copy import deepcopy
+            >>> stream = BitStream("A")
+            >>> stream
+            01000001
+            >>> deepcopy(stream)
+            01000001
+            >>> stream
+            01000001
+        """
         return self.copy()
         
-    def __repr__(self):
-        return str(self)
+    # Length and Comparison
+    # --------------------------------------------------------------------------
+    def __len__(self):
+        """
+        Return the bitstream length in bits.
 
-    def __hash__(self):
-        copy = self.copy() # read_only would be better
-        uint8s = copy.read(numpy.uint8, len(self) / 8)
-        bools  = copy.read(bool, len(copy))
-        return hash((hashlib.sha1(uint8s).hexdigest(), tuple(bools)))
+        Usage
+        ------------------------------------------------------------------------
+
+            >>> stream = BitStream([True, False])
+            >>> len(stream) 
+            2
+
+            >>> stream = BitStream("ABC")
+            >>> len(stream)
+            24
+            >>> len(stream) // 8
+            3
+            >>> len(stream) % 8
+            0
+        """
+        return self._write_offset - self._read_offset
 
     def __richcmp__(BitStream self, other, int operation):
+        """
+        Equality / Inequality operators
+
+        Usage
+        ------------------------------------------------------------------------
+
+            >>> BitStream(True) == BitStream(True)
+            True
+            >>> BitStream(True) == BitStream([True])
+            True
+            >>> BitStream(True) == BitStream(False)
+            False
+            >>> BitStream(True) == BitStream([True, False])
+            False
+            >>> BitStream(True) != BitStream(True)
+            False
+            >>> BitStream(True) != BitStream([True])
+            False
+            >>> BitStream(True) != BitStream(False)
+            True
+            >>> BitStream(True) != BitStream([True, False])
+            True
+
+            >>> ord("A")
+            65
+            >>> BitStream("A") == BitStream(65, uint8)
+            True
+            >>> BitStream("A") == BitStream(66, uint8)
+            False
+            >>> BitStream("A") != BitStream(65, uint8)
+            False
+            >>> BitStream("A") != BitStream(66, uint8)
+            True
+        """
         # see http://docs.cython.org/src/userguide/special_methods.html
         cdef boolean equal
         if operation not in (2, 3):
@@ -443,6 +540,15 @@ cdef class BitStream:
         else:
             return not equal
 
+    def __hash__(self):
+        copy = self.copy() # read_only would be better
+        uint8s = copy.read(numpy.uint8, len(self) / 8)
+        bools  = copy.read(bool, len(copy))
+        return hash((hashlib.sha1(uint8s).hexdigest(), tuple(bools)))
+
+
+    # Snapshots
+    # --------------------------------------------------------------------------
     cpdef State save(BitStream self):
         cdef State state
         state = self._states[-1]
@@ -480,19 +586,24 @@ cdef class BitStream:
     def __dealloc__(self):
         free(self._bytes)
 
-#
+
+# Exceptions
+# ------------------------------------------------------------------------------
+class ReadError(Exception):
+    pass
+
+class WriteError(Exception):
+    pass
+
+
 # Bitstream State
 # ------------------------------------------------------------------------------
-#
-
 cdef class State: # treat as opaque and immutable.
-
     def __richcmp__(self, State other, int operation):
         # see http://docs.cython.org/src/userguide/special_methods.html
         cdef boolean equal
         if operation not in (2, 3):
             raise NotImplementedError()
-        # BUG: the state attribute access is not optimized ... Why ?
         equal = self._stream is other._stream and \
                 self._read_offset == other._read_offset and \
                 self._write_offset == other._write_offset and \
@@ -501,11 +612,10 @@ cdef class State: # treat as opaque and immutable.
             return equal
         else:
             return not equal
-#
+
+
 # Bool Reader / Writer
 # ------------------------------------------------------------------------------
-#
-
 cpdef read_bool(BitStream stream, n=None):
     """
     Read bools from a stream.
@@ -540,12 +650,6 @@ cpdef read_bool(BitStream stream, n=None):
     stream._read_offset += _n
     return bools
 
-# TODO: support numpy._bool (that are not singletons) and arrays.
-#       Consistency with the array implementation and the way we
-#       handle list also dictates that in last resolt, we cast the
-#       argument to bool and write it.
-# TODO: lots of code duplicate. Consider an C inline function and
-#       measure the impact.
 cpdef write_bool(BitStream stream, bools):
     """
     Write bools into a stream.
@@ -557,15 +661,11 @@ cpdef write_bool(BitStream stream, bools):
     cdef size_t byte_index
     cdef unsigned char bit_index
     cdef long long offset
-    #cdef boolean _bool
     cdef list _bools
     cdef type _type
     cdef np.uint8_t _np_bool
-    #cdef np.ndarray[np.uint8_t, ndim=1, cast=True] _array
 
     offset = stream._write_offset
-    # Rk: the fallback path is actually only 7% slower than the "fast" path.
-    #     It is worth keeping the duplicated code here ?
     if bools is false or bools is zero: # False or 0 (if cached).
         stream._extend(1)
         _bytes = stream._bytes
@@ -598,7 +698,7 @@ cpdef write_bool(BitStream stream, bools):
                 mask1 = 128 >> bit_index
                 mask2 = 255 - mask1
                 _byte = _bytes[byte_index]
-                if _bool is false: # check the benefit of duplication here ?
+                if _bool is false:
                     _bytes[byte_index] = (_byte & mask2)
                 elif _bool is true or _bool:
                     _bytes[byte_index] = (_byte & mask2) | mask1
@@ -607,37 +707,6 @@ cpdef write_bool(BitStream stream, bools):
                 i += 1
             stream._write_offset += n
         elif _type is ndarray:
-            # Perf is not very good here for small sizes: 25% RT for 8-bit 
-            # chunks (compared with 5% for lists of bools). Even for large
-            # size, the array is not much faster ...
-            # Plus the semantics is a mess: BitStream(array(256, uint16), bool)
-            # would yield 0 for example, instead of 1.
-            # try with dtype=bool again and go beyond the ValueError ?
-            # OK, done with "cast=True", that semantics issue is solved.
-            # TODO: Add tests to make sure that part works as expected.
-            # Can't do much for the dog slow part ... this is the array
-            # cast mostly (~ 2/3 of the time) ...
-            # Today we pay the cost even if the array needs no cast
-            # (right type, right dimension ...)
-            # Note that if the type does not match (say uint8), we
-            # go up to 45% RT ...
-            # I guess that for bools I may have to kill this call to array ...
-            # and iterate directly on the structure ? Try that ? May slightly
-            # deoptimize the list code and share this code ?
-            # Well if we do that, the array code is "only" 17% of RT (25% for
-            # non-bool types) and typically always stay 2x slower than the
-            # list case (3x for non-bool types). And the check that still 
-            # lack are going to slow down the things a little ...
-
-            # TODO: need to check dimensions ... Maybe we should not accept
-            #       0-dim arrays to begin with ? And let the 2-dim and more
-            #       array pass as if the value to be cast to bool is the 
-            #       inner array (this is gonna generate a ValueError that
-            #       may be quite cryptic ...)
-            #       We could do that ... but the behavior will (slightly
-            #       differ from the other writers if we don't accept 0-dim
-            #       arrays). So add the support for them. (is there a macro
-            #       from the Numpy API that we could use ? I think so.)
             n = len(bools)
             stream._extend(n)
             _bytes = stream._bytes
@@ -654,25 +723,6 @@ cpdef write_bool(BitStream stream, bools):
                     _bytes[byte_index] = (_byte & mask2)
                 i += 1
             stream._write_offset += n
-
-#            _array = numpy.array(bools, dtype=bool, ndmin=1, copy=False)
-#            n = len(_array)
-#            stream._extend(n)
-#            _bytes = stream._bytes
-#            i = 0
-#            for i in range(n):
-#                _np_bool = <np.uint8_t>(_array[i])
-#                byte_index = (offset + i) / 8
-#                bit_index  = (offset + i) - 8 * byte_index
-#                mask1 = 128 >> bit_index
-#                mask2 = 255 - mask1
-#                _byte = _bytes[byte_index]
-#                if _np_bool:
-#                    _bytes[byte_index] = (_byte & mask2) | mask1
-#                else:
-#                    _bytes[byte_index] = (_byte & mask2)
-#                i += 1
-#            stream._write_offset += n
         elif bools:
             stream._extend(1)
             _bytes = stream._bytes
@@ -695,15 +745,9 @@ cpdef write_bool(BitStream stream, bools):
 register(bool, reader=read_bool, writer=write_bool)
 register(numpy.bool_, reader=read_bool, writer=write_bool)
 
-#
+
 # Integers Type Readers and Writers: signed/unsigned, 8/16/32 bits integers
 # ------------------------------------------------------------------------------
-#
-
-# TODO: check type, if that's not ndarray / list, treat as a scalar. (fast path)
-#       otherwise cast to array, this policy has the best asymptotic behavior
-#       and perform the type check upfront for list that may contain stuff that
-#       can't be converted to uint8.
 cpdef write_uint8(BitStream stream, data):
     cdef unsigned char *_bytes
     cdef size_t num_bytes, byte_index, i
@@ -725,8 +769,6 @@ cpdef write_uint8(BitStream stream, data):
     _type = type(data)
     
     if _type is list or _type is np.ndarray: 
-        # don't "cast" if this is an array ? measure list / array perf.
-        # discrepancy in benchmarks ?
         array = numpy.array(data, dtype=uint8, copy=False, ndmin=1)
         num_bytes = len(array)
         stream._extend(8 * num_bytes)
@@ -761,13 +803,6 @@ cpdef write_uint8(BitStream stream, data):
                 (_bytes[byte_index + 1] & mask2) | _uint8
         stream._write_offset += 8           
      
-#cpdef ____write_uint8(BitStream stream, data):
-#    """
-#    Write unsigned 8-bit integers into a stream.
-#    """
-#    array = numpy.array(data, uint8, copy=false, ndmin=1)
-#    _write_uint8(stream, array)
-
 @cython.boundscheck(False) # TODO: generalize
 cpdef _write_uint8(BitStream stream, np.ndarray[np.uint8_t, ndim=1] uint8s):
     """
@@ -823,7 +858,7 @@ cpdef read_uint8(BitStream stream, n=None):
             raise ReadError("end of stream")
         stream._read_offset += 8
         if bit_index == 0:
-            return uint8(_bytes[byte_index]) # cast instead ? probably faster.
+            return uint8(_bytes[byte_index])
         else:
           bit_index_c = 8 - bit_index
           mask1 = 255 >> bit_index
@@ -975,8 +1010,7 @@ cpdef _write_uint16(BitStream stream, np.ndarray[np.uint16_t, ndim=1] uint16s):
                             
     num_uint16s = len(uint16s)
     stream._extend(16 * num_uint16s)
-    _bytes = stream._bytes # That's a nasty bug if i take a ref to _bytes
-    # BEFORE the extend ...
+    _bytes = stream._bytes
 
     byte_index = stream._write_offset / 8
     bit_index  = stream._write_offset - 8 * byte_index
@@ -1412,11 +1446,8 @@ cpdef _write_int64(BitStream stream, np.ndarray[np.int64_t, ndim=1] int64s):
 
 register(int64, reader=read_int64, writer=write_int64)
 
-#
 # Floating-Point Data Reader and Writer: 64 bits (double)
 # ------------------------------------------------------------------------------
-#
-
 cpdef read_float64(BitStream stream, n=None):
     """
     Read 64-bit floating-point numbers (doubles) from a stream.
@@ -1447,11 +1478,6 @@ cpdef _write_float64(BitStream stream, np.ndarray[np.float64_t, ndim=1] float64s
     """
     Write a 1-dim. array of 64-bit floating-point numbers into a stream.
     """
-    # Comment: The function `_PyFloat_Pack8` belongs to the Python API. 
-    #           Refer to "floatobject.h" (included by "Python.h") for details.
-    #
-    # TODO: management on errors of `_PyFloat_Pack8`
-
     cdef size_t num_floats
 
     cdef size_t byte_offset
@@ -1479,9 +1505,6 @@ cpdef _write_float64(BitStream stream, np.ndarray[np.float64_t, ndim=1] float64s
         for _float in float64s:
             _PyFloat_Pack8(_float, _buffer, 0)
             for i in range(8):
-                # rk: we're doing *a lot* of useless pointer reads (overridden)
-                #     for the sake of not having to write specialize code for 
-                #     the first and last byte of the target.
                 pointer[i  ] =  (pointer[i  ] & (255 << bit_offset_c)) + \
                                ((_buffer[i  ] & (255 << bit_offset  )) >> bit_offset  )
                 pointer[i+1] = ((_buffer[i  ] & (255 >> bit_offset_c)) << bit_offset_c) + \
@@ -1492,17 +1515,15 @@ cpdef _write_float64(BitStream stream, np.ndarray[np.float64_t, ndim=1] float64s
 register(numpy.float64, reader=read_float64, writer=write_float64)
 register(float, reader=read_float64, writer=write_float64)
 
-#
+
 # String Reader / Writer
 # ------------------------------------------------------------------------------
-#
-
 cpdef read_str(BitStream stream, n=None):
     """
     Read a string from a stream.
     """
-    if n is None: # have a more consistent API and consider that None is 1 char ?
-        if (len(stream) % 8) != 0: # Really ? Accept and let the user check ?
+    if n is None:
+        if (len(stream) % 8) != 0:
             raise ReadError("cannot empty the stream.")
         else:
             n = len(stream) / 8
@@ -1519,10 +1540,9 @@ cpdef write_str(BitStream stream, string):
 
 register(str, reader=read_str, writer=write_str)
 
-#
+
 # BitStream Reader/Writer
 # ------------------------------------------------------------------------------
-#
 cpdef write_bitstream(BitStream sink, BitStream source):
     """
     Write the stream `source` into the stream `sink`.
@@ -1561,28 +1581,4 @@ cpdef read_bitstream(BitStream source, n=None):
     return sink
 
 register(BitStream, reader=read_bitstream, writer=write_bitstream)
-
-#
-# Hex Dump
-# ------------------------------------------------------------------------------
-#
-
-# TODO: see man hexdump and look for "canonical display"
-def format_hex(integer, length):
-    hex_ = hex(integer)[2:]
-    pad = (length - len(hex_)) * "0"
-    return pad + hex_
-
-def hex_dump(stream):
-    stream = stream.copy()
-    offset = 0
-    try: 
-        while len(stream) > 0:
-            print format_hex(offset, 7),
-            for i in range(6):
-                print format_hex(stream.read_uint16(stream), 4),
-            print
-            offset += 12
-    except ReadError:
-        pass # forget about trailing bits
 
