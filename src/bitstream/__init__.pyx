@@ -5,6 +5,10 @@
 Binary Data for Humans: <http://boisgera.github.io/bitstream/>
 """
 
+
+# Imports
+# ------------------------------------------------------------------------------
+
 # Standard Python 2.7 Library 
 import __builtin__
 cdef object __builtin__type = __builtin__.type
@@ -40,6 +44,24 @@ __author__ = u"Sébastien Boisgérault <Sebastien.Boisgerault@mines-paristech.fr
 __license__ = "MIT License"
 
 
+# Constants
+# ------------------------------------------------------------------------------
+cdef object none = None
+cdef boolean true  = True
+cdef boolean false = False
+cdef type uint8   = numpy.uint8
+cdef type int8    = numpy.int8
+cdef type uint16  = numpy.uint16
+cdef type int16   = numpy.int16
+cdef type uint32  = numpy.uint32
+cdef type int32   = numpy.int32
+cdef type uint64  = numpy.uint64
+cdef type int64  = numpy.int64
+cdef type float64 = numpy.float64
+cdef type ndarray = numpy.ndarray
+cdef object zero = 0
+cdef object one  = 1
+
 # Cython Interface (pxd file)
 # ------------------------------------------------------------------------------
 _include = None
@@ -59,47 +81,6 @@ def _cleanup():
         shutil.rmtree(_include)
 
 atexit.register(_cleanup)
-
-
-# Allocation helpers
-# ------------------------------------------------------------------------------
-cdef unsigned char *byte_array_malloc(size_t size):
-    cdef unsigned char *_bytes 
-    _bytes = <unsigned char *>malloc(size * sizeof(unsigned char))
-    if not _bytes:
-        raise MemoryError()
-    else:
-        return _bytes
-
-cdef byte_array_free(unsigned char *_bytes):
-    free(_bytes)
-
-
-
-cdef dict _readers = {}
-cdef dict _writers = {}
-
-def register(type, reader=None, writer=None):
-    if reader is not None:
-        _readers[type] = reader
-    if writer is not None:
-        _writers[type] = writer
-
-cdef object none = None
-cdef boolean true  = True
-cdef boolean false = False
-cdef type uint8   = numpy.uint8
-cdef type int8    = numpy.int8
-cdef type uint16  = numpy.uint16
-cdef type int16   = numpy.int16
-cdef type uint32  = numpy.uint32
-cdef type int32   = numpy.int32
-cdef type uint64  = numpy.uint64
-cdef type int64  = numpy.int64
-cdef type float64 = numpy.float64
-cdef type ndarray = numpy.ndarray
-cdef object zero = 0
-cdef object one  = 1
 
 
 # BitStream
@@ -161,11 +142,6 @@ cdef class BitStream:
             self._num_bytes = new_num_bytes
         return 0
 
-# TODO: builtin_type prevents Cython to optimize the type function ...
-#       add an underscore to "type" in the signature ? Use *args and
-#       *kwargs and get the info (and validate the stuff ?). Does it
-#       destroy the cases where the function could be called as a C
-#       function ?
     cpdef write(BitStream self, data, type=None):
         """
         Encode `data` and append it to the stream.
@@ -199,8 +175,6 @@ cdef class BitStream:
         cdef int auto_detect = 0
         type_error = "unsupported type {0!r}."
 
-        # type = args[0] if args else kwargs.get("type")
-
         # automatic type detection
         if type is None:
             auto_detect = 1
@@ -213,7 +187,7 @@ cdef class BitStream:
                     if len(data) == 0:
                         return
                     else:
-                        type = __builtin__type(data[0]) # really ?                   
+                        type = __builtin__type(data[0])                  
                 elif data_type is ndarray:
                     type = data.dtype.type
                 else:
@@ -466,6 +440,7 @@ cdef class BitStream:
         """
         return self.copy()
         
+
     # Length and Comparison
     # --------------------------------------------------------------------------
     def __len__(self):
@@ -531,7 +506,7 @@ cdef class BitStream:
         if not isinstance(other, BitStream):
             equal = false
         else:
-           s1 = self.copy() # read_only would be better ...
+           s1 = self.copy()
            s2 = other.copy() # test for type, 
            equal = all(s1.read(numpy.uint8, len(s1) / 8) == s2.read(numpy.uint8, len(s2) / 8)) and\
                    (s1.read(bool, len(s1)) == s2.read(bool, len(s2)))
@@ -541,7 +516,12 @@ cdef class BitStream:
             return not equal
 
     def __hash__(self):
-        copy = self.copy() # read_only would be better
+        """
+        Compute a bitstream hash 
+
+        The computed hash is consistent with the equality operator.
+        """
+        copy = self.copy()
         uint8s = copy.read(numpy.uint8, len(self) / 8)
         bools  = copy.read(bool, len(copy))
         return hash((hashlib.sha1(uint8s).hexdigest(), tuple(bools)))
@@ -550,6 +530,9 @@ cdef class BitStream:
     # Snapshots
     # --------------------------------------------------------------------------
     cpdef State save(BitStream self):
+        """
+        Return a `State` instance
+        """
         cdef State state
         state = self._states[-1]
         if state._read_offset != self._read_offset or \
@@ -568,6 +551,11 @@ cdef class BitStream:
         return state
 
     cpdef restore(BitStream self, State state):
+        """
+        Restore a previous stream state.
+
+        Raise a `ValueError` if the state is invalid.
+        """
         if self is not state._stream:
             raise ValueError("the state does not belong to this stream.")
         # The restore action may fail, so we work on a copy of the saved states.
@@ -587,18 +575,37 @@ cdef class BitStream:
         free(self._bytes)
 
 
+# Types Registration
+# ------------------------------------------------------------------------------
+cdef dict _readers = {}
+cdef dict _writers = {}
+
+def register(type, reader=None, writer=None):
+    if reader is not None:
+        _readers[type] = reader
+    if writer is not None:
+        _writers[type] = writer
+
+
 # Exceptions
 # ------------------------------------------------------------------------------
 class ReadError(Exception):
-    pass
+    """
+    Exception raised when a binary decoding is impossible.
+    """
 
 class WriteError(Exception):
-    pass
+    """
+    Exception raised when a binary encoding is impossible.
+    """
 
 
 # Bitstream State
 # ------------------------------------------------------------------------------
 cdef class State: # treat as opaque and immutable.
+    """
+    The (opaque) type of stream state.
+    """
     def __richcmp__(self, State other, int operation):
         # see http://docs.cython.org/src/userguide/special_methods.html
         cdef boolean equal
@@ -1488,7 +1495,6 @@ cpdef _write_float64(BitStream stream, np.ndarray[np.float64_t, ndim=1] float64s
     cdef unsigned char j
     cdef unsigned char *_buffer = [0, 0, 0, 0, 0, 0, 0, 0]
     cdef double _float
-
 
     num_floats = len(float64s)
     stream._extend(64 * num_floats)
