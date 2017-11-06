@@ -17,20 +17,10 @@ try:
 except ImportError:
     error = "pip is not installed, refer to <{url}> for instructions."
     raise ImportError(error.format(url="http://pip.readthedocs.org"))
-import setuptools
-import numpy
-
-# TODO: to build the library, numpy headers (arrayobject.h for example)
-#       are needed, handle that. When setuptools is "playing" with bitstream,
-#       the headers are not installed (yet ?). Have a look at
-#       <http://mail.scipy.org/pipermail/numpy-discussion/2010-April/049782.html>
-#       Get rid of the install_require approach, check it manually (numpy,
-#       version >= 1.8 and headers location) and document why.
-
-
 import pkg_resources
+import setuptools
 
-# Numpy
+# NumPy 
 try:
     requirement = "numpy"
     pkg_resources.require(requirement)
@@ -39,10 +29,9 @@ except pkg_resources.DistributionNotFound:
     error = "{0!r} not available".format(requirement)
     raise ImportError(error)
 
-#
+
 # Metadata
 # ------------------------------------------------------------------------------
-#
 metadata = dict(
   name = "bitstream",
   version = "2.1.1-alpha.1",
@@ -60,10 +49,9 @@ metadata = dict(
     ]
 )
 
-#
+
 # CYTHON and REST options management (from setup.cfg)
 # ------------------------------------------------------------------------------
-#
 CYTHON = None
 REST = None
 
@@ -100,10 +88,9 @@ def import_CYTHON_REST_from_setup_cfg():
 
 import_CYTHON_REST_from_setup_cfg()
 
-#
+
 # Custom developer commands
 # ------------------------------------------------------------------------------
-#
 def make_extension():
     if CYTHON:
         pkg_resources.require("Cython")
@@ -163,25 +150,10 @@ commands = dict(
     )
 )
 
-#
+
 # Setup
 # ------------------------------------------------------------------------------
-#
-
-# BUG: there is still a conflict between the "package" version of bitstream
-# (that contains the package data) and the extension module.
-
 if __name__ == "__main__":
-
-    # TODO: transform bitstream into a package, include bitstream.pxd as
-    # package data, provide some API to get the path of the pxd file
-    # (such as get_pxd or get_include ? find a project that already does that, 
-    # such as lxml). Then, in the cython packages that depend on the pxd files,
-    # install bitstream as a setup dependency, query the path of the pxd file,
-    # then specify the path with cythonize (i hope that the API allows it).
-    # UPDATE: go for get_include, lxml also uses this pattern (but returns
-    # a list, not a string like numpy)
-
     # CYTHON and REST options management (from command-line)
     if "--cython" in sys.argv:
         sys.argv.remove("--cython")
@@ -189,10 +161,6 @@ if __name__ == "__main__":
     if "--rest" in sys.argv:
         sys.argv.remove("--rest")
         REST = True
-
-    # Execution of custom commands
-
-    #ake_extension()
 
     contents = dict(
       packages = setuptools.find_packages(),
