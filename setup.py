@@ -123,9 +123,10 @@ def make_extension():
             raise IOError(error)
 
 def make_rest():
-    error = os.system("pandoc -o manual.rst manual.txt")
-    if error:
-        raise OSError(error, "cannot generate ReST documentation")
+    pass
+#    error = os.system("pandoc -o manual.rst manual.txt")
+#    if error:
+#        raise OSError(error, "cannot generate ReST documentation")
 
 def make_pdf():
     "Generate a PDF documentation"

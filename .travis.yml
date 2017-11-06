@@ -12,5 +12,5 @@ install:
   - python setup.py --cython install
 
 script: 
-  - cd .. && python -m doctest bitstream/manual.txt
+  - cd .. && python -m doctest mkdocs/*.md
 
