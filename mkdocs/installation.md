@@ -9,9 +9,9 @@ for this version of the interpreter
     $ pip --version
     pip 9.0.1 from /usr/local/lib/python2.7/dist-packages (python 2.7)
 
-and install wish
+and install bitstream
 
-    $ pip install wish
+    $ pip install bitstream
 
 [pip]: https://packaging.python.org/tutorials/installing-packages/#install-pip-setuptools-and-wheel
 
@@ -20,7 +20,7 @@ Python 3
 --------------------------------------------------------------------------------
 
 !!! warning
-    Wish does not support Python 3.
+    bitstream does not support Python 3.
 
 If you want to install bitstream (for Python 2) 
 but `pip` refers to your Python 3 interpreter
@@ -29,7 +29,7 @@ but `pip` refers to your Python 3 interpreter
     pip 9.0.1 from /usr/local/lib/python3.5/dist-packages (python 3.5)
 
 then you may have a version of pip for Python 2 installed.
-It may be named `pip2` or `pip2.7`; you can use it to install wish.
+It may be named `pip2` or `pip2.7`; you can use it to install bitstream.
 Otherwise, refer to your Python 2 interpreter explicitly: 
 if it is named `python`
 
