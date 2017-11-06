@@ -10,6 +10,8 @@ Contribute
 
   - build from the sources
 
+  - run the tests
+
 ----
 
 Bitstream targets [Python 2.7][], you will need to install it first.
