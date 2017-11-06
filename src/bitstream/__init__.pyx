@@ -211,7 +211,29 @@ cdef object one  = 1
 
 cdef class BitStream:
     """
-    BitStream Class
+    BitStream class / constructor
+
+    Arguments
+    ---------------------------------------------------------------------------- 
+   
+      - without arguments, `BitStream()` creates an empty bitstream.
+
+      - with arguments, `BitStream(*args, **kwargs)`
+        also forwards the arguments to the `write` method.
+
+    Usage
+    ----------------------------------------------------------------------------
+
+        >>> stream = BitStream()
+        >>> stream = BitStream([False, True])
+        >>> stream = BitStream("Hello", str)
+        >>> stream = BitStream(42, uint8)
+
+    See also
+    ----------------------------------------------------------------------------
+
+      - Read / Write
+
     """    
     def __cinit__(self):
         self._read_offset = 0
