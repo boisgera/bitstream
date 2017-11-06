@@ -312,8 +312,15 @@
     <ul class="md-nav__list" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#create-read-write" title="Create / Read / Write" class="md-nav__link">
-    Create / Read / Write
+  <a href="#constructor" title="Constructor" class="md-nav__link">
+    Constructor
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#read-write" title="Read / Write" class="md-nav__link">
+    Read / Write
   </a>
   
 </li>
@@ -402,8 +409,15 @@
     <ul class="md-nav__list" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#create-read-write" title="Create / Read / Write" class="md-nav__link">
-    Create / Read / Write
+  <a href="#constructor" title="Constructor" class="md-nav__link">
+    Constructor
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#read-write" title="Read / Write" class="md-nav__link">
+    Read / Write
   </a>
   
 </li>
@@ -472,16 +486,18 @@
 <pre><code>&gt;&gt;&gt; from numpy import *
 &gt;&gt;&gt; from bitstream import *
 </code></pre>
-<h2 id="create-read-write">Create / Read / Write<a class="headerlink" href="#create-read-write" title="Permanent link">&para;</a></h2>
-<details class="note"><summary><code>BitStream(...)</code></summary><p>Create a BitStream.</p><p><h5>Arguments</h5></p><ul><li><p>without arguments, <code>BitStream()</code> creates an empty bitstream.</p></li><li><p>with arguments, <code>BitStream(*args, **kwargs)</code>
+<h2 id="constructor">Constructor<a class="headerlink" href="#constructor" title="Permanent link">&para;</a></h2>
+<p>Most of the library features are available through the <code>BitStream</code> class:</p>
+<details class="note"><summary><code>BitStream(...)</code></summary><p>BitStream class / constructor.</p><p><h5>Arguments</h5></p><ul><li><p>without arguments, <code>BitStream()</code> creates an empty bitstream.</p></li><li><p>with arguments, <code>BitStream(*args, **kwargs)</code>
     also forwards 
     the arguments to the <code>write</code> method.</p></li></ul><p><h5>Usage</h5></p><pre><code>&gt;&gt;&gt; stream = BitStream()
 &gt;&gt;&gt; stream = BitStream([False, True])
 &gt;&gt;&gt; stream = BitStream("Hello", str)
 &gt;&gt;&gt; stream = BitStream(42, uint8)
-</code></pre></details><details class="note"><summary><code>BitStream.write(self, data, type=None)</code></summary><p>Append <code>data</code> at the end of the stream.</p><p><h5>Arguments</h5></p><ul><li><p><code>data</code> is the data to be encoded.</p><p>Its type should be consistent with the <code>type</code> argument.</p></li><li><p><code>type</code> is a type identifier (such as <code>bool</code>, <code>str</code>, <code>int8</code>, etc.).</p><p>It is optional if <code>data</code> is an instance
-of a registered type or for
-lists and 1d NumPy arrays of such 
+</code></pre><p><h5>See also</h5></p><ul><li><a href="#read-write">Read / Write</a></li></ul></details><h2 id="read-write">Read / Write<a class="headerlink" href="#read-write" title="Permanent link">&para;</a></h2>
+<details class="note"><summary><code>BitStream.write(self, data, type=None)</code></summary><p>Enconde <code>data</code> and append it to the stream.</p><p><h5>Arguments</h5></p><ul><li><p><code>data</code> is the data to be encoded.</p><p>Its type should be consistent with the <code>type</code> argument.</p></li><li><p><code>type</code> is a type identifier (such as <code>bool</code>, <code>str</code>, <code>int8</code>, etc.).</p><p>It is optional if <code>data</code> is an instance
+of a registered type or a
+list or 1d NumPy array of such 
 instances.</p></li></ul><p><h5>Usage</h5></p><pre><code>&gt;&gt;&gt; stream = BitStream()
 &gt;&gt;&gt; stream.write(True, bool)       # explicit bool type
 &gt;&gt;&gt; stream.write(False)            # implicit bool type
@@ -489,7 +505,7 @@ instances.</p></li></ul><p><h5>Usage</h5></p><pre><code>&gt;&gt;&gt; stream = Bi
 &gt;&gt;&gt; stream.write(3*[True])         # list (implicit type)
 &gt;&gt;&gt; stream.write("AB", str)        # string
 &gt;&gt;&gt; stream.write(-128, int8)       # signed 8 bit integer
-</code></pre><p><h5>See also</h5></p><ul><li><p><a href="../../types">Builtin Types</a></p></li><li><p><a href="../../custom">Custom Types</a></p></li></ul></details><details class="note"><summary><code>BitStream.read(self, type=None, n=None)</code></summary><p>Consume and return <code>n</code> items of <code>data</code> from the start of the stream.</p><p><h5>Arguments</h5></p><ul><li><p><code>type</code>: type identifier (such as <code>bool</code>, <code>str</code>, <code>int8</code>, etc.)</p><p>If <code>type</code> is <code>None</code> a bitstream is returned.</p></li><li><p><code>n</code>: number of items to read</p><p>For most types, <code>n=None</code> reads one item, 
+</code></pre><p><h5>See also</h5></p><ul><li><p><a href="../../types">Builtin Types</a></p></li><li><p><a href="../../custom">Custom Types</a></p></li></ul></details><details class="note"><summary><code>BitStream.read(self, type=None, n=None)</code></summary><p>Decode and consume <code>n</code> items of <code>data</code> from the start of the stream.</p><p><h5>Arguments</h5></p><ul><li><p><code>type</code>: type identifier (such as <code>bool</code>, <code>str</code>, <code>int8</code>, etc.)</p><p>If <code>type</code> is <code>None</code> a bitstream is returned.</p></li><li><p><code>n</code>: number of items to read</p><p>For most types, <code>n=None</code> reads one item, 
 but some types use a different convention.</p></li></ul><p><h5>Returns</h5></p><ul><li><p><code>data</code>: <code>n</code> items of data</p><p>The type of data depends on <code>type</code> and <code>n</code>.</p></li></ul><p><h5>Usage</h5></p><pre><code>&gt;&gt;&gt; stream = BitStream("Hello World!")
 &gt;&gt;&gt; stream.read(str, 2)
 'He'
@@ -588,10 +604,11 @@ False
 True
 </code></pre></details><details class="note"><summary><code>BitStream.__hash__(self)</code></summary><p>Compute a bitstream hash </p><p>The computed hash is consistent with the equality operator.</p></details><h2 id="custom-types">Custom Types<a class="headerlink" href="#custom-types" title="Permanent link">&para;</a></h2>
 <p>User-defined binary codecs can be bound to type identifiers.
-See also: <a href="../../custom">Custom Types</a>.</p>
+For details, refer to <a href="../../custom">Custom Types</a>.</p>
 <details class="note"><summary><code>register(type, reader=None, writer=None)</code></summary><p>Register a binary encoding (and/or) decoding.</p><ul><li><p><code>type</code> is a type identifier (type or "type tag").</p></li><li><p><code>reader</code> is a function with signature <code>reader(stream, n=None)</code>.</p></li><li><p><code>writer</code> is a function with signature <code>writer(stream, data)</code>.</p></li></ul></details><h2 id="exceptions">Exceptions<a class="headerlink" href="#exceptions" title="Permanent link">&para;</a></h2>
 <details class="note"><summary><code>ReadError</code></summary><p>Exception raised when a binary decoding is impossible.</p></details><details class="note"><summary><code>WriteError</code></summary><p>Exception raised when a binary encoding is impossible.</p></details><h2 id="snapshots">Snapshots<a class="headerlink" href="#snapshots" title="Permanent link">&para;</a></h2>
-<p>Save and restore stream states. See also: <a href="../../snapshots">Snapshots</a>.</p>
+<p>Save and restore stream states. 
+For details, refer to <a href="../../snapshots">Snapshots</a>.</p>
 <details class="note"><summary><code>State</code></summary><p>The (opaque) type of stream state.</p></details><details class="note"><summary><code>BitStream.save(self)</code></summary><p>Return a <code>State</code> instance</p></details><details class="note"><summary><code>BitStream.restore(self, state)</code></summary><p>Restore a previous stream state.</p><p>Raise a <code>ValueError</code> if the state is invalid.</p></details>
                 
                   
