@@ -37,7 +37,7 @@ Examples
 
 The basic API is made of three methods only:
 
-| Actions | Code                          |
+| Action  | Code                          |
 |---------|-------------------------------|
 | Create  | `stream = BitStream()`        |
 | Write   | `stream.write(data, type)`    |
