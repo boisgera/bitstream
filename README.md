@@ -17,16 +17,14 @@ Motivation, set of features
 Quickstart
 --------------------------------------------------------------------------------
 
-Bitstream supports Python 2.7; if Python 2.7, pip, NumPy and a C compiler 
+Bitstream supports Python 2.7.
+If Python 2.7, pip, NumPy and a C compiler 
 are available, install bitstream with
 
     $ pip install bitstream
 
 [pip]: https://packaging.python.org/tutorials/installing-packages/#install-pip-setuptools-and-wheel
 
-    >>> from bitstream import BitStream
-    >>> BitStream("Hello!")
-    010010000110010101101100011011000110111100100001
 
 Examples
 --------------------------------------------------------------------------------
