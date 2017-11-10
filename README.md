@@ -17,15 +17,16 @@ Motivation, set of features
 Quickstart
 --------------------------------------------------------------------------------
 
-Bitstream supports Python 2.7.
-If Python 2.7, pip, NumPy and a C compiler 
-are available, install bitstream with
+Make sure that Python 2.7 is installed and that pip, NumPy and a C compiler 
+are available, then install bitstream with
 
     $ pip install bitstream
 
 [pip]: https://packaging.python.org/tutorials/installing-packages/#install-pip-setuptools-and-wheel
 
-and make sure that it works in the Python interpreter:
+For more details, refer to [the documentation][install].
+
+[install]: http://boisgera.github.io/bitstream/installation/
 
 Examples
 --------------------------------------------------------------------------------
