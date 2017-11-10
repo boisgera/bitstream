@@ -29,12 +29,37 @@ are available, install bitstream with
 Examples
 --------------------------------------------------------------------------------
 
-    >>> from bitstream import BitStream
-    >>> BitStream("Hello!")
-    010010000110010101101100011011000110111100100001
+The basic API is made of three methods only:
 
-Documentation
---------------------------------------------------------------------------------
+Create a stream:
+
+    stream = BitStream()
+
+Write into a stream:
+
+    stream.write(data, type)
+
+Read data from a stream:
+    
+    data = stream.read(type, n)
+
+For example:
+
+    >>> stream = BitStream()      # <empty>
+    >>> stream.write(True, bool)  # 1
+    >>> stream.write(False, bool) # 10
+    >>> stream.write(-128, int8)  # 1010000000
+    >>> stream.write("AB", str)   # 10100000000100000101000010
+    >>> stream.read(bool, 2)      # 100000000100000101000010
+    [True, False]
+    >>> stream.read(int8, 1)      # 0100000101000010
+    array([-128], dtype=int8)
+    >>> stream.read(str, 2)       # <empty>
+    "AB"
+
+Refer to [the documentation](http://boisgera.github.io/bitstream/) for more
+information.
+
 
 Contribute / Developers
 --------------------------------------------------------------------------------
