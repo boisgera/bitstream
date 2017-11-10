@@ -17,14 +17,8 @@ Motivation, set of features
 Quickstart
 --------------------------------------------------------------------------------
 
-Bitstream supports Python 2.7.
-Make sure that the [pip] package installer is available 
-for this version of the interpreter
-
-    $ pip --version
-    pip 9.0.1 from /usr/local/lib/python2.7/dist-packages (python 2.7)
-
-and install bitstream
+Bitstream supports Python 2.7; if Python 2.7, pip, NumPy and a C compiler 
+are available, install bitstream with
 
     $ pip install bitstream
 

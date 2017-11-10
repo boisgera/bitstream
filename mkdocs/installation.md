@@ -13,16 +13,16 @@ Check the following prerequisites
         $ pip --version
         pip 9.0.1 from /usr/local/lib/python2.7/dist-packages (python 2.7)
 
-    Otherwise follow these [installation instructions][install-pip].
+    Otherwise follow these [instructions][install-pip].
 
 ??? note "NumPy"
     Bitstream depends on the [NumPy] package; install it if necessary:
 
-            $ pip install numpy
+        $ pip install numpy
 
 ??? note "C compiler"
-    You need a C compiler pip can work with. 
-    On Windows, you may need to install the 
+    You need a compiler pip can work with. 
+    On Windows, you can install the 
     [Microsoft Visual C++ Compiler for Python 2.7][MSVC].
 
 then install bitstream:
