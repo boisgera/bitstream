@@ -243,15 +243,15 @@
     <ul class="md-nav__list" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#python-2" title="Python 2" class="md-nav__link">
-    Python 2
+  <a href="#installation" title="Installation" class="md-nav__link">
+    Installation
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#python-3" title="Python 3" class="md-nav__link">
-    Python 3
+  <a href="#troubleshooting" title="Troubleshooting" class="md-nav__link">
+    Troubleshooting
   </a>
   
 </li>
@@ -344,15 +344,15 @@
     <ul class="md-nav__list" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#python-2" title="Python 2" class="md-nav__link">
-    Python 2
+  <a href="#installation" title="Installation" class="md-nav__link">
+    Installation
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#python-3" title="Python 3" class="md-nav__link">
-    Python 3
+  <a href="#troubleshooting" title="Troubleshooting" class="md-nav__link">
+    Troubleshooting
   </a>
   
 </li>
@@ -376,39 +376,28 @@
                 
                   <h1>Installation</h1>
                 
-                <h2 id="python-2">Python 2<a class="headerlink" href="#python-2" title="Permanent link">&para;</a></h2>
-<p>Bitstream supports Python 2.7.
-Make sure that the <a href="https://packaging.python.org/tutorials/installing-packages/#install-pip-setuptools-and-wheel">pip</a> package installer is available 
-for this version of the interpreter</p>
-<pre><code>$ pip --version
+                <p>Bitstream supports Python 2.7 on Linux, Windows and MacOS.</p>
+<h2 id="installation">Installation<a class="headerlink" href="#installation" title="Permanent link">&para;</a></h2>
+<p>Check the following prerequisites </p>
+<details class="note"><summary>Pip</summary><p>The pip package installer should be available for Python 2.7</p><pre><code>$ pip --version
 pip 9.0.1 from /usr/local/lib/python2.7/dist-packages (python 2.7)
-</code></pre>
-<p>and install bitstream</p>
+</code></pre><p>Otherwise follow these <a href="https://pip.pypa.io/en/stable/installing/">installation instructions</a>.</p></details><details class="note"><summary>NumPy</summary><p>Bitstream depends on the <a href="http://www.numpy.org/">NumPy</a> package; install it if necessary:</p><pre><code>    $ pip install numpy
+</code></pre></details><details class="note"><summary>C compiler</summary><p>You need a C compiler pip can work with. 
+On Windows, you may need to install the 
+<a href="https://www.microsoft.com/en-us/download/details.aspx?id=44266">Microsoft Visual C++ Compiler for Python 2.7</a>.</p></details><p>then install bitstream:</p>
 <pre><code>$ pip install bitstream
 </code></pre>
-<h2 id="python-3">Python 3<a class="headerlink" href="#python-3" title="Permanent link">&para;</a></h2>
-<div class="admonition warning">
-<p class="admonition-title">Warning</p>
-<p>bitstream does not support Python 3.</p>
-</div>
-<p>If you want to install bitstream (for Python 2) 
-but <code>pip</code> refers to your Python 3 interpreter</p>
-<pre><code>$ pip --version
+<h2 id="troubleshooting">Troubleshooting<a class="headerlink" href="#troubleshooting" title="Permanent link">&para;</a></h2>
+<details class="warning"><summary>What if pip is available but associated to Python 3?</summary><p>If <code>pip</code> refers to your Python 3 interpreter</p><pre><code>$ pip --version
 pip 9.0.1 from /usr/local/lib/python3.5/dist-packages (python 3.5)
-</code></pre>
-<p>then you may have a version of pip for Python 2 installed.
+</code></pre><p>you may still have a version of pip for Python 2.7 installed.
 It may be named <code>pip2</code> or <code>pip2.7</code>; you can use it to install bitstream.
-Otherwise, refer to your Python 2 interpreter explicitly: 
-if it is named <code>python</code></p>
-<pre><code>$ python --version
+Otherwise, refer to your Python 2.7 interpreter explicitly: 
+if it is named <code>python</code></p><pre><code>$ python --version
 Python 2.7.12
-</code></pre>
-<p>then install pip for Python 2 with</p>
-<pre><code>$ python -m pip install --upgrade pip
-</code></pre>
-<p>and finally install bitstream</p>
-<pre><code>$ python -m pip install bitstream
-</code></pre>
+</code></pre><p>then install pip for Python 2.7 with</p><pre><code>$ python -m pip install --upgrade pip
+</code></pre><p>and finally install bitstream</p><pre><code>$ python -m pip install bitstream
+</code></pre></details>
                 
                   
                 

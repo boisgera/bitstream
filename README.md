@@ -30,12 +30,24 @@ and install bitstream
 
 [pip]: https://packaging.python.org/tutorials/installing-packages/#install-pip-setuptools-and-wheel
 
+    >>> from bitstream import BitStream
+    >>> BitStream("Hello!")
+    010010000110010101101100011011000110111100100001
 
 Examples
 --------------------------------------------------------------------------------
 
+    >>> from bitstream import BitStream
+    >>> BitStream("Hello!")
+    010010000110010101101100011011000110111100100001
+
+Documentation
+--------------------------------------------------------------------------------
+
 Contribute / Developers
 --------------------------------------------------------------------------------
+
+Link to contributors
 
 License
 --------------------------------------------------------------------------------

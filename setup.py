@@ -34,16 +34,16 @@ except pkg_resources.DistributionNotFound:
 # ------------------------------------------------------------------------------
 metadata = dict(
   name = "bitstream",
-  version = "2.1.1-alpha.1",
-  description = "A Binary Data Type with a Stream Interface",
+  version = "2.1.1-beta.1",
+  description = "Binary Data for Humans",
   url = "https://github.com/boisgera/bitstream",
   author = u"Sébastien Boisgérault",
   author_email = "Sebastien.Boisgerault@mines-paristech.fr",
   license = "MIT License",
   classifiers = [
-    "Development Status :: 3 - Alpha",
+    "Development Status :: 4 - Beta",
     "License :: OSI Approved :: MIT License",
-    "Operating System :: POSIX :: Linux",
+    "Operating System :: OS Independent",
     "Programming Language :: Python :: 2.7",
     "Programming Language :: Cython",
     ]
