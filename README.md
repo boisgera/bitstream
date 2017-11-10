@@ -1,7 +1,7 @@
 # Bitstream -- Binary Data for Humans
 
-[![Build Status](https://travis-ci.org/boisgera/bitstream.svg?branch=master)](https://travis-ci.org/boisgera/bitstream)
 ![Python 2.7](https://img.shields.io/badge/python-2.7-blue.svg)
+[![Build Status](https://travis-ci.org/boisgera/bitstream.svg?branch=master)](https://travis-ci.org/boisgera/bitstream)
 [![PyPI version](https://badge.fury.io/py/bitstream.svg)](https://badge.fury.io/py/bitstream)
 
 **TODO: one-liner**
