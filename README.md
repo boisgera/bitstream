@@ -31,17 +31,11 @@ Examples
 
 The basic API is made of three methods only:
 
-Create a stream:
-
-    stream = BitStream()
-
-Write into a stream:
-
-    stream.write(data, type)
-
-Read data from a stream:
-    
-    data = stream.read(type, n)
+Actions | Code
+---------------------------------------
+Create  | `stream = BitStream()`
+Write   | `stream.write(data, type)`
+Read    | `data = stream.read(type, n)`
 
 For example:
 
