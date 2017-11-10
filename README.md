@@ -37,15 +37,15 @@ Examples
 
 The basic API is made of three methods only:
 
-| Action  | Code                          |
-|---------|-------------------------------|
-| Create  | `stream = BitStream()`        |
-| Write   | `stream.write(data, type)`    |
-| Read    | `data = stream.read(type, n)` |
+| Action        | Code                          |
+|---------------|-------------------------------|
+| Create stream | `stream = BitStream()`        |
+| Write data    | `stream.write(data, type)`    |
+| Read data     | `data = stream.read(type, n)` |
 
 For example:
 
-    >>> stream = BitStream()      # <empty bitstream>
+    >>> stream = BitStream()      # <empty>
     >>> stream.write(True, bool)  # 1
     >>> stream.write(False, bool) # 10
     >>> stream.write(-128, int8)  # 1010000000
@@ -54,7 +54,7 @@ For example:
     [True, False]
     >>> stream.read(int8, 1)      # 0100000101000010
     array([-128], dtype=int8)
-    >>> stream.read(str, 2)       # <empty bitstream>
+    >>> stream.read(str, 2)       # <empty>
     "AB"
 
 Refer to [the documentation](http://boisgera.github.io/bitstream/) for more
