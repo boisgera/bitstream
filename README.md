@@ -27,13 +27,18 @@ are available, install bitstream with
 
 and make sure that it works in the Python interpreter:
 
+Examples
+--------------------------------------------------------------------------------
+
+First, the mandatory "hello world !"
+
+    >>> from bitstream import BitStream
+    >>> BitStream("Hello World!")
+    010010000110010101101100011011000110111100100000010101110110111101110010011011000110010000100001
+
     >>> from bitstream import BitStream
     >>> BitStream("Hello!")
     010010000110010101101100011011000110111100100001
-
-
-Examples
---------------------------------------------------------------------------------
 
 The basic API is made of three methods only:
 
