@@ -25,6 +25,12 @@ are available, install bitstream with
 
 [pip]: https://packaging.python.org/tutorials/installing-packages/#install-pip-setuptools-and-wheel
 
+and make sure that it works in the Python interpreter:
+
+    >>> from bitstream import BitStream
+    >>> BitStream("Hello!")
+    010010000110010101101100011011000110111100100001
+
 
 Examples
 --------------------------------------------------------------------------------
