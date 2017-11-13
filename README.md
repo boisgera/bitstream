@@ -22,9 +22,7 @@ are available, then install bitstream with
 
 [pip]: https://packaging.python.org/tutorials/installing-packages/#install-pip-setuptools-and-wheel
 
-For more details, refer to [the documentation][install].
-
-[install]: http://boisgera.github.io/bitstream/installation/
+For more details, refer to [the documentation](http://boisgera.github.io/bitstream/installation/)
 
 Examples
 --------------------------------------------------------------------------------
@@ -70,7 +68,7 @@ Link to contributors
 License
 --------------------------------------------------------------------------------
 
-Bitstream is open source software released under the [MIT license](LICENSE.txt).
+Bitstream is open source software released under the [MIT license](https://github.com/boisgera/bitstream/blob/master/LICENSE.txt).
 
 Copyright (c) 2012-2017 Sébastien Boisgérault
 
