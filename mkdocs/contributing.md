@@ -54,6 +54,8 @@ Cython source files have the `.pyx` and `.pxd` extensions.
 Run the Tests
 --------------------------------------------------------------------------------
 
+**TODO:** mention `pyyaml`
+
 To run all the tests, install bitstream and type
 
      $ python test.py
