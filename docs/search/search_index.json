@@ -163,7 +163,7 @@
         {
             "location": "/contributing/", 
             "text": "Contribute\n\n\nTODO:\n\n\n\n\n\n\ncontribution process (via GitHub)\n\n\n\n\n\n\nbuild the documentation\n\n\n\n\n\n\nbuild from the sources\n\n\n\n\n\n\nrun the tests\n\n\n\n\n\n\n\n\nBitstream targets \nPython 2.7\n, you will need to install it first.\n\n\nTODO:\n move NumPy dependency here (? Dunno ...), talk about Linux-only platform.\n\n\n\n\n\n\nInstall from source:\n the releases of Bitstream are available\n    on the \nPython Package Index (PyPi)\n. Once you have \n    downloaded and unpacked the archive, to build the Bitstream module, \n    you need \nsetuptools\n.\n    You also need to install the \nNumPy\n package, version 1.6.1 or later.\n\n\nTODO: test if numpy is automatically download if needed\n.\n\n\nThen, as root, execute\n\n\n$ python setup.py install\n\n\n\n\n\n\n\nHack with git:\n to experiment with the latest version of Bitstream, \n    clone the GitHub repository:\n\n\n$ git clone git://github.com/boisgera/bitstream.git\n\n\n\nTo actually build the module, you will need everything you need to build\nfrom source and will execute the same command. If in addition, you want\nto edit the source files, you will also need the [Cython][] compiler, \nversion 0.15.1 or later and will execute instead:\n\n\n$ python setup.py install --cython", 
-            "title": "Contribute"
+            "title": "Contributing"
         }, 
         {
             "location": "/contributing/#contribute", 
