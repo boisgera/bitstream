@@ -1,0 +1,103 @@
+---
+references:
+
+- id: bitstream
+  type: webpage
+  author:
+  - family: Boisgérault
+    given: Sébastien
+  title: "Bitstream: binary data for humans"
+  container-title: Github
+  issued:
+  - year: 2017
+  URL: https://github.com/boisgera/bitstream
+
+- id: DAC
+  type: webpage
+  author:
+  - family: Boisgérault
+    given: Sébastien
+  title: Digital Audio Coding
+  container-title: Eul.Ink
+  issued:
+  - year: 2017
+  URL: http://eul.ink/audio/
+
+- id: S1916
+  type: webpage
+  author:
+  - literal: MINES ParisTech, PSL University
+  title: Digital Audio Coding
+  container-title: MINES ParisTech Graduate School Course Catalog
+  issued:
+  - year: 2013
+  URL: https://sgs.mines-paristech.fr/prod/sgs/ensmp/catalog/course/detail.php?code=S1916&year=3a&lang=EN
+
+- id: Rob94
+  type: report
+  author:
+  - family: Robinson
+    given: Tony
+  title: "SHORTEN: Simple lossless and near-lossless waveform compression"
+  issued:
+  - year: 1994
+  URL: http://mi.eng.cam.ac.uk/reports/svr-ftp/auto-pdf/robinson_tr156.pdf
+  
+- id: For81
+  type: article-journal
+  author:
+  - family: Fornberg
+    given: Bengt
+  issued:
+  - year: '2006'
+    month: '4'
+    day: '3'
+  title: Numerical differentiation of analytic functions.
+  container-title: ACM Trans. Math. Softw.
+  page: '512-526'
+  volume: '7'
+  issue: '4'
+  keyword: dblp
+  URL: http://dblp.uni-trier.de/db/journals/toms/toms7.html#Fornberg81
+
+- id: struct
+  type: webpage
+  author: 
+  - literal: "Python 2.7 Standard Library"
+  issued:
+  - year: 2017
+  URL: https://docs.python.org/2/library/struct.html
+
+- id: bitstring
+  type: webpage
+  author:
+  - family: Griffiths
+    given: Scott
+  title: "Bitstring: a Python module to help you manage your bits"
+  container-title: Github
+  issued:
+  - year: 2014
+  URL: http://scott-griffiths.github.io/bitstring/
+
+- id: bitarray
+  type: webpage
+  title: "Bitarray: efficient array of booleans for Python"
+  author:
+  - family: Schnell
+    given: Ilan
+  container-title: Github
+  issued:
+  - year: 2013
+  URL: https://github.com/ilanschnell/bitarray
+
+- id: WAVE
+  type: webpage
+  author:
+  - family: Kabal
+    given: Peter
+  title: "Audio File Format Specification"
+  container-title: "MMSP Lab, ECE, McGill University"
+  issued:
+  - year: 2017
+...
+
