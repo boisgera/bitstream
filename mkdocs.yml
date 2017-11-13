@@ -6,7 +6,6 @@ site_dir: docs
 
 pages:
   - Overview: overview.md
-  - Quickstart: index.md
   - Installation: installation.md
   - Built-in Types: types.md
   - Custom Types: custom.md

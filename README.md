@@ -4,7 +4,7 @@
 
 # Bitstream
 
-A Python library that deals with binary data stored in bit streams.
+A Python library which manages binary data as bit streams.
 
 Overview
 --------------------------------------------------------------------------------

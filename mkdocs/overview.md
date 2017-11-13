@@ -2,17 +2,7 @@
 Overview
 ================================================================================
 
-Statement of need
-
-State of the art, links, etc.
-
-Where to go next
-
------
-
-
-Bitstream provides a binary data type with a stream interface 
-for [Python] [].
+Bitstream is a [Python] library which manages binary data as bit streams.
 
   - **Binary Data:** the `BitStream` class is a linearly ordered container of bits.
     The standard library is only convenient to manage binary data at the byte level. 
@@ -38,10 +28,9 @@ for [Python] [].
     for your needs ! Under the hood, the [Cython] [] language and compiler 
     are used to generate this extension module.
 
-  - **Open-Source:** the Bitstream software is distributed under a [MIT license]
-    [MIT], its documentation under a [Creative Commons Attribution 3.0] 
-    [CC-BY-3.0] license. The development takes place on [GitHub] [] and 
-    releases are also available on [PyPi] [].
+  - **Open-Source.** Bitstream  is distributed under a [MIT license]
+    [MIT]. The development takes place on [GitHub] and 
+    releases are available on [PyPI].
 
 
 [Markdown]: http://daringfireball.net/projects/markdown/
@@ -51,4 +40,6 @@ for [Python] [].
 [Cython]: http://www.cython.org
 [bitarray]: https://pypi.python.org/pypi/bitarray
 [bitstring]: https://code.google.com/p/python-bitstring
-[MIT]: http://opensource.org/licenses/MIT
+[MIT]: https://github.com/boisgera/bitstream/blob/master/LICENSE.txt
+[GitHub]: https://github.com/boisgera/bitstream
+[PyPI]: https://pypi.python.org/pypi/bitstream/

@@ -115,41 +115,6 @@ def make_rest():
     if error:
         raise OSError(error, "cannot generate ReST documentation")
 
-def make_pdf():
-    "Generate a PDF README"
-    title  = metadata["name"].capitalize() + " " + metadata["version"]
-    author = metadata["author"].encode("utf-8")
-    date   = datetime.date.today().strftime("%d %B %Y")
-    header = "%{0}\n%{1}\n%{2}\n\n".format(title, author, date)
-    file = tempfile.NamedTemporaryFile()
-    file.write(header)
-    file.write(open("README.md").read())
-    file.flush()
-    error = os.system("pandoc -o README.pdf {0}".format(file.name))
-    file.close()
-    if error:
-        raise OSError(error, "cannot generate PDF documentation")
-
-def command(function):
-     contents = dict(
-       description = function.__doc__, 
-       user_options = [],
-       initialize_options = lambda self: None,
-       finalize_options = lambda self: None,
-       run = lambda self: function()
-     )
-     return type(
-       function.__name__.capitalize(), 
-       (setuptools.Command, object), 
-       contents
-     )
-
-commands = dict(
-    cmdclass = dict(
-        pdf = command(make_pdf)
-    )
-)
-
 
 # Setup
 # ------------------------------------------------------------------------------
