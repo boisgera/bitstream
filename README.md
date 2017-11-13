@@ -4,15 +4,12 @@
 
 # Bitstream
 
-Binary data for humans.
+A Python library that deals with binary data stored in bit streams.
 
-
-Why Bitstream?
+Overview
 --------------------------------------------------------------------------------
 
 Motivation, set of features
-
-
 
 
 Quickstart
