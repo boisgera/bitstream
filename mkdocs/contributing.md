@@ -77,7 +77,7 @@ To add new tests, just [update the documentation](#the-documentation).
 The Documentation
 --------------------------------------------------------------------------------
 
-The documentation is build with [MkDocs](http://www.mkdocs.org/) and its 
+The documentation is built with [MkDocs](http://www.mkdocs.org/) and its 
 [Material](https://squidfunk.github.io/mkdocs-material/) theme.
 Install them with:
 
