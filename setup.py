@@ -106,7 +106,8 @@ def make_extension():
                                          sources=["src/bitstream/__init__.c"],
                                          include_dirs=[numpy.get_include()])]
         else:
-            error = "file not found: 'bitstream/__init__.c'"
+            error  = "C files not found, Cython compilation required: \n"
+            error += "execute `python setup.py --cython install`"
             raise IOError(error)
 
 def make_rest():
