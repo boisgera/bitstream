@@ -5,12 +5,12 @@ docs_dir: mkdocs
 site_dir: docs
 
 pages:
-  - Overview: overview.md
+  - Overview: index.md
   - Installation: installation.md
   - Built-in Types: types.md
   - Custom Types: custom.md
   - Snapshots: snapshots.md
-  - API: API.md
+  - API Reference: API.md
   - Contribute: contribute.md
 
 theme: "material" 

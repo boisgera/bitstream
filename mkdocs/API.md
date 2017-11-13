@@ -1,5 +1,5 @@
 
-API
+API Reference
 ================================================================================
 
 We assume in the sequel that all symbols of NumPy and BitStream are available:
