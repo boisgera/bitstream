@@ -110,22 +110,22 @@ def make_extension():
             raise IOError(error)
 
 def make_rest():
-    pass
-#    error = os.system("pandoc -o manual.rst manual.txt")
-#    if error:
-#        raise OSError(error, "cannot generate ReST documentation")
+    "Generate a ReStructuredText README"
+    error = os.system("pandoc -o README.rst README.md")
+    if error:
+        raise OSError(error, "cannot generate ReST documentation")
 
 def make_pdf():
-    "Generate a PDF documentation"
+    "Generate a PDF README"
     title  = metadata["name"].capitalize() + " " + metadata["version"]
     author = metadata["author"].encode("utf-8")
     date   = datetime.date.today().strftime("%d %B %Y")
     header = "%{0}\n%{1}\n%{2}\n\n".format(title, author, date)
     file = tempfile.NamedTemporaryFile()
     file.write(header)
-    file.write(open("manual.txt").read())
+    file.write(open("README.md").read())
     file.flush()
-    error = os.system("pandoc -o manual.pdf {0}".format(file.name))
+    error = os.system("pandoc -o README.pdf {0}".format(file.name))
     file.close()
     if error:
         raise OSError(error, "cannot generate PDF documentation")
@@ -178,8 +178,8 @@ if __name__ == "__main__":
 
     if REST:
         make_rest()
-    if os.path.isfile("manual.rst"):
-        metadata["long_description"] = open("manual.rst").read()
+    if os.path.isfile("README.rst"):
+        metadata["long_description"] = open("README.rst").read()
 
     # Assembly of setup arguments
     kwargs = {}
