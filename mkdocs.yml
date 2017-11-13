@@ -24,5 +24,6 @@ markdown_extensions:
 
 repo_name: "bitstream"
 repo_url: "https://github.com/boisgera/bitstream"
+edit_uri: edit/master/docs/
 
 
