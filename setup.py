@@ -151,7 +151,6 @@ if __name__ == "__main__":
     kwargs.update(metadata)
     kwargs.update(contents)
     kwargs.update(data)
-    kwargs.update(commands)
 
     # Setup    
     setuptools.setup(**kwargs)
