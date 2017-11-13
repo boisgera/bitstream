@@ -3,8 +3,9 @@ Contributing
 ================================================================================
 
 Bitstream is hosted on [GitHub](https://github.com/boisgera/bitstream).
-
 To contribute to its development, [open an issue][issue] or [submit a pull request][PR].
+
+Contributors: <https://github.com/boisgera/bitstream/graphs/contributors>
 
 [GitHub]: https://github.com/boisgera/bitstream
 [issue]: https://github.com/boisgera/bitstream/issues
