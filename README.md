@@ -59,10 +59,10 @@ Refer to [the documentation](http://boisgera.github.io/bitstream/) for more
 information.
 
 
-Contribute / Developers
+Contributing
 --------------------------------------------------------------------------------
 
-Link to contributors
+Refer to [the documentation](http://boisgera.github.io/bitstream/contributing/>).
 
 
 License
