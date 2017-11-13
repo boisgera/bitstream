@@ -71,7 +71,7 @@
   <nav class="md-header-nav md-grid">
     <div class="md-flex">
       <div class="md-flex__cell md-flex__cell--shrink">
-        <a href="overview/" title="BitStream" class="md-header-nav__button md-logo">
+        <a href="." title="BitStream" class="md-header-nav__button md-logo">
           
             <i class="md-icon"></i>
           
@@ -86,7 +86,7 @@
             
               
             
-            Quickstart
+            Overview
           
         </span>
       </div>
@@ -194,18 +194,6 @@
       
       
 
-
-  <li class="md-nav__item">
-    <a href="overview/" title="Overview" class="md-nav__link">
-      Overview
-    </a>
-  </li>
-
-    
-      
-      
-      
-
   
 
 
@@ -216,8 +204,8 @@
       
     
     
-    <a href="." title="Quickstart" class="md-nav__link md-nav__link--active">
-      Quickstart
+    <a href="." title="Overview" class="md-nav__link md-nav__link--active">
+      Overview
     </a>
     
   </li>
@@ -277,8 +265,8 @@
 
 
   <li class="md-nav__item">
-    <a href="API/" title="API" class="md-nav__link">
-      API
+    <a href="API/" title="API Reference" class="md-nav__link">
+      API Reference
     </a>
   </li>
 
@@ -289,7 +277,7 @@
 
 
   <li class="md-nav__item">
-    <a href="contribute/" title="Contribute" class="md-nav__link">
+    <a href="contributing/" title="Contribute" class="md-nav__link">
       Contribute
     </a>
   </li>
@@ -325,50 +313,108 @@
                   <a href="https://github.com/boisgera/bitstream/edit/master/docs/index.md" title="Edit this page" class="md-icon md-content__icon">&#xE3C9;</a>
                 
                 
-                <p>Binary Data Stream</p>
-<h1 id="overview">Overview<a class="headerlink" href="#overview" title="Permanent link">&para;</a></h1>
-<p><strong>TODO</strong></p>
-<h1 id="quickstart">Quickstart<a class="headerlink" href="#quickstart" title="Permanent link">&para;</a></h1>
-<ol>
-<li>Install wish with pip (<a href="./installation">instructions</a>).</li>
-</ol>
-<hr />
-<p>Most of the features of bitstream are available via the <code>BitStream</code> class.</p>
+                <h1 id="overview">Overview<a class="headerlink" href="#overview" title="Permanent link">&para;</a></h1>
+<p>Bitstream is a <a href="http://www.python.org/">Python</a> library which manages binary data as bit streams:</p>
 <pre><code>&gt;&gt;&gt; from bitstream import BitStream
+&gt;&gt;&gt; BitStream("Hello World!")
+010010000110010101101100011011000110111100100000010101110110111101110010011011000110010000100001
 </code></pre>
-<p>The module is tightly integrated with the [NumPy][NumPy] library. 
-For convenience, we import all symbols from its top-level module.</p>
-<pre><code>&gt;&gt;&gt; from numpy import *
-</code></pre>
-<h1 id="overview-of-bitstream-features">Overview of Bitstream Features<a class="headerlink" href="#overview-of-bitstream-features" title="Permanent link">&para;</a></h1>
+<p>The standard library provides the <a href="https://docs.python.org/2/library/struct.html">struct</a> 
+module to manage binary data. 
+If you find its API arcane, consider using bitstream instead<sup id="fnref:1"><a class="footnote-ref" href="#fn:1" rel="footnote">1</a></sup>:</p>
+<div class="admonition note">
+<p class="admonition-title">Binary Data</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Stream Interface</p>
+<p>You can only read data at the start of a stream 
+and write data at its end.
+This is a very simple way to interact with binary data, but it is also
+the pattern that comes naturally in many applications. </p>
 <pre><code>&gt;&gt;&gt; stream = BitStream()
-&gt;&gt;&gt; stream
-&lt;BLANKLINE&gt;
 &gt;&gt;&gt; stream.write(True, bool)
-&gt;&gt;&gt; stream
-1
 &gt;&gt;&gt; stream.write(False, bool)
-&gt;&gt;&gt; stream
-10
 &gt;&gt;&gt; stream.write(-128, int8)
-&gt;&gt;&gt; stream
-1010000000
 &gt;&gt;&gt; stream.write("AB", str)
 &gt;&gt;&gt; stream
 10100000000100000101000010
 &gt;&gt;&gt; stream.read(bool, 2)
 [True, False]
-&gt;&gt;&gt; stream
-100000000100000101000010
 &gt;&gt;&gt; stream.read(int8, 1)
 array([-128], dtype=int8)
-&gt;&gt;&gt; stream
-0100000101000010
 &gt;&gt;&gt; stream.read(str, 2)
 'AB'
-&gt;&gt;&gt; stream
-&lt;BLANKLINE&gt;
 </code></pre>
+<p>To manage
+binary codes and formats, in my experience, random data access is 
+not a requirement.</p>
+<p>HERE: snapshot ref</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Python &amp; NumPy</p>
+<p>BitStream has built-in support for the common data types 
+with a standard binary layout: bools, ASCII strings, 
+fixed-size integers and floating-point integers. </p>
+<pre><code>&gt;&gt;&gt; from numpy import *
+&gt;&gt;&gt; dt = 1.0 / 44100.0
+&gt;&gt;&gt; t = r_[0.0:1.0:dt]
+&gt;&gt;&gt; data = cos(2*pi*440.0*t)       
+&gt;&gt;&gt; stream = BitStream(data)
+</code></pre>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Performance</p>
+<p>Bitstream is a Python C-extension module that has been
+optimized for the common use cases. Hopefully, it will be fast enough 
+for your needs! 
+Under the hood, the <a href="http://www.cython.org">Cython</a> language and compiler are used to generate 
+this extension module.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Advanced Features</p>
+<ul>
+<li>
+<p>Custom types: 
+    The list of supported types and binary 
+    representation may be enlarged at will: new readers and writers 
+    can be implemented and associated to specific data types.</p>
+<p>See: <a href="./custom">Custom types</a></p>
+</li>
+<li>
+<p>Snapshots:</p>
+<p>See: <a href="./snapshots">Snapshots</a></p>
+</li>
+</ul>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Open Source</p>
+<p>Bitstream  is distributed under a <a href="https://github.com/boisgera/bitstream/blob/master/LICENSE.txt">MIT license</a>. 
+The development takes place on <a href="https://github.com/boisgera/bitstream">GitHub</a> and 
+releases are distributed on <a href="https://pypi.python.org/pypi/bitstream/">PyPI</a>.</p>
+</div>
+<div class="footnote">
+<hr />
+<ol>
+<li id="fn:1">
+<p>Compare the binary encoding of a sequence of doubles</p>
+<pre><code>&gt;&gt;&gt; data = [1.0, 2.0, 3.0]
+</code></pre>
+<p>with struct</p>
+<pre><code>&gt;&gt;&gt; import struct
+&gt;&gt;&gt; format = "&gt;{0}d".format(len(data))
+&gt;&gt;&gt; struct.pack(format, *data)
+'?\xf0\x00\x00\x00\x00\x00\x00@\x00\x00\x00\x00\x00\x00\x00@\x08\x00\x00\x00\x00\x00\x00'
+</code></pre>
+<p>and with bitstream</p>
+<pre><code>&gt;&gt;&gt; from bitstream import BitStream
+&gt;&gt;&gt; stream = BitStream(data)
+&gt;&gt;&gt; stream.read(str)
+'?\xf0\x00\x00\x00\x00\x00\x00@\x00\x00\x00\x00\x00\x00\x00@\x08\x00\x00\x00\x00\x00\x00'
+</code></pre>
+<p><a class="footnote-backref" href="#fnref:1" rev="footnote" title="Jump back to footnote 1 in the text">&#8617;</a></p>
+</li>
+</ol>
+</div>
                 
                   
                 
@@ -386,20 +432,6 @@ array([-128], dtype=int8)
   
     <div class="md-footer-nav">
       <nav class="md-footer-nav__inner md-grid">
-        
-          <a href="overview/" title="Overview" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel="prev">
-            <div class="md-flex__cell md-flex__cell--shrink">
-              <i class="md-icon md-icon--arrow-back md-footer-nav__button"></i>
-            </div>
-            <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
-              <span class="md-flex__ellipsis">
-                <span class="md-footer-nav__direction">
-                  Previous
-                </span>
-                Overview
-              </span>
-            </div>
-          </a>
         
         
           <a href="installation/" title="Installation" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">

@@ -11,7 +11,7 @@ pages:
   - Custom Types: custom.md
   - Snapshots: snapshots.md
   - API Reference: API.md
-  - Contribute: contribute.md
+  - Contribute: contributing.md
 
 theme: "material" 
 
