@@ -4,13 +4,15 @@
 
 # Bitstream
 
-Binary Data for Humans.
+Binary data for humans.
 
 
 Why Bitstream?
 --------------------------------------------------------------------------------
 
 Motivation, set of features
+
+
 
 
 Quickstart
