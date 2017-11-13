@@ -74,7 +74,7 @@ To add new tests, just [update the documentation](#the-documentation).
 [doctest]: https://docs.python.org/2/library/doctest.html
 
 
-The Documentation
+Documentation
 --------------------------------------------------------------------------------
 
 The documentation is built with [MkDocs](http://www.mkdocs.org/) and its 
