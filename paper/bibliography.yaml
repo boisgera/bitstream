@@ -64,6 +64,7 @@ references:
   type: webpage
   author: 
   - literal: "Python 2.7 Standard Library"
+  title: "struct — Interpret strings as packed binary data"
   issued:
   - year: 2017
   URL: https://docs.python.org/2/library/struct.html

@@ -1,5 +1,6 @@
 ---
 title: 'Bitstream -- Binary Data for Humans'
+author: Sébastien Boisgérault, MINES ParisTech
 tags:
   - binary data
   - data compression
@@ -11,8 +12,8 @@ authors:
 affiliations:
  - name: MINES ParisTech, PSL Research University, Center for robotics
    index: 1
-date: 9 November 2017
-bibliography: paper.yaml
+date: 13 November 2017
+bibliography: bibliography.json
 ---
 
 # Summary

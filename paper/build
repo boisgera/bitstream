@@ -1,0 +1,9 @@
+#!/bin/bash 
+
+pandoc-citeproc -j bibliography.yaml > bibliography.json 
+
+pandoc --standalone \
+       --smart \
+       --bibliography=bibliography.json \
+       -o paper.html \
+       paper.md

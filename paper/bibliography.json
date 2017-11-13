@@ -1,0 +1,183 @@
+[
+  {
+    "URL": "https://github.com/boisgera/bitstream",
+    "author": [
+      {
+        "family": "Boisgérault",
+        "given": "Sébastien"
+      }
+    ],
+    "container-title": "Github",
+    "id": "bitstream",
+    "issued": {
+      "date-parts": [
+        [
+          2017
+        ]
+      ]
+    },
+    "title": "Bitstream: binary data for humans",
+    "type": "webpage"
+  },
+  {
+    "URL": "http://eul.ink/audio/",
+    "author": [
+      {
+        "family": "Boisgérault",
+        "given": "Sébastien"
+      }
+    ],
+    "container-title": "Eul.Ink",
+    "id": "DAC",
+    "issued": {
+      "date-parts": [
+        [
+          2017
+        ]
+      ]
+    },
+    "title": "Digital Audio Coding",
+    "type": "webpage"
+  },
+  {
+    "URL": "https://sgs.mines-paristech.fr/prod/sgs/ensmp/catalog/course/detail.php?code=S1916&year=3a&lang=EN",
+    "author": [
+      {
+        "literal": "MINES ParisTech, PSL University"
+      }
+    ],
+    "container-title": "MINES ParisTech Graduate School Course Catalog",
+    "id": "S1916",
+    "issued": {
+      "date-parts": [
+        [
+          2013
+        ]
+      ]
+    },
+    "title": "Digital Audio Coding",
+    "type": "webpage"
+  },
+  {
+    "URL": "http://mi.eng.cam.ac.uk/reports/svr-ftp/auto-pdf/robinson_tr156.pdf",
+    "author": [
+      {
+        "family": "Robinson",
+        "given": "Tony"
+      }
+    ],
+    "id": "Rob94",
+    "issued": {
+      "date-parts": [
+        [
+          1994
+        ]
+      ]
+    },
+    "title": "SHORTEN: Simple lossless and near-lossless waveform compression",
+    "type": "report"
+  },
+  {
+    "URL": "http://dblp.uni-trier.de/db/journals/toms/toms7.html#Fornberg81",
+    "author": [
+      {
+        "family": "Fornberg",
+        "given": "Bengt"
+      }
+    ],
+    "container-title": "ACM Trans. Math. Softw.",
+    "id": "For81",
+    "issue": "4",
+    "issued": {
+      "date-parts": [
+        [
+          2006,
+          4,
+          3
+        ]
+      ]
+    },
+    "keyword": "dblp",
+    "page": "512-526",
+    "title": "Numerical differentiation of analytic functions.",
+    "type": "article-journal",
+    "volume": "7"
+  },
+  {
+    "URL": "https://docs.python.org/2/library/struct.html",
+    "author": [
+      {
+        "literal": "Python 2.7 Standard Library"
+      }
+    ],
+    "id": "struct",
+    "issued": {
+      "date-parts": [
+        [
+          2017
+        ]
+      ]
+    },
+    "title": "struct — Interpret strings as packed binary data",
+    "type": "webpage"
+  },
+  {
+    "URL": "http://scott-griffiths.github.io/bitstring/",
+    "author": [
+      {
+        "family": "Griffiths",
+        "given": "Scott"
+      }
+    ],
+    "container-title": "Github",
+    "id": "bitstring",
+    "issued": {
+      "date-parts": [
+        [
+          2014
+        ]
+      ]
+    },
+    "title": "Bitstring: a Python module to help you manage your bits",
+    "type": "webpage"
+  },
+  {
+    "URL": "https://github.com/ilanschnell/bitarray",
+    "author": [
+      {
+        "family": "Schnell",
+        "given": "Ilan"
+      }
+    ],
+    "container-title": "Github",
+    "id": "bitarray",
+    "issued": {
+      "date-parts": [
+        [
+          2013
+        ]
+      ]
+    },
+    "title": "Bitarray: efficient array of booleans for Python",
+    "type": "webpage"
+  },
+  {
+    "author": [
+      {
+        "family": "Kabal",
+        "given": "Peter"
+      }
+    ],
+    "container-title": "MMSP Lab, ECE, McGill University",
+    "id": "WAVE",
+    "issued": {
+      "date-parts": [
+        [
+          2017
+        ]
+      ]
+    },
+    "title": "Audio File Format Specification",
+    "type": "webpage"
+  }
+]
