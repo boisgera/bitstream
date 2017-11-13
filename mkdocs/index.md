@@ -1,58 +1,45 @@
-Binary Data Stream
 
 Overview
 ================================================================================
 
-**TODO**
+Bitstream is a [Python] library which manages binary data as bit streams.
 
-Quickstart
-================================================================================
+  - **Binary Data:** the `BitStream` class is a linearly ordered container of bits.
+    The standard library is only convenient to manage binary data at the byte level. 
+    Consider using BitStream instead, especially you need to address the bit level.
 
- 1. Install wish with pip ([instructions](installation)).
+  - **Stream Interface:** you can only read data at the start of a stream 
+    and write data at its end.
+    This is a very simple way to interact with binary data, but it is also
+    the pattern that comes naturally in many applications. To manage
+    binary codes and formats, in my experience, random data access is 
+    not a requirement.
 
- 
-------
+  - **Python and Numpy Types.** BitStream has built-in readers and writers
+    for the common data types with a standard binary layout: bools, 
+    ASCII strings, fixed-size integers and floating-point integers. 
+
+  - **User-Defined Types.** The list of supported types and binary 
+    representation may be enlarged at will: new readers and writers 
+    can be implemented and associated to specific data types.
+
+  - **Performance.** Bitstream is a Python C-extension module that has been
+    optimized for the common use cases. Hopefully, it will be fast enough 
+    for your needs ! Under the hood, the [Cython] [] language and compiler 
+    are used to generate this extension module.
+
+  - **Open-Source.** Bitstream  is distributed under a [MIT license]
+    [MIT]. The development takes place on [GitHub] and 
+    releases are available on [PyPI].
 
 
-Most of the features of bitstream are available via the `BitStream` class.
-
-    >>> from bitstream import BitStream
-
-The module is tightly integrated with the [NumPy][NumPy] library. 
-For convenience, we import all symbols from its top-level module.
-
-    >>> from numpy import *
-
-
-
-Overview of Bitstream Features
-================================================================================ 
-
-    >>> stream = BitStream()
-    >>> stream
-    <BLANKLINE>
-    >>> stream.write(True, bool)
-    >>> stream
-    1
-    >>> stream.write(False, bool)
-    >>> stream
-    10
-    >>> stream.write(-128, int8)
-    >>> stream
-    1010000000
-    >>> stream.write("AB", str)
-    >>> stream
-    10100000000100000101000010
-    >>> stream.read(bool, 2)
-    [True, False]
-    >>> stream
-    100000000100000101000010
-    >>> stream.read(int8, 1)
-    array([-128], dtype=int8)
-    >>> stream
-    0100000101000010
-    >>> stream.read(str, 2)
-    'AB'
-    >>> stream
-    <BLANKLINE>
-
+[Markdown]: http://daringfireball.net/projects/markdown/
+[CC-BY-3.0]: http://creativecommons.org/licenses/by/3.0/
+[struct]: http://docs.python.org/2/library/struct.html
+[Python]: http://www.python.org/
+[Cython]: http://www.cython.org
+[bitarray]: https://pypi.python.org/pypi/bitarray
+[bitstring]: https://code.google.com/p/python-bitstring
+[MIT]: https://github.com/boisgera/bitstream/blob/master/LICENSE.txt
+[GitHub]: https://github.com/boisgera/bitstream
+[PyPI]: https://pypi.python.org/pypi/bitstream/
