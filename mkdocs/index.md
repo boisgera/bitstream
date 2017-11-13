@@ -47,6 +47,7 @@ If you find its API arcane, consider using bitstream instead[^1]:
         >>> stream = BitStream()
         >>> stream.write(True, bool)
         >>> stream.write(False, bool)
+        >>> from numpy import int8
         >>> stream.write(-128, int8)
         >>> stream.write("AB", str)
         >>> stream

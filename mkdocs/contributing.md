@@ -6,11 +6,15 @@ Contributing
 
   - contribution process (via GitHub)
 
-  - build the documentation
+  - contributors
 
-  - build from the sources
+  - build from the sources (Cython)
 
   - run the tests
+
+  - build the documentation
+
+
 
 ----
 
