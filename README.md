@@ -46,11 +46,11 @@ First, the mandatory "Hello World!" example:
 
 The basic API is made of three methods only:
 
-| Action        | Code                          |
-|---------------|-------------------------------|
-| Create stream | `stream = BitStream()`        |
-| Write data    | `stream.write(data, type)`    |
-| Read data     | `data = stream.read(type, n)` |
+  - `stream = BitStream()` to create an empty stream.
+
+  - `stream.write(data, type)` to write `data` of type `type.
+
+  - `data = stream.read(type, n)` to read `n` items of type `type`.
 
 For example:
 
@@ -67,7 +67,7 @@ For example:
     "AB"
 
 Refer to [the documentation](http://boisgera.github.io/bitstream/) for more
-information.
+examples.
 
 
 Contributing
