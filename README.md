@@ -66,8 +66,8 @@ For example:
     >>> stream.read(str, 2)       # <empty>
     "AB"
 
-Refer to [the documentation](http://boisgera.github.io/bitstream/) for more
-examples.
+Refer to the documentation [Overview](http://boisgera.github.io/bitstream/) 
+section for more elementary examples.
 
 
 Contributing
