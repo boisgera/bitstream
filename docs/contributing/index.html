@@ -394,12 +394,20 @@ The following sections should help you to get started.</p>
 $ cd bitstream
 </code></pre>
 <h2 id="build-from-sources">Build from Sources<a class="headerlink" href="#build-from-sources" title="Permanent link">&para;</a></h2>
-<p><strong>TODO:</strong> mention the usual install tools, PLUS Cython.</p>
 <p>Bitstream is a <a href="http://cython.org/#documentation">Cython</a> project.
-<a href="http://cython.readthedocs.io/en/latest/src/quickstart/install.html#installing-cython">Install Cython</a>, then build and install bitstream with:</p>
+Its source files have <code>.pyx</code> and <code>.pxd</code> extensions. </p>
+<p>To build and install bitstream from its git repository:</p>
+<ul>
+<li>
+<p><a href="../installation">install the tools required for a classic install</a>,</p>
+</li>
+<li>
+<p><a href="http://cython.org/#documentation">install the Cython compiler</a>,</p>
+</li>
+</ul>
+<p>then execute:</p>
 <pre><code>$ python setup.py --cython install
 </code></pre>
-<p>Cython source files have the <code>.pyx</code> and <code>.pxd</code> extensions.</p>
 <details class="warning"><summary>The command <code>python setup.py install</code> doesn't work</summary><p>This is expected:
 this command needs C files to build bitstream,
 which is a Python C extension module,
@@ -410,8 +418,7 @@ from the <code>.pyx</code> and <code>.pxd</code> files with:</p><pre><code>$ pyt
 with a <code>setup.cfg</code> file that contains:</p><pre><code>[global]
 cython = 1
 </code></pre></details><h2 id="run-the-tests">Run the Tests<a class="headerlink" href="#run-the-tests" title="Permanent link">&para;</a></h2>
-<p><strong>TODO:</strong> mention <code>pyyaml</code></p>
-<p>To run all the tests, install bitstream and type</p>
+<p>To run all the tests, install <code>pyyaml</code><sup id="fnref:1"><a class="footnote-ref" href="#fn:1" rel="footnote">1</a></sup> then install bitstream and type</p>
 <pre><code> $ python test.py
 </code></pre>
 <p>If nothing happens, your version of bitstream is probably fine: 
@@ -424,7 +431,7 @@ To find out more about these tests, run</p>
 <p>The bitstream project uses <a href="https://travis-ci.org/">Travis CI</a> 
 to run all the tests on each new commit. 
 If you fork bitstream, make sure to <a href="https://docs.travis-ci.com/user/getting-started/">activate Travis CI</a>.
-To add new tests, just <a href="#the-documentation">update the documentation</a>.</p>
+To add new tests, just <a href="#documentation">update the documentation</a>.</p>
 <h2 id="documentation">Documentation<a class="headerlink" href="#documentation" title="Permanent link">&para;</a></h2>
 <p>The documentation is built with <a href="http://www.mkdocs.org/">MkDocs</a> and its 
 <a href="https://squidfunk.github.io/mkdocs-material/">Material</a> theme.
@@ -435,17 +442,20 @@ Install them with:</p>
 in the <a href="https://github.com/boisgera/bitstream/tree/master/mkdocs"><code>mkdocs</code></a>
 directory and assembled according to the configuration file 
 <a href="https://github.com/boisgera/bitstream/blob/master/mkdocs.yml"><code>mkdocs.yml</code></a>.
-Build the docs<sup id="fnref:build"><a class="footnote-ref" href="#fn:build" rel="footnote">1</a></sup> with</p>
+Build the docs<sup id="fnref:build"><a class="footnote-ref" href="#fn:build" rel="footnote">2</a></sup> with</p>
 <pre><code>$ mkdocs build
 </code></pre>
 <p>This command outputs HTML documentation into the <code>docs</code> directory.</p>
 <div class="footnote">
 <hr />
 <ol>
+<li id="fn:1">
+<p><code>pip install pyyaml</code>&#160;<a class="footnote-backref" href="#fnref:1" rev="footnote" title="Jump back to footnote 1 in the text">&#8617;</a></p>
+</li>
 <li id="fn:build">
 <p>For work in progress, use <code>mkdocs serve</code>: it creates a web server 
   that listens on <code>http://127.0.0.1:8000</code> and refreshes automatically
-  the documentation when its source files change.&#160;<a class="footnote-backref" href="#fnref:build" rev="footnote" title="Jump back to footnote 1 in the text">&#8617;</a></p>
+  the documentation when its source files change.&#160;<a class="footnote-backref" href="#fnref:build" rev="footnote" title="Jump back to footnote 2 in the text">&#8617;</a></p>
 </li>
 </ol>
 </div>
