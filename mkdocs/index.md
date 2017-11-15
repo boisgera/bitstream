@@ -2,7 +2,7 @@
 Overview
 ================================================================================
 
-Bitstream is a [Python] library to manage binary data as bit streams:
+Bitstream is a [Python] library to manage binary data as bitstreams:
 
     >>> from bitstream import BitStream
     >>> BitStream("Hello World!")
