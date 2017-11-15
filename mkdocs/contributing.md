@@ -23,14 +23,18 @@ In the sequel we assume that you are in the project directory:
 Build from Sources
 --------------------------------------------------------------------------------
 
-**TODO:** mention the usual install tools, PLUS Cython.
-
 Bitstream is a [Cython] project.
-[Install Cython], then build and install bitstream with:
+Its source files have `.pyx` and `.pxd` extensions. 
+
+To build and install bitstream from its git repository:
+
+  - [install the tools required for a classic install](installation),
+
+  - [install the Cython compiler][Cython],
+
+then execute:
 
     $ python setup.py --cython install
-
-Cython source files have the `.pyx` and `.pxd` extensions.
 
 ??? warning "The command `python setup.py install` doesn't work"
 
@@ -56,11 +60,11 @@ Cython source files have the `.pyx` and `.pxd` extensions.
 Run the Tests
 --------------------------------------------------------------------------------
 
-**TODO:** mention `pyyaml`
-
-To run all the tests, install bitstream and type
+To run all the tests, install `pyyaml`[^1] then install bitstream and type
 
      $ python test.py
+
+[^1]: `pip install pyyaml`
 
 If nothing happens, your version of bitstream is probably fine: 
 all the code snippets
@@ -73,7 +77,7 @@ To find out more about these tests, run
 The bitstream project uses [Travis CI](https://travis-ci.org/) 
 to run all the tests on each new commit. 
 If you fork bitstream, make sure to [activate Travis CI](https://docs.travis-ci.com/user/getting-started/).
-To add new tests, just [update the documentation](#the-documentation).
+To add new tests, just [update the documentation](#documentation).
 
 [doctest]: https://docs.python.org/2/library/doctest.html
 
