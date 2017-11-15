@@ -48,7 +48,7 @@ The basic API is made of three methods only:
 
   - `stream = BitStream()` to create an empty stream.
 
-  - `stream.write(data, type)` to write `data` of type `type.
+  - `stream.write(data, type)` to write `data` of type `type`.
 
   - `data = stream.read(type, n)` to read `n` items of type `type`.
 
