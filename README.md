@@ -1,5 +1,6 @@
 [![Python 2.7](https://img.shields.io/badge/python-2.7-blue.svg)](https://www.python.org/download/releases/2.7/)
 [![PyPI version](https://img.shields.io/pypi/v/bitstream.svg)](https://pypi.python.org/pypi/bitstream/2.0.3)
+[![Mkdocs](https://img.shields.io/badge/doc-mkdocs-3f51b5.svg)](http://boisgera.github.io/bitstream)
 [![Build Status](https://travis-ci.org/boisgera/bitstream.svg?branch=master)](https://travis-ci.org/boisgera/bitstream)
 
 # Bitstream
