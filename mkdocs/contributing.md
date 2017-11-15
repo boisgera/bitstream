@@ -17,7 +17,7 @@ The following sections should help you to get started.
 
 In the sequel we assume that you are in the project directory:
 
-    $ https://github.com/boisgera/bitstream
+    $ git clone https://github.com/boisgera/bitstream
     $ cd bitstream
 
 Build from Sources
