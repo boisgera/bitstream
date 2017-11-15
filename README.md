@@ -13,7 +13,7 @@ Overview
 
 Bitstream three main features:
 
-  - It is easy to use, since the bitstream abstraction is simple.
+  - It is easy to use since the bitstream abstraction is simple.
 
   - It works seamlesly at the bit and byte level.
 
