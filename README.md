@@ -4,12 +4,20 @@
 
 # Bitstream
 
-A Python library which manages binary data as bit streams.
+A Python library to manages binary data as [bitstreams](https://en.wikipedia.org/wiki/Bitstream).
 
 Overview
 --------------------------------------------------------------------------------
 
-Motivation, set of features
+Bitstream is
+
+  - Easy to use, with a stream + snapshot model
+
+  - Works seamlesly at the bit and byte level,
+
+  - Supports Python, NumPy and user-defined types,
+
+See the documentation [Overview] section for more details.
 
 
 Quickstart
