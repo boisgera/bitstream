@@ -13,11 +13,11 @@ Overview
 
 Bitstream three main features:
 
-  - It is easy to use, since the bitstream abstraction is simple,
+  - It is easy to use, since the bitstream abstraction is simple.
 
-  - It works seamlesly at the bit and byte level,
+  - It works seamlesly at the bit and byte level.
 
-  - It supports Python, NumPy and user-defined types,
+  - It supports Python, NumPy and user-defined types.
 
 See the documentation [Overview](http://boisgera.github.io/bitstream)
 section for more details.
