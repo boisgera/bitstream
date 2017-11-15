@@ -73,7 +73,7 @@ section for more elementary examples.
 Contributing
 --------------------------------------------------------------------------------
 
-Refer to [the documentation](http://boisgera.github.io/bitstream/contributing/>).
+Refer to [the documentation](http://boisgera.github.io/bitstream/contributing).
 
 
 License
