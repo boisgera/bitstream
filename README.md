@@ -56,6 +56,7 @@ For example:
     >>> stream = BitStream()      # <empty>
     >>> stream.write(True, bool)  # 1
     >>> stream.write(False, bool) # 10
+    >>> from numpy import int8
     >>> stream.write(-128, int8)  # 1010000000
     >>> stream.write("AB", str)   # 10100000000100000101000010
     >>> stream.read(bool, 2)      # 100000000100000101000010
