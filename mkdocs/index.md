@@ -37,16 +37,24 @@ The main features are:
 
 !!! note "Works at the bit and byte level."
 
-    Example with chars and bools. 
+    Compact codes (for example [Huffman codes](https://en.wikipedia.org/wiki/Huffman_coding))
+    do not always represent data with an entire number of bytes.
+    Since bitstream supports bits and not merely bytes, such codes
+    are implemented with the same API.
+    For example, the [unary coding](https://en.wikipedia.org/wiki/Unary_coding) 
+    of a sequence natural numbers requires only a few lines:
 
-    Talk about masks and shifts not required for data not aligned 
-    to the bit boundary?
+        >>> data = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+        >>> stream = BitStream()
+        >>> for number in data:
+        ...     stream.write(number * [True] + [False])
+        ... 
+        >>> stream
+        0101101110111101111101111110111111101111111101111111110
+
 
 
 !!! note "Supports Python & NumPy types" 
-    Bistream ... encode, decode ...
-
-    [Built-in types](types)
 
     BitStream has built-in support for the common data types 
     with a standard binary layout: bools, ASCII strings, 
@@ -67,13 +75,15 @@ The main features are:
         >>> stream.read(str, 2)
         'AB'
 
-    ... numpy handy wada wada
+    NumPy arrays are a convenient way to deal with sequences of homogeneous data:
 
         >>> from numpy import *
         >>> dt = 1.0 / 44100.0
         >>> t = r_[0.0:1.0:dt]
         >>> data = cos(2*pi*440.0*t)       
         >>> stream = BitStream(data)
+
+    Refer to the [Built-in types](types) section for more details.
 
 
 !!! note "Advanced features"
@@ -89,11 +99,16 @@ The main features are:
         representation may be enlarged at will: new readers and writers 
         can be implemented and associated to specific data types.
 
-        See: [Custom types](custom)
+        See also: [Custom types](custom).
 
-      - **Snapshots.**
+      - **Snapshots.** At times, the stream abstraction is too simple,
+        for example when you need to lookahead into the stream without
+        consuming its content. Snapshots are an extension of the stream
+        model that solve this kind of issue
+        since they provide a "time machine" to restore a stream 
+        to an earlier state.
 
-        See: [Snapshots](snapshots)
+        See also: [Snapshots](snapshots).
 
 !!! note "Open Source"
     Bitstream  is distributed under a [MIT license]. 
