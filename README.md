@@ -7,8 +7,6 @@
 
 A Python library to manage binary data as [bitstreams](https://en.wikipedia.org/wiki/Bitstream).
 
-**Documentation:** <http://boisgera.github.io/bitstream>
-
 Overview
 --------------------------------------------------------------------------------
 
