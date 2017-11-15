@@ -32,7 +32,7 @@ are available, then install bitstream with
 
 [pip]: https://packaging.python.org/tutorials/installing-packages/#install-pip-setuptools-and-wheel
 
-For more details, refer to [the documentation](http://boisgera.github.io/bitstream/installation/)
+For more details, refer to [the documentation](http://boisgera.github.io/bitstream/installation/).
 
 Examples
 --------------------------------------------------------------------------------
