@@ -314,23 +314,57 @@
                 
                 
                 <h1 id="overview">Overview<a class="headerlink" href="#overview" title="Permanent link">&para;</a></h1>
-<p>Bitstream is a <a href="http://www.python.org/">Python</a> library which manages binary data as bit streams:</p>
+<p>Bitstream is a <a href="http://www.python.org/">Python</a> library to manage binary data as bitstreams:</p>
 <pre><code>&gt;&gt;&gt; from bitstream import BitStream
 &gt;&gt;&gt; BitStream("Hello World!")
 010010000110010101101100011011000110111100100000010101110110111101110010011011000110010000100001
 </code></pre>
-<p>The standard library provides the <a href="https://docs.python.org/2/library/struct.html">struct</a> 
-module to manage binary data. 
-If you find its API arcane, consider using bitstream instead<sup id="fnref:1"><a class="footnote-ref" href="#fn:1" rel="footnote">1</a></sup>:</p>
+<p>The main features are:</p>
 <div class="admonition note">
-<p class="admonition-title">Binary Data</p>
+<p class="admonition-title">Easy to use</p>
+<p><a href="https://en.wikipedia.org/wiki/Bitstream">Bitstreams</a> are a simple abstraction.
+They behave like communication channels: 
+you can only write data at one end of it 
+and read data at the other end, in the same order.
+So you only need to know how to create a stream, write into it
+and read it to use this library:</p>
+<pre><code>&gt;&gt;&gt; stream = BitStream()
+&gt;&gt;&gt; stream.write("Hello")
+&gt;&gt;&gt; stream.write(" World!")
+&gt;&gt;&gt; stream.read(str, 5)
+'Hello'
+&gt;&gt;&gt; stream.read(str, 7)
+' World!'
+</code></pre>
+<p>This simple way to manage binary data is good enough for a surprisingly
+large number of use cases. 
+It should be much easier to use than
+<a href="https://docs.python.org/2/library/struct.html">struct</a> and 
+<a href="https://docs.python.org/2/library/array.html">array</a>, 
+the modules that the standard Python library provides for this task. </p>
 </div>
 <div class="admonition note">
-<p class="admonition-title">Stream Interface</p>
-<p>You can only read data at the start of a stream 
-and write data at its end.
-This is a very simple way to interact with binary data, but it is also
-the pattern that comes naturally in many applications. </p>
+<p class="admonition-title">Works at the bit and byte level.</p>
+<p>Compact codes (for example <a href="https://en.wikipedia.org/wiki/Huffman_coding">Huffman codes</a>)
+do not always represent data with an entire number of bytes.
+Since bitstream supports bits and not merely bytes, such codes
+are implemented with the same API.
+For example, the <a href="https://en.wikipedia.org/wiki/Unary_coding">unary coding</a> 
+of a sequence natural numbers requires only a few lines:</p>
+<pre><code>&gt;&gt;&gt; data = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+&gt;&gt;&gt; stream = BitStream()
+&gt;&gt;&gt; for number in data:
+...     stream.write(number * [True] + [False])
+... 
+&gt;&gt;&gt; stream
+0101101110111101111101111110111111101111111101111111110
+</code></pre>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Supports Python &amp; NumPy types</p>
+<p>BitStream has built-in support for the common data types 
+with a standard binary layout: bools, ASCII strings, 
+fixed-size integers and floating-point integers. </p>
 <pre><code>&gt;&gt;&gt; stream = BitStream()
 &gt;&gt;&gt; stream.write(True, bool)
 &gt;&gt;&gt; stream.write(False, bool)
@@ -346,44 +380,40 @@ array([-128], dtype=int8)
 &gt;&gt;&gt; stream.read(str, 2)
 'AB'
 </code></pre>
-<p>To manage
-binary codes and formats, in my experience, random data access is 
-not a requirement.</p>
-<p>HERE: snapshot ref</p>
-</div>
-<div class="admonition note">
-<p class="admonition-title">Python &amp; NumPy</p>
-<p>BitStream has built-in support for the common data types 
-with a standard binary layout: bools, ASCII strings, 
-fixed-size integers and floating-point integers. </p>
+<p>NumPy arrays are a convenient way to deal with sequences of homogeneous data:</p>
 <pre><code>&gt;&gt;&gt; from numpy import *
 &gt;&gt;&gt; dt = 1.0 / 44100.0
 &gt;&gt;&gt; t = r_[0.0:1.0:dt]
 &gt;&gt;&gt; data = cos(2*pi*440.0*t)       
 &gt;&gt;&gt; stream = BitStream(data)
 </code></pre>
+<p>Refer to the <a href="./types">Built-in types</a> section for more details.</p>
 </div>
 <div class="admonition note">
-<p class="admonition-title">Performance</p>
-<p>Bitstream is a Python C-extension module that has been
-optimized for the common use cases. Hopefully, it will be fast enough 
-for your needs! 
-Under the hood, the <a href="http://www.cython.org">Cython</a> language and compiler are used to generate 
-this extension module.</p>
-</div>
-<div class="admonition note">
-<p class="admonition-title">Advanced Features</p>
+<p class="admonition-title">Advanced features</p>
 <ul>
 <li>
-<p>Custom types: 
+<p><strong>Performance.</strong> Bitstream is a Python C-extension module that has been
+    optimized for the common use cases. Hopefully, it will be fast enough 
+    for your needs! 
+    Under the hood, the <a href="http://www.cython.org">Cython</a> language and compiler are used to generate 
+    this extension module.</p>
+</li>
+<li>
+<p><strong>Custom types.</strong>
     The list of supported types and binary 
     representation may be enlarged at will: new readers and writers 
     can be implemented and associated to specific data types.</p>
-<p>See: <a href="./custom">Custom types</a></p>
+<p>See also: <a href="./custom">Custom types</a>.</p>
 </li>
 <li>
-<p>Snapshots:</p>
-<p>See: <a href="./snapshots">Snapshots</a></p>
+<p><strong>Snapshots.</strong> At times, the stream abstraction is too simple,
+    for example when you need to lookahead into the stream without
+    consuming its content. Snapshots are an extension of the stream
+    model that solve this kind of issue
+    since they provide a "time machine" to restore a stream 
+    to an earlier state.</p>
+<p>See also: <a href="./snapshots">Snapshots</a>.</p>
 </li>
 </ul>
 </div>
@@ -392,29 +422,6 @@ this extension module.</p>
 <p>Bitstream  is distributed under a <a href="https://github.com/boisgera/bitstream/blob/master/LICENSE.txt">MIT license</a>. 
 The development takes place on <a href="https://github.com/boisgera/bitstream">GitHub</a> and 
 releases are distributed on <a href="https://pypi.python.org/pypi/bitstream/">PyPI</a>.</p>
-</div>
-<div class="footnote">
-<hr />
-<ol>
-<li id="fn:1">
-<p>Compare the binary encoding of a sequence of doubles</p>
-<pre><code>&gt;&gt;&gt; data = [1.0, 2.0, 3.0]
-</code></pre>
-<p>with struct</p>
-<pre><code>&gt;&gt;&gt; import struct
-&gt;&gt;&gt; format = "&gt;{0}d".format(len(data))
-&gt;&gt;&gt; struct.pack(format, *data)
-'?\xf0\x00\x00\x00\x00\x00\x00@\x00\x00\x00\x00\x00\x00\x00@\x08\x00\x00\x00\x00\x00\x00'
-</code></pre>
-<p>and with bitstream</p>
-<pre><code>&gt;&gt;&gt; from bitstream import BitStream
-&gt;&gt;&gt; stream = BitStream(data)
-&gt;&gt;&gt; stream.read(str)
-'?\xf0\x00\x00\x00\x00\x00\x00@\x00\x00\x00\x00\x00\x00\x00@\x08\x00\x00\x00\x00\x00\x00'
-</code></pre>
-<p><a class="footnote-backref" href="#fnref:1" rev="footnote" title="Jump back to footnote 1 in the text">&#8617;</a></p>
-</li>
-</ol>
 </div>
                 
                   
