@@ -23,6 +23,8 @@ In the sequel we assume that you are in the project directory:
 Build from Sources
 --------------------------------------------------------------------------------
 
+**TODO:** mention the usual install tools, PLUS Cython.
+
 Bitstream is a [Cython] project.
 [Install Cython], then build and install bitstream with:
 
