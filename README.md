@@ -13,7 +13,7 @@ Overview
 
 Bitstream three main features:
 
-  - It is easy to use, with a stream interface than you learn
+  - It is easy to use, with a stream interface than you learn in an instant
 
   - It works seamlesly at the bit and byte level,
 
