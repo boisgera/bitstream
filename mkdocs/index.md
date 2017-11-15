@@ -2,47 +2,55 @@
 Overview
 ================================================================================
 
-Bitstream is a [Python] library which manages binary data as bit streams:
+Bitstream is a [Python] library to manage binary data as bit streams:
 
     >>> from bitstream import BitStream
     >>> BitStream("Hello World!")
     010010000110010101101100011011000110111100100000010101110110111101110010011011000110010000100001
 
+The main features are:
 
-The standard library provides the [struct](https://docs.python.org/2/library/struct.html) 
-module to manage binary data. 
-If you find its API arcane, consider using bitstream instead[^1]:
+!!! note "Easy to use"
 
-[^1]:
-    Compare the binary encoding of a sequence of doubles
+    [Bitstreams](https://en.wikipedia.org/wiki/Bitstream) are a simple abstraction.
+    They behave like communication channels: 
+    you can only write data at one end of it 
+    and read data at the other end, in the same order.
+    So you only need to know how to create a stream, write into it
+    and read it to use this library:
 
-        >>> data = [1.0, 2.0, 3.0]
+        >>> stream = BitStream()
+        >>> stream.write("Hello")
+        >>> stream.write(" World!")
+        >>> stream.read(str, 5)
+        'Hello'
+        >>> stream.read(str, 7)
+        ' World!'
 
-    with struct
+    This simple way to manage binary data is good enough for a surprisingly
+    large number of use cases. 
+    It should be much easier to use than
+    [struct](https://docs.python.org/2/library/struct.html) and 
+    [array](https://docs.python.org/2/library/array.html), 
+    the modules that the standard Python library provides for this task. 
+    
 
-        >>> import struct
-        >>> format = ">{0}d".format(len(data))
-        >>> struct.pack(format, *data)
-        '?\xf0\x00\x00\x00\x00\x00\x00@\x00\x00\x00\x00\x00\x00\x00@\x08\x00\x00\x00\x00\x00\x00'
+!!! note "Works at the bit and byte level."
 
-    and with bitstream
+    Example with chars and bools. 
 
-        >>> from bitstream import BitStream
-        >>> stream = BitStream(data)
-        >>> stream.read(str)
-        '?\xf0\x00\x00\x00\x00\x00\x00@\x00\x00\x00\x00\x00\x00\x00@\x08\x00\x00\x00\x00\x00\x00'
-
-
-
-!!! note "Binary Data"
+    Talk about masks and shifts not required for data not aligned 
+    to the bit boundary?
 
 
+!!! note "Supports Python & NumPy types" 
+    Bistream ... encode, decode ...
 
-!!! note "Stream Interface"
-    You can only read data at the start of a stream 
-    and write data at its end.
-    This is a very simple way to interact with binary data, but it is also
-    the pattern that comes naturally in many applications. 
+    [Built-in types](types)
+
+    BitStream has built-in support for the common data types 
+    with a standard binary layout: bools, ASCII strings, 
+    fixed-size integers and floating-point integers. 
 
         >>> stream = BitStream()
         >>> stream.write(True, bool)
@@ -59,19 +67,7 @@ If you find its API arcane, consider using bitstream instead[^1]:
         >>> stream.read(str, 2)
         'AB'
 
-
-    To manage
-    binary codes and formats, in my experience, random data access is 
-    not a requirement.
-
-    HERE: snapshot ref
-
-!!! note "Python & NumPy" 
-    BitStream has built-in support for the common data types 
-    with a standard binary layout: bools, ASCII strings, 
-    fixed-size integers and floating-point integers. 
-
-
+    ... numpy handy wada wada
 
         >>> from numpy import *
         >>> dt = 1.0 / 44100.0
@@ -79,23 +75,23 @@ If you find its API arcane, consider using bitstream instead[^1]:
         >>> data = cos(2*pi*440.0*t)       
         >>> stream = BitStream(data)
 
-!!! note "Performance" 
-    Bitstream is a Python C-extension module that has been
-    optimized for the common use cases. Hopefully, it will be fast enough 
-    for your needs! 
-    Under the hood, the [Cython] language and compiler are used to generate 
-    this extension module.
 
-!!! note "Advanced Features"
+!!! note "Advanced features"
 
-      - Custom types: 
+      - **Performance.** Bitstream is a Python C-extension module that has been
+        optimized for the common use cases. Hopefully, it will be fast enough 
+        for your needs! 
+        Under the hood, the [Cython] language and compiler are used to generate 
+        this extension module.
+
+      - **Custom types.**
         The list of supported types and binary 
         representation may be enlarged at will: new readers and writers 
         can be implemented and associated to specific data types.
 
         See: [Custom types](custom)
 
-      - Snapshots:
+      - **Snapshots.**
 
         See: [Snapshots](snapshots)
 
