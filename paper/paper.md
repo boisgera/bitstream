@@ -20,8 +20,8 @@ bibliography: bibliography.json
 
 [Bitstream] [@bitstream] is a Python library to manage binary data 
 as bitstreams.
-Bitstreams are sequential: you can only read data at the beginning of a 
-stream and write data at its end, in the same order.
+Bitstreams are sequential: you can only write data at the end of
+a stream and read data at its beginning, in the same order.
 This simple model lends itself to a high-level programming interface
 which is mostly self-explanatory.
 
@@ -40,20 +40,21 @@ If you reach the limits of the purely sequential model,
 the library supports creation and restoration of stream snapshots;
 this "time machine" scheme is more than adequate for many use cases
 (header lookahead, decoders with strong exception safety, etc.).
-And since it's a Python C extension, it is fast enough for many use cases.
+And since bitstream is a Python C extension, it is fast enough for many use cases.
 
 The design of bitstream was initially driven by the development of 
 a "Digital Audio Coding" graduate course at MINES ParisTech University
-[@S1916; @DAC], a context (information theory, binary formats, numeric data)
-where the bitstream abstraction works really well;
-a simple interface was required to replace pseudo-code
+[@S1916; @DAC].
+In this context, which mixes information theory, binary formats and numeric data, 
+the bitstream abstraction works really well.
+A simple interface was required to replace pseudo-code
 with actual code, bridging the gap between lectures and lab sessions.
 Since none of the Python libraries we were aware of 
 [@struct; @array; @bitstring; @bitarray, etc.] supported
 the feature set described above, bitstream was born.
 
 The library later proved to be useful to prototype and document
-classic and experimental formats and codecs.
+quickly classic and experimental binary formats and codecs.
 It was integrated as a component of the Python [`audio`] package 
 and used by audio coding applications,
 such as [`audio.wave`], a reader and writer of WAVE files [see e.g. @WAVE]
