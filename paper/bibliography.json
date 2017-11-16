@@ -122,6 +122,24 @@
     "type": "webpage"
   },
   {
+    "URL": "https://docs.python.org/2/library/array.html",
+    "author": [
+      {
+        "literal": "Python 2.7 Standard Library"
+      }
+    ],
+    "id": "array",
+    "issued": {
+      "date-parts": [
+        [
+          2017
+        ]
+      ]
+    },
+    "title": "array — Efficient arrays of numeric values",
+    "type": "webpage"
+  },
+  {
     "URL": "http://scott-griffiths.github.io/bitstring/",
     "author": [
       {

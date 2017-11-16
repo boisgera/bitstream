@@ -69,6 +69,15 @@ references:
   - year: 2017
   URL: https://docs.python.org/2/library/struct.html
 
+- id: array
+  type: webpage
+  author: 
+  - literal: "Python 2.7 Standard Library"
+  title: "array — Efficient arrays of numeric values"
+  issued:
+  - year: 2017
+  URL: https://docs.python.org/2/library/array.html
+
 - id: bitstring
   type: webpage
   author:
