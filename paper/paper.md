@@ -10,7 +10,7 @@ authors:
    orcid: 0000-0003-4685-8099
    affiliation: 1
 affiliations:
- - name: MINES ParisTech, PSL Research University, Center for robotics
+ - name: MINES ParisTech, PSL Research University, Centre for robotics
    index: 1
 date: 13 November 2017
 bibliography: bibliography.json
@@ -18,29 +18,44 @@ bibliography: bibliography.json
 
 # Summary
 
-[Bitstream] [@bitstream] is a Python library to manage binary data 
-as bitstreams.
-Bitstreams are sequential: you can only write data at the end of
-a stream and read data at its beginning, in the same order.
-This simple model lends itself to a high-level programming interface
-which is mostly self-explanatory.
+Audiophiles are familiar with multiple digital
+audio file formats (WAV, MP3, AAC, ALAC, FLAC, etc.) and generally 
+know that this multiplicity is justified by different trade-offs and features
+(in terms of quality, compression rate, complexity, for example).
+The same logic drives the research for new binary formats
+in many contexts.
+Such research goes through an experimental phase where the development of
+codecs -- the software that transforms back and forth the original data 
+into binary data -- is required for any theoretical design.
+Any tool which can simplify and speed up the prototyping 
+of such codecs therefore improves significantly this iterative process.
 
-[Bitstream]: https://github.com/boisgera/bitstream
+In this context, [Bitstream] 
+[@bitstream] provides a Python library with a 
+simple, high-level and customizable programming interface 
+to manage binary data. 
+Many classic but menial tasks usually required
+are automatically taken care of under the hood.
 
-This library supports out of the box data types from Python and NumPy: 
+The cornerstone of the library is the use of the "bitstream" abstraction.
+The "stream" part means that we use a simple model where 
+one can only write data at one end of the binary structure 
+and read data at the other end, in the same order. 
+The "bit" part means that the library can work seamlessly 
+with individual bits and not merely bytes, a feature frequently
+required by lossless data compression schemes. 
+Bitstream supports out of the box data types from Python and NumPy: 
 ASCII strings, (arrays of) booleans, fixed-size integers, floating-point numbers,
 etc.
-You can also define and register custom (even parametrized) types and 
+One can also define and register custom (even parametrized) types and 
 their binary representation,
 and then use them with the same interface. 
-As its name implies, bitstream can work at the bit-level,
-thus data types that don't fit in a entire number of bytes are
-managed seamlessly.
-If you reach the limits of the purely sequential model,
-the library supports creation and restoration of stream snapshots;
+Since the library supports creation and restoration of stream snapshots,
+it's possible to go beyond the stream model when necessary;
 this "time machine" scheme is more than adequate for many use cases
 (header lookahead, decoders with strong exception safety, etc.).
-And since bitstream is a Python C extension, it is fast enough for many use cases.
+And since bitstream is a Python C extension, it is fast enough for many
+applications.
 
 The design of bitstream was initially driven by the development of 
 a "Digital Audio Coding" graduate course at MINES ParisTech University
@@ -61,6 +76,7 @@ such as [`audio.wave`], a reader and writer of WAVE files [see e.g. @WAVE]
 integrated with NumPy and [`audio.shrink`], an experimental lossless codec 
 inspired by SHORTEN [@Rob94].
 
+[Bitstream]: https://github.com/boisgera/bitstream
 [`audio`]: https://pypi.python.org/pypi/audio
 [`audio.wave`]: https://github.com/boisgera/audio.wave
 [`audio.shrink`]: https://github.com/boisgera/audio.shrink
@@ -69,5 +85,6 @@ inspired by SHORTEN [@Rob94].
 [array]: https://docs.python.org/2/library/array.html
 [bitstring]: https://pypi.python.org/pypi/bitstring
 [bitarray]: https://pypi.python.org/pypi/bitarray
-
+ 
 # References
+
