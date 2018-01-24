@@ -81,7 +81,7 @@ Support
 --------------------------------------------------------------------------------
 
 If you need some support with bitstream and you haven't found a solution to your
-problem [in the documentation](http://boisgera.github.io/bitstream/installation/),
+problem [in the documentation](http://boisgera.github.io/bitstream/),
 please open an issue in the 
 [GitHub issue tracker](https://github.com/boisgera/bitstream/issues).
 
