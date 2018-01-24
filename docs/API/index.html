@@ -583,7 +583,7 @@ For details, refer to <a href="../../custom">Custom Types</a>.</p>
 <details class="note"><summary><code>ReadError</code></summary><p>Exception raised when a binary decoding is impossible.</p></details><details class="note"><summary><code>WriteError</code></summary><p>Exception raised when a binary encoding is impossible.</p></details><h2 id="snapshots">Snapshots<a class="headerlink" href="#snapshots" title="Permanent link">&para;</a></h2>
 <p>Save and restore stream states. 
 For details, refer to <a href="../../snapshots">Snapshots</a>.</p>
-<details class="note"><summary><code>State</code></summary><p>The (opaque) type of stream state.</p></details><details class="note"><summary><code>BitStream.save(self)</code></summary><p>Return a <code>State</code> instance</p></details><details class="note"><summary><code>BitStream.restore(self, state)</code></summary><p>Restore a previous stream state.</p><p>Raise a <code>ValueError</code> if the state is invalid.</p></details>
+<details class="note"><summary><code>State</code></summary><p>The <a href="https://en.wikipedia.org/wiki/Opaque_data_type">opaque type</a> of stream state.</p></details><details class="note"><summary><code>BitStream.save(self)</code></summary><p>Return a <code>State</code> instance</p></details><details class="note"><summary><code>BitStream.restore(self, state)</code></summary><p>Restore a previous stream state.</p><p>Raise a <code>ValueError</code> if the state is invalid.</p></details>
                 
                   
                 

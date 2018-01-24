@@ -247,3 +247,26 @@ but then `s1` cannot be used anymore
     ValueError: ...
 
 
+How does it Work?
+--------------------------------------------------------------------------------
+
+The main (private) attributes of a `BitStream` structure are:
+
+  - an array of bytes: the raw data
+
+  - read and write cursors: they locate the beginning and the end 
+    of the stream in the bytes array.
+ 
+When you read data from a stream, 
+you shift the read cursor but the 
+corresponding data is *not* deleted[^1] -- its is merely not accessible.
+The `State` structure stores values 
+of the read and write cursors; the call `state = stream.save()` produces 
+a snapshot of the current cursor locations and
+`stream.restore(state)` restores them.
+
+[^1]: This is why the memory consumption increases if you write a lot
+of data into a stream, *even if you read it!* The solution in this case is to
+copy the stream and discard the original since the copy method discards 
+write history.
+

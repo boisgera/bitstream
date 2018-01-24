@@ -340,7 +340,7 @@ Save and restore stream states.
 For details, refer to [Snapshots](../snapshots).
 
 ??? note "`State`"
-    The (opaque) type of stream state.
+    The [opaque type](https://en.wikipedia.org/wiki/Opaque_data_type) of stream state.
 
 ??? note "`BitStream.save(self)`"
 

@@ -291,6 +291,13 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#how-does-it-work" title="How does it Work?" class="md-nav__link">
+    How does it Work?
+  </a>
+  
+</li>
+      
       
       
     </ul>
@@ -361,6 +368,13 @@
         <li class="md-nav__item">
   <a href="#multiple-snapshots" title="Multiple Snapshots" class="md-nav__link">
     Multiple Snapshots
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#how-does-it-work" title="How does it Work?" class="md-nav__link">
+    How does it Work?
   </a>
   
 </li>
@@ -592,6 +606,35 @@ Traceback (most recent call last):
 ...
 ValueError: ...
 </code></pre>
+<h2 id="how-does-it-work">How does it Work?<a class="headerlink" href="#how-does-it-work" title="Permanent link">&para;</a></h2>
+<p>The main (private) attributes of a <code>BitStream</code> structure are:</p>
+<ul>
+<li>
+<p>an array of bytes: the raw data</p>
+</li>
+<li>
+<p>read and write cursors: they locate the beginning and the end 
+    of the stream in the bytes array.</p>
+</li>
+</ul>
+<p>When you read data from a stream, 
+you shift the read cursor but the 
+corresponding data is <em>not</em> deleted<sup id="fnref:1"><a class="footnote-ref" href="#fn:1" rel="footnote">1</a></sup> -- its is merely not accessible.
+The <code>State</code> structure stores values 
+of the read and write cursors; the call <code>state = stream.save()</code> produces 
+a snapshot of the current cursor locations and
+<code>stream.restore(state)</code> restores them.</p>
+<div class="footnote">
+<hr />
+<ol>
+<li id="fn:1">
+<p>This is why the memory consumption increases if you write a lot
+of data into a stream, <em>even if you read it!</em> The solution in this case is to
+copy the stream and discard the original since the copy method discards 
+write history.&#160;<a class="footnote-backref" href="#fnref:1" rev="footnote" title="Jump back to footnote 1 in the text">&#8617;</a></p>
+</li>
+</ol>
+</div>
                 
                   
                 
