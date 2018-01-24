@@ -13,20 +13,32 @@ Constructor
 
 Most of the library features are available through the `BitStream` class:
 
-??? note "`BitStream(...)`"
-    BitStream class / constructor.
-
-    <h5>Arguments</h5>
-    
-      - without arguments, `BitStream()` creates an empty bitstream.
-
-      - with arguments, `BitStream(*args, **kwargs)`
-        also forwards 
-        the arguments to the `write` method.
+??? note "`BitStream()`"
+    Create an empty bitstream.
 
     <h5>Usage</h5>
 
         >>> stream = BitStream()
+
+??? note "`BitStream(data, type=None)`"
+    Create an empty bitstream,
+    then call the `write` method.
+
+    <h5>Arguments</h5>
+
+      - `data` is the data to be encoded.
+
+        The data type should be consistent with the `type` argument.
+
+      - `type` is a type identifier (such as `bool`, `str`, `int8`, etc.).
+
+        `type` can be omitted if `data` is an instance
+        of a registered type or a
+        list or 1d NumPy array of such 
+        instances.
+
+    <h5>Usage</h5>
+
         >>> stream = BitStream([False, True])
         >>> stream = BitStream("Hello", str)
         >>> stream = BitStream(42, uint8)
@@ -49,7 +61,8 @@ Read / Write
 
       - `type` is a type identifier (such as `bool`, `str`, `int8`, etc.).
 
-        It is optional if `data` is an instance
+        `type` can be omitted if `data`
+        is an instance
         of a registered type or a
         list or 1d NumPy array of such 
         instances.

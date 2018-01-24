@@ -175,6 +175,10 @@ cdef class BitStream:
         cdef int auto_detect = 0
         type_error = "unsupported type {0!r}."
 
+        # no data
+        if data is None:
+            return
+
         # automatic type detection
         if type is None:
             auto_detect = 1

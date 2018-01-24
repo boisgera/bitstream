@@ -459,14 +459,17 @@
 </code></pre>
 <h2 id="constructor">Constructor<a class="headerlink" href="#constructor" title="Permanent link">&para;</a></h2>
 <p>Most of the library features are available through the <code>BitStream</code> class:</p>
-<details class="note"><summary><code>BitStream(...)</code></summary><p>BitStream class / constructor.</p><p><h5>Arguments</h5></p><ul><li><p>without arguments, <code>BitStream()</code> creates an empty bitstream.</p></li><li><p>with arguments, <code>BitStream(*args, **kwargs)</code>
-    also forwards 
-    the arguments to the <code>write</code> method.</p></li></ul><p><h5>Usage</h5></p><pre><code>&gt;&gt;&gt; stream = BitStream()
-&gt;&gt;&gt; stream = BitStream([False, True])
+<details class="note"><summary><code>BitStream()</code></summary><p>Create an empty bitstream.</p><p><h5>Usage</h5></p><pre><code>&gt;&gt;&gt; stream = BitStream()
+</code></pre></details><details class="note"><summary><code>BitStream(data, type=None)</code></summary><p>Create an empty bitstream,
+then call the <code>write</code> method.</p><p><h5>Arguments</h5></p><ul><li><p><code>data</code> is the data to be encoded.</p><p>The data type should be consistent with the <code>type</code> argument.</p></li><li><p><code>type</code> is a type identifier (such as <code>bool</code>, <code>str</code>, <code>int8</code>, etc.).</p><p><code>type</code> can be omitted if <code>data</code> is an instance
+of a registered type or a
+list or 1d NumPy array of such 
+instances.</p></li></ul><p><h5>Usage</h5></p><pre><code>&gt;&gt;&gt; stream = BitStream([False, True])
 &gt;&gt;&gt; stream = BitStream("Hello", str)
 &gt;&gt;&gt; stream = BitStream(42, uint8)
 </code></pre><p><h5>See also</h5></p><ul><li><a href="#read-write">Read / Write</a></li></ul></details><h2 id="read-write">Read / Write<a class="headerlink" href="#read-write" title="Permanent link">&para;</a></h2>
-<details class="note"><summary><code>BitStream.write(self, data, type=None)</code></summary><p>Encode <code>data</code> and append it to the stream.</p><p><h5>Arguments</h5></p><ul><li><p><code>data</code> is the data to be encoded.</p><p>Its type should be consistent with the <code>type</code> argument.</p></li><li><p><code>type</code> is a type identifier (such as <code>bool</code>, <code>str</code>, <code>int8</code>, etc.).</p><p>It is optional if <code>data</code> is an instance
+<details class="note"><summary><code>BitStream.write(self, data, type=None)</code></summary><p>Encode <code>data</code> and append it to the stream.</p><p><h5>Arguments</h5></p><ul><li><p><code>data</code> is the data to be encoded.</p><p>Its type should be consistent with the <code>type</code> argument.</p></li><li><p><code>type</code> is a type identifier (such as <code>bool</code>, <code>str</code>, <code>int8</code>, etc.).</p><p><code>type</code> can be omitted if <code>data</code>
+is an instance
 of a registered type or a
 list or 1d NumPy array of such 
 instances.</p></li></ul><p><h5>Usage</h5></p><pre><code>&gt;&gt;&gt; stream = BitStream()
