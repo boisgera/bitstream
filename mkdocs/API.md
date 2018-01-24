@@ -90,7 +90,18 @@ Read / Write
 
       - `data`: `n` items of data
 
-        The type of data depends on `type` and `n`.
+        The type of `data` depends on `type` and `n`. For built-in types:
+
+        `type`                   | `n = None`         | `n = 0, 1, 2, ...` 
+        -------------------------|--------------------|----------------------------------------
+        `bool`                   | `bool`             | `list` of bools
+        `BitStream`              | `BitStream`        | `BitStream`
+        `str`                    | `str`              | `str`
+        `numpy.uint8`            | `numpy.uint8`      | `numpy.array`
+        `numpy.int8`             | `numpy.int8`       | `numpy.array`
+        `numpy.uint16`           | `numpy.int16`      | `numpy.array`
+        ...                      | ...                | ...
+        `float`                  | `float`            | `numpy.array`
 
     <h5>Usage</h5>
 
