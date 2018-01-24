@@ -34,7 +34,7 @@ except pkg_resources.DistributionNotFound:
 # ------------------------------------------------------------------------------
 metadata = dict(
   name = "bitstream",
-  version = "2.2.0",
+  version = "2.3.0",
   description = "Binary Data for Humans",
   url = "https://github.com/boisgera/bitstream",
   author = u"Sébastien Boisgérault",
