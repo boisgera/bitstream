@@ -91,7 +91,8 @@ please include "bitstream" in the subject.
 You will find my e-mail address in my 
 [GitHub profile](https://github.com/boisgera).
 
-In both cases, you will need to sign into GitHub (and [join GitHub] if you
+In both cases, you will need to sign into GitHub 
+(and [join GitHub](https://github.com/join) if you
 don't already have an account).
 
 
