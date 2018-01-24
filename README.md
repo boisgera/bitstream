@@ -87,7 +87,7 @@ please open an issue in the
 
 If you don't feel like you problem belongs there, 
 you can send me an e-mail instead; 
-please include the "bitstream" in the subject.
+please include "bitstream" in the subject.
 You will find my e-mail address in my 
 [GitHub profile](https://github.com/boisgera).
 
