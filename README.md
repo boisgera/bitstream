@@ -73,8 +73,26 @@ section for more elementary examples.
 Contributing
 --------------------------------------------------------------------------------
 
-Refer to [Contributing](http://boisgera.github.io/bitstream/contributing) in the
-documentation.
+Refer to [Contributing](http://boisgera.github.io/bitstream/contributing) 
+in the documentation.
+
+
+Support
+--------------------------------------------------------------------------------
+
+If you need some support with bitstream and you haven't found a solution to your
+problem [in the documentation](http://boisgera.github.io/bitstream/installation/),
+please open an issue in the 
+[GitHub issue tracker](https://github.com/boisgera/bitstream/issues).
+
+If you don't feel like you problem belongs there, 
+you can send me an e-mail instead; 
+please include the "bitstream" in the subject.
+You will find my e-mail address in my 
+[GitHub profile](https://github.com/boisgera).
+
+In both cases, you will need to sign into GitHub (and [join GitHub] if you
+don't already have an account).
 
 
 License
