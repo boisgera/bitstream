@@ -2,7 +2,15 @@
 Examples
 ================================================================================
 
+We provide the following examples of bitstream usage:
 
+  - [Spoon](#spoon): build a translator between Brainfuck programs and Spoon
+    programs.
+
+  - [Wave](#wave): synthesize a pure tone and generate the corresponding
+    WAVE audio file.
+
+But first, as usual, let's start with
 
     >>> from bitstream import BitStream
     
