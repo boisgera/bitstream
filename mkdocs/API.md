@@ -339,8 +339,13 @@ Snapshots
 Save and restore stream states. 
 For details, refer to [Snapshots](../snapshots).
 
+As a user, you should not rely on the implementation of `State` 
+which is an internal detail: 
+instances of `State` have no public attribute, no public method,
+they can only be produced by `save` and consumed by `restore`.
+
 ??? note "`State`"
-    The [opaque type](https://en.wikipedia.org/wiki/Opaque_data_type) of stream state.
+    The opaque type of stream state.
 
 ??? note "`BitStream.save(self)`"
 
