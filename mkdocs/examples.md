@@ -235,4 +235,12 @@ actual file.
     >>> wave_file.write(wave_str)
        
 You can now listen to the sound in `output.wav` with your favorite music player.
+For the sake of consistency, let's make sure that you and I have the same 
+contents:
+
+    >>> import hashlib
+    >>> m = hashlib.md5()
+    >>> m.update(wave_str)
+    >>> m.digest()
+    '\xb0\xcf\x0e8\x150\x1fV \x86\x9e2\xdf\xfb\x1d\xec'
 
