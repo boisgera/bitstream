@@ -8,6 +8,15 @@ Bitstream is a [Python] library to manage binary data as bitstreams:
     >>> BitStream("Hello World!")
     010010000110010101101100011011000110111100100000010101110110111101110010011011000110010000100001
 
+If you need to deal with existing binary file formats,
+or design your own binary formats or
+experiment with data compression algorithms, etc. 
+and if the Python standard library doesn't work for you,
+you may be interested in bitstream.
+Read this section and have a look at the [example applications](examples) 
+to see if it is what you need.
+
+
 The main features are:
 
 !!! note "Easy to use"
