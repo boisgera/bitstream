@@ -1,0 +1,5 @@
+numpy
+Cython
+pyyaml
+mkdocs 
+mkdocs-material

@@ -5,7 +5,7 @@ language: bash
 before_install:
   - curl https://repo.continuum.io/miniconda/Miniconda2-latest-Linux-x86_64.sh > conda.sh
   - bash conda.sh -b -p $HOME/conda
-  - $HOME/conda/bin/conda install -y numpy cython pyyaml
+  - pip install -r requirements.txt
   - export PATH=$HOME/conda/bin:$PATH
 
 install:
