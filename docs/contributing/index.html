@@ -402,10 +402,11 @@ for the code or documentation.
 The following sections should help you to get started.</p>
 <hr />
 <h2 id="getting-started">Getting Started<a class="headerlink" href="#getting-started" title="Permanent link">&para;</a></h2>
-<p>First, follow the steps required to <a href="../installation/#install-from-sources">install bitstream from sources</a>.
-Make sure that you are in the project directory.</p>
+<p>Follow the steps required to <a href="../installation/#install-from-sources">install from sources</a>
+and make sure that you have installed all the developer dependencies 
+(<code>pip install -r requirements-dev.txt</code>).</p>
 <h2 id="run-the-tests">Run the Tests<a class="headerlink" href="#run-the-tests" title="Permanent link">&para;</a></h2>
-<p>To run all the tests, install <code>pyyaml</code><sup id="fnref:1"><a class="footnote-ref" href="#fn:1" rel="footnote">1</a></sup> and type</p>
+<p>To run all the tests, type</p>
 <pre><code> $ python test.py
 </code></pre>
 <p>If nothing happens, your version of bitstream is probably fine: 
@@ -421,10 +422,7 @@ If you fork bitstream, make sure to <a href="https://docs.travis-ci.com/user/get
 To add new tests, just <a href="#documentation">update the documentation</a>.</p>
 <h2 id="documentation">Documentation<a class="headerlink" href="#documentation" title="Permanent link">&para;</a></h2>
 <p>The documentation is built with <a href="http://www.mkdocs.org/">MkDocs</a> and its 
-<a href="https://squidfunk.github.io/mkdocs-material/">Material</a> theme.
-Install them with:</p>
-<pre><code>$ pip install mkdocs mkdocs-material
-</code></pre>
+<a href="https://squidfunk.github.io/mkdocs-material/">Material</a> theme.</p>
 <p>The documentation sources are markdown files located 
 in the <a href="https://github.com/boisgera/bitstream/tree/master/mkdocs"><code>mkdocs</code></a>
 directory and assembled according to the configuration file 

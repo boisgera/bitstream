@@ -254,6 +254,33 @@
     Install from Sources
   </a>
   
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#download-the-sources" title="Download the Sources" class="md-nav__link">
+    Download the Sources
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#required-tools" title="Required Tools" class="md-nav__link">
+    Required Tools
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#build-and-install" title="Build and Install" class="md-nav__link">
+    Build and Install
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -362,6 +389,33 @@
     Install from Sources
   </a>
   
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#download-the-sources" title="Download the Sources" class="md-nav__link">
+    Download the Sources
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#required-tools" title="Required Tools" class="md-nav__link">
+    Required Tools
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#build-and-install" title="Build and Install" class="md-nav__link">
+    Build and Install
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -406,14 +460,35 @@ On Windows, you can install the
 <pre><code>$ pip install bitstream
 </code></pre>
 <h2 id="install-from-sources">Install from Sources<a class="headerlink" href="#install-from-sources" title="Permanent link">&para;</a></h2>
-<p>Bitstream is a <a href="http://cython.org/#documentation">Cython</a> project.
-Its source files have <code>.pyx</code> and <code>.pxd</code> extensions.</p>
-<details class="note"><summary>Download the Sources</summary><p>For example, with <a href="https://git-scm.com/">git</a>:</p><pre><code>$ git clone https://github.com/boisgera/bitstream
+<h3 id="download-the-sources">Download the Sources<a class="headerlink" href="#download-the-sources" title="Permanent link">&para;</a></h3>
+<p>First, download the sources with <a href="https://git-scm.com/">git</a>
+and enter the project directory:</p>
+<pre><code>$ git clone https://github.com/boisgera/bitstream
 $ cd bitstream
-</code></pre></details><details class="note"><summary>Pip Install Dependencies</summary><p><a href="#install-with-pip">Install the tools required for a pip install</a>.</p></details><details class="note"><summary>Cython</summary><p><a href="http://docs.cython.org/en/latest/src/quickstart/install.html">Install the Cython compiler</a>. Typically:</p><pre><code>$ pip install Cython
-</code></pre></details><p>You're now ready to install bitstream: run the command</p>
-<pre><code>    $ python setup.py --cython install
 </code></pre>
+<p>Alternatively, you can also download the
+<a href="https://github.com/boisgera/bitstream/archive/master.zip">project ZIP archive</a>.
+For example:</p>
+<pre><code>$ wget https://github.com/boisgera/bitstream/archive/master.zip
+$ unzip master.zip
+$ cd bitstream-master
+</code></pre>
+<h3 id="required-tools">Required Tools<a class="headerlink" href="#required-tools" title="Permanent link">&para;</a></h3>
+<p>Building from sources requires everything you need for a 
+<a href="#install-with-pip">pip-based install</a> and more. 
+Since bitstream is written in <a href="http://cython.org/#documentation">Cython</a>, at the very least
+you need <a href="../install Cython">a Cython compiler</a>.
+If you don't mind having a few extra packags installed, 
+it's easier to install all developer dependencies with:</p>
+<pre><code>$ pip install -r requirements-dev.txt
+</code></pre>
+<h3 id="build-and-install">Build and Install<a class="headerlink" href="#build-and-install" title="Permanent link">&para;</a></h3>
+<p>Run the command:</p>
+<pre><code>$ python setup.py --cython install
+</code></pre>
+<p>If you want to do more than just build bitstream from sources
+-- for example run the tests, regenerate the documentation, etc. --
+please refer to the <a href="../contributing">Contributing section</a>.</p>
 <h2 id="troubleshooting">Troubleshooting<a class="headerlink" href="#troubleshooting" title="Permanent link">&para;</a></h2>
 <details class="warning"><summary>What if pip is available but associated to Python 3?</summary><p>If <code>pip</code> refers to your Python 3 interpreter</p><pre><code>$ pip --version
 pip 9.0.1 from /usr/local/lib/python3.5/dist-packages (python 3.5)

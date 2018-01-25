@@ -15,16 +15,19 @@ The following sections should help you to get started.
 
 -----
 
+
 Getting Started
 --------------------------------------------------------------------------------
 
-First, follow the steps required to [install bitstream from sources](installation/#install-from-sources).
-Make sure that you are in the project directory.
+Follow the steps required to [install from sources](installation/#install-from-sources)
+and make sure that you have installed all the developer dependencies 
+(`pip install -r requirements-dev.txt`).
+
 
 Run the Tests
 --------------------------------------------------------------------------------
 
-To run all the tests, install `pyyaml`[^1] and type
+To run all the tests, type
 
      $ python test.py
 
@@ -51,9 +54,6 @@ Documentation
 
 The documentation is built with [MkDocs](http://www.mkdocs.org/) and its 
 [Material](https://squidfunk.github.io/mkdocs-material/) theme.
-Install them with:
-
-    $ pip install mkdocs mkdocs-material
 
 The documentation sources are markdown files located 
 in the [`mkdocs`](https://github.com/boisgera/bitstream/tree/master/mkdocs)

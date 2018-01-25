@@ -22,11 +22,11 @@ import setuptools
 
 # NumPy 
 try:
-    requirement = "numpy"
-    pkg_resources.require(requirement)
+    pkg_resources.require("numpy")
     import numpy
 except pkg_resources.DistributionNotFound:
-    error = "{0!r} not available".format(requirement)
+    error  = "numpy not available. Try the command 'pip install -m numpy' "
+    error += "or use a pre-built package for your operating system."
     raise ImportError(error)
 
 

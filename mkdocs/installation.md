@@ -39,40 +39,49 @@ then install bitstream:
 [NumPy]: http://www.numpy.org/
 [MSVC]: https://www.microsoft.com/en-us/download/details.aspx?id=44266
 
-
-
-
 Install from Sources
 --------------------------------------------------------------------------------
 
-Bitstream is a [Cython] project.
-Its source files have `.pyx` and `.pxd` extensions.
+### Download the Sources
 
-??? note "Download the Sources"
+First, download the sources with [git](https://git-scm.com/)
+and enter the project directory:
 
-    For example, with [git](https://git-scm.com/):
+    $ git clone https://github.com/boisgera/bitstream
+    $ cd bitstream
 
-        $ git clone https://github.com/boisgera/bitstream
-        $ cd bitstream
+Alternatively, you can also download the
+[project ZIP archive](https://github.com/boisgera/bitstream/archive/master.zip).
+For example:
+        
+    $ wget https://github.com/boisgera/bitstream/archive/master.zip
+    $ unzip master.zip
+    $ cd bitstream-master
 
-??? note "Pip Install Dependencies"
+### Required Tools
 
-    [Install the tools required for a pip install](#install-with-pip).
+Building from sources requires everything you need for a 
+[pip-based install](#install-with-pip) and more. 
+Since bitstream is written in [Cython], at the very least
+you need [a Cython compiler](install Cython).
+If you don't mind having a few extra packags installed, 
+it's easier to install all developer dependencies with:
 
-??? note "Cython" 
+    $ pip install -r requirements-dev.txt
 
-    [Install the Cython compiler][Installing Cython]. Typically:
+### Build and Install
 
-        $ pip install Cython
+Run the command:
 
-You're now ready to install bitstream: run the command
+    $ python setup.py --cython install
 
-        $ python setup.py --cython install
+If you want to do more than just build bitstream from sources
+-- for example run the tests, regenerate the documentation, etc. --
+please refer to the [Contributing section](contributing).
 
 [Cython]: http://cython.org/#documentation
 [Installing Cython]: http://docs.cython.org/en/latest/src/quickstart/install.html
 [install Cython]: http://cython.readthedocs.io/en/latest/src/quickstart/install.html#installing-cython
-
 
 Troubleshooting
 --------------------------------------------------------------------------------
