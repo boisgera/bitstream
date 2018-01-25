@@ -235,6 +235,7 @@ actual file.
     >>> wave_file.write(wave_str)
        
 You can now listen to the sound in `output.wav` with your favorite music player.
+
 For the sake of consistency, let's make sure that you and I have the same 
 contents:
 
