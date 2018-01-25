@@ -241,6 +241,13 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#wave" title="Wave" class="md-nav__link">
+    Wave
+  </a>
+  
+</li>
+      
       
       
     </ul>
@@ -349,6 +356,13 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#wave" title="Wave" class="md-nav__link">
+    Wave
+  </a>
+  
+</li>
+      
       
       
     </ul>
@@ -373,7 +387,7 @@
 <p><a href="https://esolangs.org/wiki/Spoon">Spoon</a> is a derivative of the <a href="https://en.wikipedia.org/wiki/Brainfuck">Brainfuck</a> programming language.
 Instead of the 8 ASCII symbols used by Brainfuck, it relies on
 binary sequences to represent each instruction. </p>
-<p>The source of the "Hello World!" program in brainfuck is<sup id="fnref:dtm"><a class="footnote-ref" href="#fn:dtm" rel="footnote">1</a></sup>:</p>
+<p>The source of the "Hello World!" program in Brainfuck is<sup id="fnref:dtm"><a class="footnote-ref" href="#fn:dtm" rel="footnote">1</a></sup>:</p>
 <pre><code>&gt;&gt;&gt; hello_world = "++++++++++[&gt;+++++++&gt;++++++++++&gt;+++&gt;+&lt;&lt;&lt;&lt;-]&gt;++.&gt;+.+++++++..+++.&gt;++.&lt;&lt;+++++++++++++++.&gt;.+++.------.--------.&gt;+.&gt;."
 </code></pre>
 <p>The conversion between Brainfuck and Spoon is given by the table:</p>
@@ -404,7 +418,14 @@ to the stream.</p>
 <p>Here is the result:</p>
 <pre><code>&gt;&gt;&gt; stream
 11111111110010001011111110101111111111010111010101101101101100000110101100101001010010101111111001010001010111001010010110010100110111111111111111110010100100010101110010100000000000000000000010100000000000000000000000000010100101001010010001010
+&gt;&gt;&gt; len(hello_world) * 8
+888
+&gt;&gt;&gt; len(stream)
+245
 </code></pre>
+<p>We now have of program of 245 bits instead of the 888 bits 
+(111 bytes) of the original ASCII program. Not bad ...</p>
+<hr />
 <p>It's also pretty easy to perform the opposite operation, to translate Spoon into
 Brainfuck. First, we can compute <code>noops</code>, the inverse of the <code>spoon</code> dictionary.</p>
 <pre><code>&gt;&gt;&gt; noops = {}
@@ -434,6 +455,110 @@ empty the buffer and start again<sup id="fnref:pfc"><a class="footnote-ref" href
 <pre><code>&gt;&gt;&gt; src == hello_world
 True
 </code></pre>
+<h2 id="wave">Wave<a class="headerlink" href="#wave" title="Permanent link">&para;</a></h2>
+<p>What does it take to play a pure tone?
+The synthesis of the data is quite easy: in the realm of digital audio,
+sounds are just numbers and NumPy is up to the task.
+The painful, low-level part of the process is to actually generate an
+audio file in a format that your computer does understand. 
+Fortunately, this is where bitstream can help<sup id="fnref:r"><a class="footnote-ref" href="#fn:r" rel="footnote">4</a></sup>.</p>
+<p>Most of the audio file formats that you may know (MP3, AAC, FLAC, ALAC, etc.)
+use compression to reduce file size; unfortunately
+this feature leads to rather complex formats. 
+Therefore, we are going to output <a href="https://en.wikipedia.org/wiki/WAV">WAVE</a> 
+files instead, which are typically uncompressed.</p>
+<p>The <a href="http://soundfile.sapp.org/doc/WaveFormat/">WAVE PCM soundfile format</a> webpage<sup id="fnref:cs"><a class="footnote-ref" href="#fn:cs" rel="footnote">5</a></sup> is a great source of information
+about the format. We will use it to design our code; please have a look at it!
+Here is its high-level description:</p>
+<blockquote>
+<p>The WAVE file format is a subset of Microsoft's RIFF specification for the 
+storage of multimedia files. 
+A RIFF file starts out with a file header followed by a sequence of data 
+chunks. 
+A WAVE file is often just a RIFF file with a single "WAVE" chunk which 
+consists of two sub-chunks -- a "fmt " chunk specifying the data format 
+and a "data" chunk containing the actual sample data. </p>
+</blockquote>
+<p>First, we import NumPy (and globally the integer types that we need).</p>
+<pre><code>&gt;&gt;&gt; import numpy as np
+&gt;&gt;&gt; from numpy import uint8, uint16, uint32, int16
+</code></pre>
+<p>A sampling rate used by CD audio 44.1 kHz</p>
+<pre><code>&gt;&gt;&gt; # Generate a waveform (pure tone)
+&gt;&gt;&gt; df = 44100
+&gt;&gt;&gt; dt = 1.0 / df
+&gt;&gt;&gt; T = 3.0
+&gt;&gt;&gt; t = np.r_[0.0:T:dt]
+&gt;&gt;&gt; f = 440.0
+&gt;&gt;&gt; data = np.sin(2 * np.pi * f * t)
+</code></pre>
+<p>In this description, every sample is a floating-point number that requires 
+64 bits. The typical WAVE file requires 16-bit integer data instead, so we
+perform the (lossy) conversion:</p>
+<pre><code>&gt;&gt;&gt; # Quantize the floating-point data
+&gt;&gt;&gt; ones_ = np.ones_like(data)
+&gt;&gt;&gt; low  = (-2**15    ) * ones_
+&gt;&gt;&gt; high = ( 2**15 - 1) * ones_
+&gt;&gt;&gt; data = np.clip(2**15 * data, low, high)
+&gt;&gt;&gt; data = np.round(data).astype(np.int16)
+</code></pre>
+<p>Since WAVE files use a <a href="https://en.wikipedia.org/wiki/Endianness">little-endian</a>
+representation every numeric value
+and since bitstream is <a href="https://en.wikipedia.org/wiki/Endianness">big-endian</a>
+by default, we define a small function to
+help us perform the change automatically, using the <code>newbyteorder</code> 
+method of NumPy.</p>
+<pre><code>&gt;&gt;&gt; # Stream endianness helper 
+&gt;&gt;&gt; stream = BitStream()
+&gt;&gt;&gt; def write(datum, type=None):
+...     if type and issubclass(type, np.integer):
+...         datum = type(datum).newbyteorder()
+...     stream.write(datum, type)
+</code></pre>
+<p>The rest of the work is a straightforward translation of the 
+<a href="http://soundfile.sapp.org/doc/WaveFormat/">specification</a>: first we write the main chunk</p>
+<pre><code>&gt;&gt;&gt; # "RIFF" Chunk Descriptor
+&gt;&gt;&gt; chunk_size = 36 + 2 * len(data)  # size of the chunk after "RIFF"
+&gt;&gt;&gt; 
+&gt;&gt;&gt; write("RIFF"            )
+&gt;&gt;&gt; write(chunk_size, uint32)
+&gt;&gt;&gt; write("WAVE"            )
+</code></pre>
+<p>then the format subchunk</p>
+<pre><code>&gt;&gt;&gt; # "fmt" SubChunk
+&gt;&gt;&gt; subchunk1_size  = 16      # size in bytes of the subchunk after "fmt " 
+&gt;&gt;&gt; audio_format    = 1       # PCM data
+&gt;&gt;&gt; num_channels    = 1       # mono
+&gt;&gt;&gt; byte_rate       = 2 * df
+&gt;&gt;&gt; block_align     = 2       # number of bytes for one sample (all channels)
+&gt;&gt;&gt; bits_per_sample = 16
+&gt;&gt;&gt; 
+&gt;&gt;&gt; write("fmt "                 )
+&gt;&gt;&gt; write(subchunk1_size , uint32)
+&gt;&gt;&gt; write(audio_format   , uint16)
+&gt;&gt;&gt; write(num_channels   , uint16)
+&gt;&gt;&gt; write(df             , uint32)
+&gt;&gt;&gt; write(byte_rate      , uint32)
+&gt;&gt;&gt; write(block_align    , uint16)
+&gt;&gt;&gt; write(bits_per_sample, uint16)
+</code></pre>
+<p>and finally the data subchunk</p>
+<pre><code>&gt;&gt;&gt; # "data" SubChunk
+&gt;&gt;&gt; subchunk2_size = 2 * len(data)  # size in bytes of the subchunk after "data"
+&gt;&gt;&gt;  
+&gt;&gt;&gt; write("data"                )
+&gt;&gt;&gt; write(subchunk2_size, uint32)
+&gt;&gt;&gt; write(data          ,  int16)
+</code></pre>
+<p>and that's it! <code>stream</code> holds the content of our WAVE file;
+all we have to do is to read it as a string that we write into an 
+actual file.</p>
+<pre><code>&gt;&gt;&gt; # Generate the WAVE file
+&gt;&gt;&gt; wave_str = stream.read(str)
+&gt;&gt;&gt; wave_file = open("output.wav", "w")
+&gt;&gt;&gt; wave_file.write(wave_str)
+</code></pre>
+<p>You can now listen to the sound in <code>output.wav</code> with your favorite music player.</p>
 <div class="footnote">
 <hr />
 <ol>
@@ -446,8 +571,18 @@ a <a href="https://en.wikipedia.org/wiki/Huffman_coding">Huffman code</a>
 based on the analysis of a representative collection of Brainfuck programs.&#160;<a class="footnote-backref" href="#fnref:nac" rev="footnote" title="Jump back to footnote 2 in the text">&#8617;</a></p>
 </li>
 <li id="fn:pfc">
-<p>this approach -- without any lookahead -- is safe here because 
+<p>This approach -- without any lookahead -- is safe here because 
     this code is <a href="https://en.wikipedia.org/wiki/Prefix_code">prefix-free</a>.&#160;<a class="footnote-backref" href="#fnref:pfc" rev="footnote" title="Jump back to footnote 3 in the text">&#8617;</a></p>
+</li>
+<li id="fn:r">
+<p>Of course, there is a module in the Python standard library to
+<a href="https://docs.python.org/2/library/wave.html">read and write WAV files</a>.
+We just pretend that we're in the mood to reinvent this wheel and learn
+something in the process.&#160;<a class="footnote-backref" href="#fnref:r" rev="footnote" title="Jump back to footnote 4 in the text">&#8617;</a></p>
+</li>
+<li id="fn:cs">
+<p>by <a href="mailto:craig@ccrma.stanford.edu">Craig Sapp</a> from the
+   <a href="https://ccrma.stanford.edu/">Center for Computer Research in Music and Acoustics</a>:&#160;<a class="footnote-backref" href="#fnref:cs" rev="footnote" title="Jump back to footnote 5 in the text">&#8617;</a></p>
 </li>
 </ol>
 </div>
