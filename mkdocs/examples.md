@@ -160,7 +160,9 @@ First, we import NumPy (and globally the integer types that we need).
     >>> import numpy as np
     >>> from numpy import uint8, uint16, uint32, int16
 
-A sampling rate used by CD audio 44.1 kHz
+We use NumPy to produce 3 seconds of a pure tone with frequency 440 Hz
+(A4) at a sampling rate of 44.1 kHz 
+(the audio CD standard).
 
     >>> # Generate a waveform (pure tone)
     >>> df = 44100

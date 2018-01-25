@@ -495,7 +495,9 @@ and a "data" chunk containing the actual sample data. </p>
 <pre><code>&gt;&gt;&gt; import numpy as np
 &gt;&gt;&gt; from numpy import uint8, uint16, uint32, int16
 </code></pre>
-<p>A sampling rate used by CD audio 44.1 kHz</p>
+<p>We use NumPy to produce 3 seconds of a pure tone with frequency 440 Hz
+(A4) at a sampling rate of 44.1 kHz 
+(the audio CD standard).</p>
 <pre><code>&gt;&gt;&gt; # Generate a waveform (pure tone)
 &gt;&gt;&gt; df = 44100
 &gt;&gt;&gt; dt = 1.0 / df
