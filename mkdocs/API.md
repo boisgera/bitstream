@@ -337,7 +337,7 @@ Snapshots
 --------------------------------------------------------------------------------
 
 Save and restore stream states. 
-For details, refer to [Snapshots](../snapshots).
+For details, refer to [Snapshots](snapshots).
 
 As a user, you should not rely on the implementation of `State` 
 which is an internal detail: 
