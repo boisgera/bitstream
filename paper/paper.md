@@ -4,6 +4,7 @@ author: Sébastien Boisgérault, MINES ParisTech
 tags:
   - binary data
   - data compression
+  - audio coding
 authors:
  - name: Sébastien Boisgérault
    orcid: 0000-0003-4685-8099
