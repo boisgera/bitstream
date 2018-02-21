@@ -32,13 +32,13 @@ For example, [WAVE] audio can be detected with the function:
     ...        riff = stream.read(bytes, 4)
     ...        _ = stream.read(bytes, 4)
     ...        wave = stream.read(bytes, 4)
-    ...        return (riff == "RIFF") and (wave == "WAVE")
+    ...        return (riff == b"RIFF") and (wave == b"WAVE")
     ...    except ReadError:
     ...        return False
     
 The contents of an empty single-channel 44.1 kHz WAVE audio file are for example
 
-    >>> wave = 'RIFF$\x00\x00\x00WAVEfmt \x10\x00\x00\x00\x01\x00\x01\x00D\xac\x00\x00\x88X\x01\x00\x02\x00\x10\x00data\x00\x00\x00\x00'
+    >>> wave = b'RIFF$\x00\x00\x00WAVEfmt \x10\x00\x00\x00\x01\x00\x01\x00D\xac\x00\x00\x88X\x01\x00\x02\x00\x10\x00data\x00\x00\x00\x00'
 
 The function `is_wave` above works as expected at first
 
@@ -84,7 +84,7 @@ the original state of the stream is restored at the end.
     ...         riff = stream.read(bytes, 4)
     ...         _ = stream.read(bytes, 4)
     ...         wave = stream.read(bytes, 4)
-    ...         return (riff == "RIFF") and (wave == "WAVE")
+    ...         return (riff == b"RIFF") and (wave == b"WAVE")
     ...     except ReadError:
     ...         return False
     ...     finally:
@@ -92,7 +92,7 @@ the original state of the stream is restored at the end.
 
 This version works as expected:
 
-    >>> wave = 'RIFF$\x00\x00\x00WAVEfmt \x10\x00\x00\x00\x01\x00\x01\x00D\xac\x00\x00\x88X\x01\x00\x02\x00\x10\x00data\x00\x00\x00\x00'
+    >>> wave = b'RIFF$\x00\x00\x00WAVEfmt \x10\x00\x00\x00\x01\x00\x01\x00D\xac\x00\x00\x88X\x01\x00\x02\x00\x10\x00data\x00\x00\x00\x00'
     >>> stream = BitStream(wave)
     >>> copy = stream.copy()
     >>> is_wave(stream)
@@ -110,7 +110,7 @@ Exception Safety
 Consider the toy DNA reader below:
 
     >>> def DNA_read(stream, n=1):
-    ...     DNA_bases = "ACGT"
+    ...     DNA_bases = b"ACGT"
     ...     bases = []
     ...     for i in range(n):
     ...         base = stream.read(bytes, 1)
@@ -119,15 +119,15 @@ Consider the toy DNA reader below:
     ...             raise ReadError(error)
     ...         else:
     ...             bases.append(base)
-    ...     return "".join(bases)
+    ...     return b"".join(bases)
 
 
-It reads DNA sequences represented as strings of 
-`'A'`, `'C'`, `'G'` and `'T'` characters:
+It reads DNA sequences represented as bytes, either 
+`b'A'`, `b'C'`, `b'G'` or `b'T'`:
 
     >>> dna = BitStream(b"GATA")
     >>> DNA_read(dna, 4)
-    'GATA'
+    b'GATA'
 
 If there is a `'U'` in the sequence, this is an error since
 the [uracil base](https://en.wikipedia.org/wiki/Nucleobase) 
@@ -137,15 +137,16 @@ is only found in RNA.
 
 The DNA reader correctly rejects the code
 
-    >>> DNA_read(stream, 4)
-    Traceback (most recent call last):
-    ...
-    ReadError: invalid base 'U'
+    >>> try:
+    ...     DNA_read(stream, 4)
+    ... except ReadError:
+    ...     print("Read error")
+    Read error
 
 but the initial stream is partially consumed in the process:
 
     >>> stream.read(bytes)
-    'TA'
+    b'TA'
 
 This implementation therefore only provides some basic exception safety.
 A reader that preserves the original value of the stream when an error
@@ -175,15 +176,16 @@ With this new version, reading an invalid DNA code still
 raises an exception
 
     >>> stream = BitStream(b"GAUTA") # invalid DNA sequence
-    >>> DNA_read(stream, 4)
-    Traceback (most recent call last):
-    ...
-    ReadError: invalid base 'U'
+    >>> try:
+    ...     DNA_read(stream, 4)
+    ... except ReadError:
+    ...     print("Read error")
+    Read error
 
 but now the original stream is intact
 
     >>> stream.read(bytes)
-    'GAUTA'
+    b'GAUTA'
 
 
 Multiple Snapshots
