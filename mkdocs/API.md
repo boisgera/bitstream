@@ -30,7 +30,7 @@ Most of the library features are available through the `BitStream` class:
 
         The data type should be consistent with the `type` argument.
 
-      - `type` is a type identifier (such as `bool`, `str`, `int8`, etc.).
+      - `type` is a type identifier (such as `bool`, `bytes`, `int8`, etc.).
 
         `type` can be omitted if `data` is an instance
         of a registered type or a
@@ -40,7 +40,7 @@ Most of the library features are available through the `BitStream` class:
     <h5>Usage</h5>
 
         >>> stream = BitStream([False, True])
-        >>> stream = BitStream("Hello", str)
+        >>> stream = BitStream("Hello", bytes)
         >>> stream = BitStream(42, uint8)
 
     <h5>See also</h5>
@@ -74,7 +74,7 @@ Read / Write
         >>> stream.write(False)            # implicit bool type
         >>> stream.write(3*[False], bool)  # list (explicit type)
         >>> stream.write(3*[True])         # list (implicit type)
-        >>> stream.write("AB", str)        # string
+        >>> stream.write("AB", bytes)      # bytes
         >>> stream.write(-128, int8)       # signed 8 bit integer
 
     <h5>See also</h5>
@@ -90,7 +90,7 @@ Read / Write
 
     <h5>Arguments</h5>
 
-      - `type`: type identifier (such as `bool`, `str`, `int8`, etc.)
+      - `type`: type identifier (such as `bool`, `bytes`, `int8`, etc.)
      
         If `type` is `None` a bitstream is returned.
 
@@ -109,7 +109,7 @@ Read / Write
         -------------------------|--------------------|----------------------------------------
         `bool`                   | `bool`             | `list` of bools
         `BitStream`              | `BitStream`        | `BitStream`
-        `str`                    | `str`              | `str`
+        `bytes`                  | `bytes`            | `bytes`
         `numpy.uint8`            | `numpy.uint8`      | `numpy.array`
         `numpy.int8`             | `numpy.int8`       | `numpy.array`
         `numpy.uint16`           | `numpy.int16`      | `numpy.array`
@@ -129,7 +129,7 @@ Read / Write
         array([108, 111], dtype=uint8)
         >>> stream.read(uint8)
         32
-        >>> stream.read(str)
+        >>> stream.read(bytes)
         'World!'
 
     <h5>See also</h5>

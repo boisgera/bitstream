@@ -98,7 +98,7 @@ empty the buffer and start again[^pfc].
     ...     else:
     ...         buffer.write(stream.read(bool))
     ...         try:
-    ...             src += noops[str(buffer)]
+    ...             src += noops[bytes(buffer)]
     ...             buffer = BitStream()
     ...         except KeyError:
     ...             pass
@@ -240,9 +240,9 @@ all we have to do is to read it as a string that we write into an
 actual file.
 
     >>> # Generate the WAVE file
-    >>> wave_str = stream.read(str)
+    >>> wave_bytes = stream.read(bytes)
     >>> wave_file = open("output.wav", "w")
-    >>> wave_file.write(wave_str)
+    >>> wave_file.write(wave_bytes)
        
 You can now listen to the sound in `output.wav` with your favorite music player.
 
@@ -251,7 +251,7 @@ contents:
 
     >>> import hashlib
     >>> m = hashlib.md5()
-    >>> m.update(wave_str)
+    >>> m.update(wave_bytes)
     >>> m.digest()
     '\xb0\xcf\x0e8\x150\x1fV \x86\x9e2\xdf\xfb\x1d\xec'
 

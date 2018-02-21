@@ -31,9 +31,9 @@ The main features are:
         >>> stream = BitStream()
         >>> stream.write("Hello")
         >>> stream.write(" World!")
-        >>> stream.read(str, 5)
+        >>> stream.read(bytes, 5)
         'Hello'
-        >>> stream.read(str, 7)
+        >>> stream.read(bytes, 7)
         ' World!'
 
     This simple way to manage binary data is good enough for a surprisingly
@@ -66,7 +66,7 @@ The main features are:
 !!! note "Supports Python & NumPy types" 
 
     BitStream has built-in support for the common data types 
-    with a standard binary layout: bools, ASCII strings, 
+    with a standard binary layout: bools, bytes, 
     fixed-size integers and floating-point integers. 
 
         >>> stream = BitStream()
@@ -74,14 +74,14 @@ The main features are:
         >>> stream.write(False, bool)
         >>> from numpy import int8
         >>> stream.write(-128, int8)
-        >>> stream.write("AB", str)
+        >>> stream.write("AB", bytes)
         >>> stream
         10100000000100000101000010
         >>> stream.read(bool, 2)
         [True, False]
         >>> stream.read(int8, 1)
         array([-128], dtype=int8)
-        >>> stream.read(str, 2)
+        >>> stream.read(bytes, 2)
         'AB'
 
     NumPy arrays are a convenient way to deal with sequences of homogeneous data:

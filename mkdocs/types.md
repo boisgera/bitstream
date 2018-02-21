@@ -261,7 +261,7 @@ bitstreams: create a stream from the string `"ABCD"` with
 To be totally explicit, the code above is equivalent to:
 
     >>> stream = BitStream()
-    >>> stream.write("ABCDE", str)
+    >>> stream.write("ABCDE", bytes)
 
 Now, the content of the stream is
 
@@ -280,24 +280,24 @@ as unsigned 8-bit integers
     True
 
 There is no "single character" type in Python: 
-characters are represented as strings of length 1.
+characters are represented as bytes of length 1.
 To read one or several characters from a bitstream, 
-use the `read` method with the `str` type:
+use the `read` method with the `bytes` type:
 
-    >>> stream.read(str, 1)
+    >>> stream.read(bytes, 1)
     'A'
-    >>> stream.read(str, 2)
+    >>> stream.read(bytes, 2)
     'BC'
 
 Without an explicit number of characters, the bitstream is emptied
 
-    >>> stream.read(str)
+    >>> stream.read(bytes)
     'DE'
 
 but that works only if the bitstream contains a multiple of 8 bits.
 
     >>> stream = BitStream(42 * [True])
-    >>> stream.read(str) # doctest: +ELLIPSIS
+    >>> stream.read(bytes) # doctest: +ELLIPSIS
     Traceback (most recent call last):
     ...
     ReadError: ...
@@ -308,7 +308,7 @@ To accept up to seven trailing bits instead, use the more explicit code:
     >>> n = len(stream) // 8
     >>> n
     5
-    >>> stream.read(str, n)
+    >>> stream.read(bytes, n)
     '\xff\xff\xff\xff\xff'
     >>> stream
     11

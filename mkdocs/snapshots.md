@@ -29,9 +29,9 @@ For example, [WAVE] audio can be detected with the function:
 
     >>> def is_wave(stream):
     ...    try:
-    ...        riff = stream.read(str, 4)
-    ...        _ = stream.read(str, 4)
-    ...        wave = stream.read(str, 4)
+    ...        riff = stream.read(bytes, 4)
+    ...        _ = stream.read(bytes, 4)
+    ...        wave = stream.read(bytes, 4)
     ...        return (riff == "RIFF") and (wave == "WAVE")
     ...    except ReadError:
     ...        return False
@@ -81,9 +81,9 @@ the original state of the stream is restored at the end.
     >>> def is_wave(stream):
     ...     snapshot = stream.save()
     ...     try:
-    ...         riff = stream.read(str, 4)
-    ...         _ = stream.read(str, 4)
-    ...         wave = stream.read(str, 4)
+    ...         riff = stream.read(bytes, 4)
+    ...         _ = stream.read(bytes, 4)
+    ...         wave = stream.read(bytes, 4)
     ...         return (riff == "RIFF") and (wave == "WAVE")
     ...     except ReadError:
     ...         return False
@@ -113,7 +113,7 @@ Consider the toy DNA reader below:
     ...     DNA_bases = "ACGT"
     ...     bases = []
     ...     for i in range(n):
-    ...         base = stream.read(str, 1)
+    ...         base = stream.read(bytes, 1)
     ...         if base not in DNA_bases:
     ...             error = "invalid base {0!r}".format(base)
     ...             raise ReadError(error)
@@ -144,7 +144,7 @@ The DNA reader correctly rejects the code
 
 but the initial stream is partially consumed in the process:
 
-    >>> stream.read(str)
+    >>> stream.read(bytes)
     'TA'
 
 This implementation therefore only provides some basic exception safety.
@@ -160,7 +160,7 @@ error occurs
     ...     try:
     ...         bases = []
     ...         for i in range(n):
-    ...             base = stream.read(str, 1)
+    ...             base = stream.read(bytes, 1)
     ...             if base not in DNA_bases:
     ...                 error = "invalid base {0!r}".format(base)
     ...                 raise ReadError(error)
@@ -182,7 +182,7 @@ raises an exception
 
 but now the original stream is intact
 
-    >>> stream.read(str)
+    >>> stream.read(bytes)
     'GAUTA'
 
 
