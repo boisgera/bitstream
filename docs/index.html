@@ -363,7 +363,7 @@
                 <h1 id="overview">Overview<a class="headerlink" href="#overview" title="Permanent link">&para;</a></h1>
 <p>Bitstream is a <a href="http://www.python.org/">Python</a> library to manage binary data as bitstreams:</p>
 <pre><code>&gt;&gt;&gt; from bitstream import BitStream
-&gt;&gt;&gt; BitStream("Hello World!")
+&gt;&gt;&gt; BitStream(b"Hello World!")
 010010000110010101101100011011000110111100100000010101110110111101110010011011000110010000100001
 </code></pre>
 <p>If you need to deal with existing binary file formats,
@@ -383,12 +383,12 @@ and read data at the other end, in the same order.
 So you only need to know how to create a stream, write into it
 and read it to use this library:</p>
 <pre><code>&gt;&gt;&gt; stream = BitStream()
-&gt;&gt;&gt; stream.write("Hello")
-&gt;&gt;&gt; stream.write(" World!")
-&gt;&gt;&gt; stream.read(bytes, 5)
-'Hello'
-&gt;&gt;&gt; stream.read(bytes, 7)
-' World!'
+&gt;&gt;&gt; stream.write(b"Hello")
+&gt;&gt;&gt; stream.write(b" World!")
+&gt;&gt;&gt; stream.read(bytes, 5) # doctest: +BYTES
+b'Hello'
+&gt;&gt;&gt; stream.read(bytes, 7) # doctest: +BYTES
+b' World!'
 </code></pre>
 <p>This simple way to manage binary data is good enough for a surprisingly
 large number of use cases. 
@@ -424,15 +424,15 @@ fixed-size integers and floating-point integers. </p>
 &gt;&gt;&gt; stream.write(False, bool)
 &gt;&gt;&gt; from numpy import int8
 &gt;&gt;&gt; stream.write(-128, int8)
-&gt;&gt;&gt; stream.write("AB", bytes)
+&gt;&gt;&gt; stream.write(b"AB", bytes)
 &gt;&gt;&gt; stream
 10100000000100000101000010
 &gt;&gt;&gt; stream.read(bool, 2)
 [True, False]
 &gt;&gt;&gt; stream.read(int8, 1)
 array([-128], dtype=int8)
-&gt;&gt;&gt; stream.read(bytes, 2)
-'AB'
+&gt;&gt;&gt; stream.read(bytes, 2) # doctest: +BYTES
+b'AB'
 </code></pre>
 <p>NumPy arrays are a convenient way to deal with sequences of homogeneous data:</p>
 <pre><code>&gt;&gt;&gt; from numpy import *

@@ -470,12 +470,12 @@ For example, <a href="https://en.wikipedia.org/wiki/WAV">WAVE</a> audio can be d
 ...        riff = stream.read(bytes, 4)
 ...        _ = stream.read(bytes, 4)
 ...        wave = stream.read(bytes, 4)
-...        return (riff == "RIFF") and (wave == "WAVE")
+...        return (riff == b"RIFF") and (wave == b"WAVE")
 ...    except ReadError:
 ...        return False
 </code></pre>
 <p>The contents of an empty single-channel 44.1 kHz WAVE audio file are for example</p>
-<pre><code>&gt;&gt;&gt; wave = 'RIFF$\x00\x00\x00WAVEfmt \x10\x00\x00\x00\x01\x00\x01\x00D\xac\x00\x00\x88X\x01\x00\x02\x00\x10\x00data\x00\x00\x00\x00'
+<pre><code>&gt;&gt;&gt; wave = b'RIFF$\x00\x00\x00WAVEfmt \x10\x00\x00\x00\x01\x00\x01\x00D\xac\x00\x00\x88X\x01\x00\x02\x00\x10\x00data\x00\x00\x00\x00'
 </code></pre>
 <p>The function <code>is_wave</code> above works as expected at first</p>
 <pre><code>&gt;&gt;&gt; stream = BitStream(wave)
@@ -520,14 +520,14 @@ the original state of the stream is restored at the end. </p>
 ...         riff = stream.read(bytes, 4)
 ...         _ = stream.read(bytes, 4)
 ...         wave = stream.read(bytes, 4)
-...         return (riff == "RIFF") and (wave == "WAVE")
+...         return (riff == b"RIFF") and (wave == b"WAVE")
 ...     except ReadError:
 ...         return False
 ...     finally:
 ...         stream.restore(snapshot)
 </code></pre>
 <p>This version works as expected:</p>
-<pre><code>&gt;&gt;&gt; wave = 'RIFF$\x00\x00\x00WAVEfmt \x10\x00\x00\x00\x01\x00\x01\x00D\xac\x00\x00\x88X\x01\x00\x02\x00\x10\x00data\x00\x00\x00\x00'
+<pre><code>&gt;&gt;&gt; wave = b'RIFF$\x00\x00\x00WAVEfmt \x10\x00\x00\x00\x01\x00\x01\x00D\xac\x00\x00\x88X\x01\x00\x02\x00\x10\x00data\x00\x00\x00\x00'
 &gt;&gt;&gt; stream = BitStream(wave)
 &gt;&gt;&gt; copy = stream.copy()
 &gt;&gt;&gt; is_wave(stream)
@@ -540,7 +540,7 @@ True
 <h2 id="exception-safety">Exception Safety<a class="headerlink" href="#exception-safety" title="Permanent link">&para;</a></h2>
 <p>Consider the toy DNA reader below:</p>
 <pre><code>&gt;&gt;&gt; def DNA_read(stream, n=1):
-...     DNA_bases = "ACGT"
+...     DNA_bases = b"ACGT"
 ...     bases = []
 ...     for i in range(n):
 ...         base = stream.read(bytes, 1)
@@ -549,28 +549,29 @@ True
 ...             raise ReadError(error)
 ...         else:
 ...             bases.append(base)
-...     return "".join(bases)
+...     return b"".join(bases)
 </code></pre>
-<p>It reads DNA sequences represented as strings of 
-<code>'A'</code>, <code>'C'</code>, <code>'G'</code> and <code>'T'</code> characters:</p>
-<pre><code>&gt;&gt;&gt; dna = BitStream("GATA")
+<p>It reads DNA sequences represented as bytes, either 
+<code>b'A'</code>, <code>b'C'</code>, <code>b'G'</code> or <code>b'T'</code>:</p>
+<pre><code>&gt;&gt;&gt; dna = BitStream(b"GATA")
 &gt;&gt;&gt; DNA_read(dna, 4)
-'GATA'
+b'GATA'
 </code></pre>
 <p>If there is a <code>'U'</code> in the sequence, this is an error since
 the <a href="https://en.wikipedia.org/wiki/Nucleobase">uracil base</a> 
 is only found in RNA.</p>
-<pre><code>&gt;&gt;&gt; stream = BitStream("GAUTA") # invalid DNA sequence
+<pre><code>&gt;&gt;&gt; stream = BitStream(b"GAUTA") # invalid DNA sequence
 </code></pre>
 <p>The DNA reader correctly rejects the code</p>
-<pre><code>&gt;&gt;&gt; DNA_read(stream, 4)
-Traceback (most recent call last):
-...
-ReadError: invalid base 'U'
+<pre><code>&gt;&gt;&gt; try:
+...     DNA_read(stream, 4)
+... except ReadError:
+...     print("Read error")
+Read error
 </code></pre>
 <p>but the initial stream is partially consumed in the process:</p>
 <pre><code>&gt;&gt;&gt; stream.read(bytes)
-'TA'
+b'TA'
 </code></pre>
 <p>This implementation therefore only provides some basic exception safety.
 A reader that preserves the original value of the stream when an error
@@ -579,7 +580,7 @@ With snapshots, the modifications required to support this
 are plain: we simply restore the original stream whenever an
 error occurs</p>
 <pre><code>&gt;&gt;&gt; def DNA_read(stream, n=1):
-...     DNA_bases = "ACGT"
+...     DNA_bases = b"ACGT"
 ...     snapshot = stream.save()
 ...     try:
 ...         bases = []
@@ -597,15 +598,16 @@ error occurs</p>
 </code></pre>
 <p>With this new version, reading an invalid DNA code still 
 raises an exception</p>
-<pre><code>&gt;&gt;&gt; stream = BitStream("GAUTA") # invalid DNA sequence
-&gt;&gt;&gt; DNA_read(stream, 4)
-Traceback (most recent call last):
-...
-ReadError: invalid base 'U'
+<pre><code>&gt;&gt;&gt; stream = BitStream(b"GAUTA") # invalid DNA sequence
+&gt;&gt;&gt; try:
+...     DNA_read(stream, 4)
+... except ReadError:
+...     print("Read error")
+Read error
 </code></pre>
 <p>but now the original stream is intact</p>
 <pre><code>&gt;&gt;&gt; stream.read(bytes)
-'GAUTA'
+b'GAUTA'
 </code></pre>
 <h2 id="multiple-snapshots">Multiple Snapshots<a class="headerlink" href="#multiple-snapshots" title="Permanent link">&para;</a></h2>
 <p>You can create snapshots of a stream at any stage between read/write operations.
@@ -621,34 +623,34 @@ you can always create additional snapshots and never use them.</p>
 between write operations</p>
 <pre><code>&gt;&gt;&gt; stream = BitStream()
 &gt;&gt;&gt; s0 = stream.save()
-&gt;&gt;&gt; stream.write("A")
+&gt;&gt;&gt; stream.write(b"A")
 &gt;&gt;&gt; s1 = stream.save()
-&gt;&gt;&gt; stream.write("B")
-&gt;&gt;&gt; stream == BitStream("AB")
+&gt;&gt;&gt; stream.write(b"B")
+&gt;&gt;&gt; stream == BitStream(b"AB")
 True
 </code></pre>
 <p>restore <code>s1</code></p>
 <pre><code>&gt;&gt;&gt; stream.restore(s1)
-&gt;&gt;&gt; stream == BitStream("A")
+&gt;&gt;&gt; stream == BitStream(b"A")
 True
 </code></pre>
 <p>and then <code>s0</code></p>
 <pre><code>&gt;&gt;&gt; stream.restore(s0)
-&gt;&gt;&gt; stream == BitStream("")
+&gt;&gt;&gt; stream == BitStream(b"")
 True
 </code></pre>
 <p>You can also make the same snapshots </p>
 <pre><code>&gt;&gt;&gt; stream = BitStream()
 &gt;&gt;&gt; s0 = stream.save()
-&gt;&gt;&gt; stream.write("A")
+&gt;&gt;&gt; stream.write(b"A")
 &gt;&gt;&gt; s1 = stream.save()
-&gt;&gt;&gt; stream.write("B")
-&gt;&gt;&gt; stream == BitStream("AB")
+&gt;&gt;&gt; stream.write(b"B")
+&gt;&gt;&gt; stream == BitStream(b"AB")
 True
 </code></pre>
 <p>and directly restore <code>s0</code></p>
 <pre><code>&gt;&gt;&gt; stream.restore(s0)
-&gt;&gt;&gt; stream == BitStream("")
+&gt;&gt;&gt; stream == BitStream(b"")
 True
 </code></pre>
 <p>but then <code>s1</code> cannot be used anymore</p>

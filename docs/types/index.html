@@ -465,7 +465,8 @@
 <p>Bitstream reads and writes work out-of-the-box for many Python data types.
 It is also tightly integrated with <a href="http://www.numpy.org/">NumPy</a>,
 since this is the library of choice to deals with arrays of numeric data.</p>
-<pre><code>&gt;&gt;&gt; from bitstream import BitStream
+<pre><code>&gt;&gt;&gt; import bitstream
+&gt;&gt;&gt; from bitstream import BitStream
 &gt;&gt;&gt; from numpy import *
 </code></pre>
 <h2 id="bools">Bools<a class="headerlink" href="#bools" title="Permanent link">&para;</a></h2>
@@ -538,8 +539,8 @@ True
 </code></pre>
 <hr />
 <p>Numpy <code>bool_</code> scalars or one-dimensional arrays can be used instead:</p>
-<pre><code>&gt;&gt;&gt; bool_
-&lt;type 'numpy.bool_'&gt;
+<pre><code>&gt;&gt;&gt; bool_ # doctest: +ELLIPSIS
+&lt;... 'numpy.bool_'&gt;
 &gt;&gt;&gt; stream = BitStream()
 &gt;&gt;&gt; stream.write(bool_(False)  , bool)
 &gt;&gt;&gt; stream.write(bool_(True)   , bool)
@@ -586,28 +587,28 @@ zero is considered false and nonzero numbers are considered true.</p>
 they are empty.
 One-dimensional lists and numpy arrays are considered holders of 
 multiple data, each of which is converted to bool.</p>
-<pre><code>&gt;&gt;&gt; bool("")
+<pre><code>&gt;&gt;&gt; bool(b"")
 False
-&gt;&gt;&gt; bool(" ")
+&gt;&gt;&gt; bool(b" ")
 True
-&gt;&gt;&gt; bool("A")
+&gt;&gt;&gt; bool(b"A")
 True
-&gt;&gt;&gt; bool("AAA")
+&gt;&gt;&gt; bool(b"AAA")
 True
 
 &gt;&gt;&gt; stream = BitStream()
-&gt;&gt;&gt; stream.write("", bool)
-&gt;&gt;&gt; stream.write(" ", bool)
-&gt;&gt;&gt; stream.write("A", bool)
-&gt;&gt;&gt; stream.write("AAA", bool)
+&gt;&gt;&gt; stream.write(b"", bool)
+&gt;&gt;&gt; stream.write(b" ", bool)
+&gt;&gt;&gt; stream.write(b"A", bool)
+&gt;&gt;&gt; stream.write(b"AAA", bool)
 &gt;&gt;&gt; stream
 0111
 &gt;&gt;&gt; stream = BitStream()
-&gt;&gt;&gt; stream.write(["", " " , "A", "AAA"], bool)
+&gt;&gt;&gt; stream.write([b"", b" " , b"A", b"AAA"], bool)
 &gt;&gt;&gt; stream
 0111
 &gt;&gt;&gt; stream = BitStream()
-&gt;&gt;&gt; stream.write(array(["", " " , "A", "AAA"]), bool)
+&gt;&gt;&gt; stream.write(array([b"", b" " , b"A", b"AAA"]), bool)
 &gt;&gt;&gt; stream
 0111
 </code></pre>
@@ -626,13 +627,14 @@ is considered as a single datum.</p>
 011
 </code></pre>
 <p>More generally, arbitrary custom "bool-like" instances, 
-which have a <code>__nonzero__</code> method to handle the conversion 
-to boolean, can also be used:</p>
+which have a <code>__bool__</code> method (or <code>__nonzero__</code> for Python 2) 
+to handle the conversion to boolean, can also be used:</p>
 <pre><code>&gt;&gt;&gt; class BoolLike(object):
 ...     def __init__(self, value):
 ...         self.value = bool(value)
-...     def __nonzero__(self):
+...     def __bool__(self):
 ...         return self.value
+...     __nonzero__ = __bool__
 &gt;&gt;&gt; false = BoolLike(False)
 &gt;&gt;&gt; true = BoolLike(True)
 
@@ -683,11 +685,11 @@ bytes in memory.
 Their type is <code>str</code> (or equivalently <code>bytes</code> which is an alias).
 Fortunately, it's straightforward to convert strings to 
 bitstreams: create a stream from the string <code>"ABCD"</code> with</p>
-<pre><code>&gt;&gt;&gt; stream = BitStream("ABCD")
+<pre><code>&gt;&gt;&gt; stream = BitStream(b"ABCD")
 </code></pre>
 <p>To be totally explicit, the code above is equivalent to:</p>
 <pre><code>&gt;&gt;&gt; stream = BitStream()
-&gt;&gt;&gt; stream.write("ABCDE", bytes)
+&gt;&gt;&gt; stream.write(b"ABCDE", bytes)
 </code></pre>
 <p>Now, the content of the stream is</p>
 <pre><code>&gt;&gt;&gt; stream
@@ -707,29 +709,30 @@ True
 characters are represented as bytes of length 1.
 To read one or several characters from a bitstream, 
 use the <code>read</code> method with the <code>bytes</code> type:</p>
-<pre><code>&gt;&gt;&gt; stream.read(bytes, 1)
-'A'
-&gt;&gt;&gt; stream.read(bytes, 2)
-'BC'
+<pre><code>&gt;&gt;&gt; stream.read(bytes, 1) # doctest: +BYTES
+b'A'
+&gt;&gt;&gt; stream.read(bytes, 2) # doctest: +BYTES
+b'BC'
 </code></pre>
 <p>Without an explicit number of characters, the bitstream is emptied</p>
-<pre><code>&gt;&gt;&gt; stream.read(bytes)
-'DE'
+<pre><code>&gt;&gt;&gt; stream.read(bytes) # doctest: +BYTES
+b'DE'
 </code></pre>
 <p>but that works only if the bitstream contains a multiple of 8 bits.</p>
 <pre><code>&gt;&gt;&gt; stream = BitStream(42 * [True])
-&gt;&gt;&gt; stream.read(bytes) # doctest: +ELLIPSIS
-Traceback (most recent call last):
-...
-ReadError: ...
+&gt;&gt;&gt; try:
+...     stream.read(bytes)
+... except bitstream.ReadError:
+...     print("42 is not a multiple of 8")
+42 is not a multiple of 8
 </code></pre>
 <p>To accept up to seven trailing bits instead, use the more explicit code:</p>
 <pre><code>&gt;&gt;&gt; stream = BitStream(42 * [True])
 &gt;&gt;&gt; n = len(stream) // 8
 &gt;&gt;&gt; n
 5
-&gt;&gt;&gt; stream.read(bytes, n)
-'\xff\xff\xff\xff\xff'
+&gt;&gt;&gt; stream.read(bytes, n) # doctest: +BYTES
+b'\xff\xff\xff\xff\xff'
 &gt;&gt;&gt; stream
 11
 </code></pre>
@@ -744,12 +747,12 @@ Traceback (most recent call last):
 ...
 TypeError: unsupported type 'int'.
 
-&gt;&gt;&gt; BitStream(2**100)
+&gt;&gt;&gt; BitStream(2**100) # doctest: +ELLIPSIS
 Traceback (most recent call last):
 ...
-TypeError: unsupported type 'long'.
+TypeError: unsupported type ...
 
-&gt;&gt;&gt; BitStream("A").read(int)
+&gt;&gt;&gt; BitStream(b"A").read(int)
 Traceback (most recent call last):
 ...
 TypeError: unsupported type 'int'.
@@ -838,8 +841,8 @@ which have a well-defined binary representation (see e.g. <a href="https://orion
 &gt;&gt;&gt; len(stream)
 640
 &gt;&gt;&gt; output = stream.read(float, 10)
-&gt;&gt;&gt; type(output)
-&lt;type 'numpy.ndarray'&gt;
+&gt;&gt;&gt; type(output) # doctest: +ELLIPSIS
+&lt;... 'numpy.ndarray'&gt;
 &gt;&gt;&gt; all(output == arange(10.0))
 True
 </code></pre>
@@ -853,9 +856,9 @@ True
 </code></pre>
 <p>The byte order is big endian:</p>
 <pre><code>&gt;&gt;&gt; import struct
-&gt;&gt;&gt; PI_BE = struct.pack("&gt;d", pi)
-&gt;&gt;&gt; PI_BE
-'@\t!\xfbTD-\x18'
+&gt;&gt;&gt; PI_BE = struct.pack(b"&gt;d", pi)
+&gt;&gt;&gt; PI_BE # doctest: +BYTES
+b'@\t!\xfbTD-\x18'
 &gt;&gt;&gt; BitStream(pi) == BitStream(PI_BE)
 True
 </code></pre>

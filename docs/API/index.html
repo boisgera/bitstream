@@ -516,7 +516,7 @@ then call the <code>write</code> method.</p><p><h5>Arguments</h5></p><ul><li><p>
 of a registered type or a
 list or 1d NumPy array of such 
 instances.</p></li></ul><p><h5>Usage</h5></p><pre><code>&gt;&gt;&gt; stream = BitStream([False, True])
-&gt;&gt;&gt; stream = BitStream("Hello", bytes)
+&gt;&gt;&gt; stream = BitStream(b"Hello", bytes)
 &gt;&gt;&gt; stream = BitStream(42, uint8)
 </code></pre><p><h5>See also</h5></p><ul><li><a href="#read-write">Read / Write</a></li></ul></details><h2 id="read-write">Read / Write<a class="headerlink" href="#read-write" title="Permanent link">&para;</a></h2>
 <details class="note"><summary><code>BitStream.write(self, data, type=None)</code></summary><p>Encode <code>data</code> and append it to the stream.</p><p><h5>Arguments</h5></p><ul><li><p><code>data</code> is the data to be encoded.</p><p>Its type should be consistent with the <code>type</code> argument.</p></li><li><p><code>type</code> is a type identifier (such as <code>bool</code>, <code>str</code>, <code>int8</code>, etc.).</p><p><code>type</code> can be omitted if <code>data</code>
@@ -528,12 +528,12 @@ instances.</p></li></ul><p><h5>Usage</h5></p><pre><code>&gt;&gt;&gt; stream = Bi
 &gt;&gt;&gt; stream.write(False)            # implicit bool type
 &gt;&gt;&gt; stream.write(3*[False], bool)  # list (explicit type)
 &gt;&gt;&gt; stream.write(3*[True])         # list (implicit type)
-&gt;&gt;&gt; stream.write("AB", bytes)      # bytes
+&gt;&gt;&gt; stream.write(b"AB", bytes)     # bytes
 &gt;&gt;&gt; stream.write(-128, int8)       # signed 8 bit integer
 </code></pre><p><h5>See also</h5></p><ul><li><p><a href="../../types">Builtin Types</a></p></li><li><p><a href="../../custom">Custom Types</a></p></li></ul></details><details class="note"><summary><code>BitStream.read(self, type=None, n=None)</code></summary><p>Decode and consume <code>n</code> items of <code>data</code> from the start of the stream.</p><p><h5>Arguments</h5></p><ul><li><p><code>type</code>: type identifier (such as <code>bool</code>, <code>bytes</code>, <code>int8</code>, etc.)</p><p>If <code>type</code> is <code>None</code> a bitstream is returned.</p></li><li><p><code>n</code>: number of items to read</p><p>For most types, <code>n=None</code> reads one item, 
-but some types use a different convention.</p></li></ul><p><h5>Returns</h5></p><ul><li><p><code>data</code>: <code>n</code> items of data</p><p>The type of <code>data</code> depends on <code>type</code> and <code>n</code>. For built-in types:</p><table><thead><tr><th><code>type</code></th><th><code>n = None</code></th><th><code>n = 0, 1, 2, ...</code></th></tr></thead><tbody><tr><td><code>bool</code></td><td><code>bool</code></td><td><code>list</code> of bools</td></tr><tr><td><code>BitStream</code></td><td><code>BitStream</code></td><td><code>BitStream</code></td></tr><tr><td><code>bytes</code></td><td><code>bytes</code></td><td><code>bytes</code></td></tr><tr><td><code>numpy.uint8</code></td><td><code>numpy.uint8</code></td><td><code>numpy.array</code></td></tr><tr><td><code>numpy.int8</code></td><td><code>numpy.int8</code></td><td><code>numpy.array</code></td></tr><tr><td><code>numpy.uint16</code></td><td><code>numpy.int16</code></td><td><code>numpy.array</code></td></tr><tr><td>...</td><td>...</td><td>...</td></tr><tr><td><code>float</code></td><td><code>float</code></td><td><code>numpy.array</code></td></tr></tbody></table></li></ul><p><h5>Usage</h5></p><pre><code>&gt;&gt;&gt; stream = BitStream("Hello World!")
-&gt;&gt;&gt; stream.read(str, 2)
-'He'
+but some types use a different convention.</p></li></ul><p><h5>Returns</h5></p><ul><li><p><code>data</code>: <code>n</code> items of data</p><p>The type of <code>data</code> depends on <code>type</code> and <code>n</code>. For built-in types:</p><table><thead><tr><th><code>type</code></th><th><code>n = None</code></th><th><code>n = 0, 1, 2, ...</code></th></tr></thead><tbody><tr><td><code>bool</code></td><td><code>bool</code></td><td><code>list</code> of bools</td></tr><tr><td><code>BitStream</code></td><td><code>BitStream</code></td><td><code>BitStream</code></td></tr><tr><td><code>bytes</code></td><td><code>bytes</code></td><td><code>bytes</code></td></tr><tr><td><code>numpy.uint8</code></td><td><code>numpy.uint8</code></td><td><code>numpy.array</code></td></tr><tr><td><code>numpy.int8</code></td><td><code>numpy.int8</code></td><td><code>numpy.array</code></td></tr><tr><td><code>numpy.uint16</code></td><td><code>numpy.int16</code></td><td><code>numpy.array</code></td></tr><tr><td>...</td><td>...</td><td>...</td></tr><tr><td><code>float</code></td><td><code>float</code></td><td><code>numpy.array</code></td></tr></tbody></table></li></ul><p><h5>Usage</h5></p><pre><code>&gt;&gt;&gt; stream = BitStream(b"Hello World!")
+&gt;&gt;&gt; stream.read(bytes, 2)
+b'He'
 &gt;&gt;&gt; stream.read(bool)
 False
 &gt;&gt;&gt; stream.read(bool, 7)
@@ -543,17 +543,17 @@ array([108, 111], dtype=uint8)
 &gt;&gt;&gt; stream.read(uint8)
 32
 &gt;&gt;&gt; stream.read(bytes)
-'World!'
+b'World!'
 </code></pre><p><h5>See also</h5></p><ul><li><p><a href="../../types">Builtin Types</a></p></li><li><p><a href="../../custom">Custom Types</a></p></li></ul></details><h2 id="string-representation">String Representation<a class="headerlink" href="#string-representation" title="Permanent link">&para;</a></h2>
-<details class="note"><summary><code>BitStream.__str__(self)</code></summary><p>Represent the stream as a string of <code>'0'</code> and <code>'1'</code>.</p><p><h5>Usage</h5></p><pre><code>&gt;&gt;&gt; print BitStream("ABC")
+<details class="note"><summary><code>BitStream.__str__(self)</code></summary><p>Represent the stream as a string of <code>'0'</code> and <code>'1'</code>.</p><p><h5>Usage</h5></p><pre><code>&gt;&gt;&gt; print(BitStream(b"ABC"))
 010000010100001001000011
-</code></pre></details><details class="note"><summary><code>BitStream.__repr__(self)</code></summary><p>Represent the stream as a string of <code>'0'</code> and <code>'1'</code>.</p><p><h5>Usage</h5></p><pre><code>&gt;&gt;&gt; BitStream("ABC")
+</code></pre></details><details class="note"><summary><code>BitStream.__repr__(self)</code></summary><p>Represent the stream as a string of <code>'0'</code> and <code>'1'</code>.</p><p><h5>Usage</h5></p><pre><code>&gt;&gt;&gt; BitStream(b"ABC")
 010000010100001001000011
 </code></pre></details><h2 id="copy">Copy<a class="headerlink" href="#copy" title="Permanent link">&para;</a></h2>
 <p>Bitstreams can be copied non-destructively with <code>BitStream.copy</code>. 
 They also support the interface required by the standard library <code>copy</code> module.</p>
 <details class="note"><summary><code>BitStream.copy(self, n=None)</code></summary><p>Copy (partially or totally) the stream.</p><p>Copies do not consume the stream they read.</p><p><h5>Arguments</h5></p><ul><li><p><code>n</code>: unsigned integer of <code>None</code>.</p><p>The number of bits to copy from the start of the stream. 
-The full stream is copied if <code>n</code> is None.</p></li></ul><p><h5>Returns</h5></p><ul><li><code>stream</code>: a bitstream.</li></ul><p><h5>Raises</h5></p><ul><li><code>ReadError</code> if <code>n</code> is larger than the length of the stream.</li></ul><p><h5>Usage</h5></p><pre><code>&gt;&gt;&gt; stream = BitStream("A")
+The full stream is copied if <code>n</code> is None.</p></li></ul><p><h5>Returns</h5></p><ul><li><code>stream</code>: a bitstream.</li></ul><p><h5>Raises</h5></p><ul><li><code>ReadError</code> if <code>n</code> is larger than the length of the stream.</li></ul><p><h5>Usage</h5></p><pre><code>&gt;&gt;&gt; stream = BitStream(b"A")
 &gt;&gt;&gt; stream
 01000001
 &gt;&gt;&gt; copy = stream.copy()
@@ -570,7 +570,7 @@ The full stream is copied if <code>n</code> is None.</p></li></ul><p><h5>Returns
 &gt;&gt;&gt; stream
 0001
 </code></pre></details><details class="note"><summary><code>BitStream.__copy__(self)</code></summary><p>Bitstream shallow copy.</p><p><h5>Usage</h5></p><pre><code>&gt;&gt;&gt; from copy import copy
-&gt;&gt;&gt; stream = BitStream("A")
+&gt;&gt;&gt; stream = BitStream(b"A")
 &gt;&gt;&gt; stream
 01000001
 &gt;&gt;&gt; copy(stream)
@@ -578,7 +578,7 @@ The full stream is copied if <code>n</code> is None.</p></li></ul><p><h5>Returns
 &gt;&gt;&gt; stream
 01000001
 </code></pre></details><details class="note"><summary><code>BitStream.__deepcopy__(self, memo)</code></summary><p>Bitstream deep copy.</p><p><h5>Usage</h5></p><pre><code>&gt;&gt;&gt; from copy import deepcopy
-&gt;&gt;&gt; stream = BitStream("A")
+&gt;&gt;&gt; stream = BitStream(b"A")
 &gt;&gt;&gt; stream
 01000001
 &gt;&gt;&gt; deepcopy(stream)
@@ -590,7 +590,7 @@ The full stream is copied if <code>n</code> is None.</p></li></ul><p><h5>Returns
 &gt;&gt;&gt; len(stream) 
 2
 
-&gt;&gt;&gt; stream = BitStream("ABC")
+&gt;&gt;&gt; stream = BitStream(b"ABC")
 &gt;&gt;&gt; len(stream)
 24
 &gt;&gt;&gt; len(stream) // 8
@@ -606,11 +606,11 @@ False
 &gt;&gt;&gt; BitStream(True) == BitStream([True, False])
 False
 
-&gt;&gt;&gt; ord("A")
+&gt;&gt;&gt; ord(b"A")
 65
-&gt;&gt;&gt; BitStream("A") == BitStream(65, uint8)
+&gt;&gt;&gt; BitStream(b"A") == BitStream(65, uint8)
 True
-&gt;&gt;&gt; BitStream("A") == BitStream(66, uint8)
+&gt;&gt;&gt; BitStream(b"A") == BitStream(66, uint8)
 False
 </code></pre></details><details class="note"><summary><code>BitStream.__ne__(self, other)</code></summary><p>Inequality operator</p><p><h5>Usage</h5></p><pre><code>&gt;&gt;&gt; BitStream(True) != BitStream(True)
 False
@@ -621,11 +621,11 @@ True
 &gt;&gt;&gt; BitStream(True) != BitStream([True, False])
 True
 
-&gt;&gt;&gt; ord("A")
+&gt;&gt;&gt; ord(b"A")
 65
-&gt;&gt;&gt; BitStream("A") != BitStream(65, uint8)
+&gt;&gt;&gt; BitStream(b"A") != BitStream(65, uint8)
 False
-&gt;&gt;&gt; BitStream("A") != BitStream(66, uint8)
+&gt;&gt;&gt; BitStream(b"A") != BitStream(66, uint8)
 True
 </code></pre></details><details class="note"><summary><code>BitStream.__hash__(self)</code></summary><p>Compute a bitstream hash </p><p>The computed hash is consistent with the equality operator.</p></details><h2 id="custom-types">Custom Types<a class="headerlink" href="#custom-types" title="Permanent link">&para;</a></h2>
 <p>User-defined binary codecs can be bound to type identifiers.

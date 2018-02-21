@@ -495,7 +495,7 @@ empty the buffer and start again<sup id="fnref:pfc"><a class="footnote-ref" href
 ...     else:
 ...         buffer.write(stream.read(bool))
 ...         try:
-...             src += noops[bytes(buffer)]
+...             src += noops[str(buffer)]
 ...             buffer = BitStream()
 ...         except KeyError:
 ...             pass
@@ -573,9 +573,9 @@ method of NumPy.</p>
 <pre><code>&gt;&gt;&gt; # "RIFF" Chunk Descriptor
 &gt;&gt;&gt; chunk_size = 36 + 2 * len(data)  # size of the chunk after "RIFF"
 &gt;&gt;&gt; 
-&gt;&gt;&gt; write("RIFF"            )
+&gt;&gt;&gt; write(b"RIFF"           )
 &gt;&gt;&gt; write(chunk_size, uint32)
-&gt;&gt;&gt; write("WAVE"            )
+&gt;&gt;&gt; write(b"WAVE"           )
 </code></pre>
 <p>then the format subchunk</p>
 <pre><code>&gt;&gt;&gt; # "fmt" SubChunk
@@ -586,7 +586,7 @@ method of NumPy.</p>
 &gt;&gt;&gt; block_align     = 2       # number of bytes for one sample (all channels)
 &gt;&gt;&gt; bits_per_sample = 16
 &gt;&gt;&gt; 
-&gt;&gt;&gt; write("fmt "                 )
+&gt;&gt;&gt; write(b"fmt "                )
 &gt;&gt;&gt; write(subchunk1_size , uint32)
 &gt;&gt;&gt; write(audio_format   , uint16)
 &gt;&gt;&gt; write(num_channels   , uint16)
@@ -599,7 +599,7 @@ method of NumPy.</p>
 <pre><code>&gt;&gt;&gt; # "data" SubChunk
 &gt;&gt;&gt; subchunk2_size = 2 * len(data)  # size in bytes of the subchunk after "data"
 &gt;&gt;&gt;  
-&gt;&gt;&gt; write("data"                )
+&gt;&gt;&gt; write(b"data"               )
 &gt;&gt;&gt; write(subchunk2_size, uint32)
 &gt;&gt;&gt; write(data          ,  int16)
 </code></pre>
@@ -608,8 +608,8 @@ all we have to do is to read it as a string that we write into an
 actual file.</p>
 <pre><code>&gt;&gt;&gt; # Generate the WAVE file
 &gt;&gt;&gt; wave_bytes = stream.read(bytes)
-&gt;&gt;&gt; wave_file = open("output.wav", "w")
-&gt;&gt;&gt; wave_file.write(wave_bytes)
+&gt;&gt;&gt; wave_file = open("output.wav", "wb")
+&gt;&gt;&gt; _ = wave_file.write(wave_bytes)
 </code></pre>
 <p>You can now listen to the sound in <code>output.wav</code> with your favorite music player.</p>
 <p>For the sake of consistency, let's make sure that you and I have the same 
@@ -617,8 +617,8 @@ contents:</p>
 <pre><code>&gt;&gt;&gt; import hashlib
 &gt;&gt;&gt; m = hashlib.md5()
 &gt;&gt;&gt; m.update(wave_bytes)
-&gt;&gt;&gt; m.digest()
-'\xb0\xcf\x0e8\x150\x1fV \x86\x9e2\xdf\xfb\x1d\xec'
+&gt;&gt;&gt; m.digest() # doctest: +BYTES
+b'\xb0\xcf\x0e8\x150\x1fV \x86\x9e2\xdf\xfb\x1d\xec'
 </code></pre>
 <div class="footnote">
 <hr />

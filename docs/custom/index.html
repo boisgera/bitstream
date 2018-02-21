@@ -438,7 +438,8 @@
 that bitstream does not support natively: how to define bitstream 
 writer and reader functions and register them so that your custom
 types behave like native ones.</p>
-<pre><code>&gt;&gt;&gt; import bitstream
+<pre><code>&gt;&gt;&gt; import sys
+&gt;&gt;&gt; import bitstream
 &gt;&gt;&gt; from bitstream import BitStream
 </code></pre>
 <p>We use the example of representation of unsigned integers 
@@ -510,10 +511,10 @@ as well as lists of such data.</p>
 Traceback (most recent call last):
 ...
 ValueError: negative integers cannot be encoded
-&gt;&gt;&gt; write_uint(stream, {})
+&gt;&gt;&gt; write_uint(stream, {}) # doctest: +ELLIPSIS
 Traceback (most recent call last):
 ...
-TypeError: int() argument must be a string or a number, not 'dict'
+TypeError: int() argument must be ..., not 'dict'
 </code></pre>
 <hr />
 <p>The signature of readers is:</p>
@@ -633,7 +634,8 @@ the type identifier of a writer, you don't need to specify explicitly the
 type identifier in writes.</p>
 <p>For example, if we also associate our writer with Python integers:</p>
 <pre><code>&gt;&gt;&gt; bitstream.register(int, writer=write_uint)
-&gt;&gt;&gt; bitstream.register(long, writer=write_uint)
+&gt;&gt;&gt; if sys.version_info[0] == 2: # Python 2 has a 'long integer' type
+...     bitstream.register(long, writer=write_uint)
 </code></pre>
 <p>then every Python integer will be automatically encoded with 
 the <code>write_uint</code> writer</p>
