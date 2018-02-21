@@ -54,17 +54,17 @@ The basic API is made of three methods only:
 
 For example:
 
-    >>> stream = BitStream()      # <empty>
-    >>> stream.write(True, bool)  # 1
-    >>> stream.write(False, bool) # 10
+    >>> stream = BitStream()        # <empty>
+    >>> stream.write(True, bool)    # 1
+    >>> stream.write(False, bool)   # 10
     >>> from numpy import int8
-    >>> stream.write(-128, int8)  # 1010000000
-    >>> stream.write("AB", bytes) # 10100000000100000101000010
-    >>> stream.read(bool, 2)      # 100000000100000101000010
+    >>> stream.write(-128, int8)    # 1010000000
+    >>> stream.write(b"AB", bytes)  # 10100000000100000101000010
+    >>> stream.read(bool, 2)        # 100000000100000101000010
     [True, False]
-    >>> stream.read(int8, 1)      # 0100000101000010
+    >>> stream.read(int8, 1)        # 0100000101000010
     array([-128], dtype=int8)
-    >>> stream.read(bytes, 2)     # <empty>
+    >>> stream.read(bytes, 2)       # <empty>
     b'AB'
 
 Refer to the documentation [Overview](http://boisgera.github.io/bitstream/) 
