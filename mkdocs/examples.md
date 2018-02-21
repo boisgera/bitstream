@@ -241,8 +241,8 @@ actual file.
 
     >>> # Generate the WAVE file
     >>> wave_bytes = stream.read(bytes)
-    >>> wave_file = open("output.wav", "w")
-    >>> wave_file.write(wave_bytes)
+    >>> wave_file = open("output.wav", "wb")
+    >>> _ = wave_file.write(wave_bytes)
        
 You can now listen to the sound in `output.wav` with your favorite music player.
 
@@ -252,6 +252,6 @@ contents:
     >>> import hashlib
     >>> m = hashlib.md5()
     >>> m.update(wave_bytes)
-    >>> m.digest()
-    '\xb0\xcf\x0e8\x150\x1fV \x86\x9e2\xdf\xfb\x1d\xec'
+    >>> m.digest() # doctest: +BYTES
+    b'\xb0\xcf\x0e8\x150\x1fV \x86\x9e2\xdf\xfb\x1d\xec'
 
