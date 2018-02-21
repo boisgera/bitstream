@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
-# Python 2.7 Standard Library
+# Python Standard Library
+from __future__ import print_function
 import doctest
 import sys
 
@@ -10,7 +11,7 @@ import yaml
 # ------------------------------------------------------------------------------
 
 mkdocs_pages = yaml.load(open("mkdocs.yml"))["pages"]
-mkdocs_files = ["mkdocs/" + item.values()[0] for item in mkdocs_pages]
+mkdocs_files = ["mkdocs/" + list(item.values())[0] for item in mkdocs_pages]
 extra_testfiles = []
 
 test_files = mkdocs_files + extra_testfiles
@@ -24,11 +25,11 @@ for filename in test_files:
 
 verbose = "-v" in sys.argv or "--verbose" in sys.argv
 if verbose:
-   print
-   print 60*"-"
-   print "Test Suite Report:",
-   print "{0} failures / {1} tests".format(fails, tests)
-   print 60*"-"
+   print()
+   print(60*"-")
+   print("Test Suite Report:", end="")
+   print("{0} failures / {1} tests".format(fails, tests))
+   print(60*"-")
 if fails:
     sys.exit(1)
  
