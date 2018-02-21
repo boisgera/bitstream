@@ -105,7 +105,7 @@ cdef class BitStream:
 
         >>> stream = BitStream()
         >>> stream = BitStream([False, True])
-        >>> stream = BitStream("Hello", str)
+        >>> stream = BitStream("Hello", bytes)
         >>> stream = BitStream(42, uint8)
     """    
     def __cinit__(self):
@@ -156,7 +156,7 @@ cdef class BitStream:
 
             Its type should be consistent with the `type` argument.
 
-          - `type` is a type identifier (such as `bool`, `str`, `int8`, etc.).
+          - `type` is a type identifier (such as `bool`, `bytes`, `int8`, etc.).
 
             It is optional if `data` is an instance
             of a registered type or a
@@ -171,7 +171,7 @@ cdef class BitStream:
             >>> stream.write(False)            # implicit bool type
             >>> stream.write(3*[False], bool)  # list (explicit type)
             >>> stream.write(3*[True])         # list (implicit type)
-            >>> stream.write("AB", str)        # string
+            >>> stream.write("AB", bytes)      # bytes
             >>> stream.write(-128, int8)       # signed 8 bit integer
         """
         cdef size_t length
@@ -207,8 +207,8 @@ cdef class BitStream:
             write_uint8(self, data)
         elif type is int8:
             write_int8(self, data)
-        elif type is str:
-            write_str(self, data)
+        elif type is bytes:
+            write_bytes(self, data)
         elif type is BitStream:
             write_bitstream(self, data)
         elif type is uint16:
@@ -249,7 +249,7 @@ cdef class BitStream:
         Arguments
         ------------------------------------------------------------------------
 
-          - `type`: type identifier (such as `bool`, `str`, `int8`, etc.)
+          - `type`: type identifier (such as `bool`, `bytes`, `int8`, etc.)
          
             If `type` is `None` a bitstream is returned.
 
@@ -269,7 +269,7 @@ cdef class BitStream:
         ------------------------------------------------------------------------
 
             >>> stream = BitStream("Hello World!")
-            >>> stream.read(str, 2)
+            >>> stream.read(bytes, 2)
             'He'
             >>> stream.read(bool)
             False
@@ -279,7 +279,7 @@ cdef class BitStream:
             array([108, 111], dtype=uint8)
             >>> stream.read(uint8)
             32
-            >>> stream.read(str)
+            >>> stream.read(bytes)
             'World!'
         """
         if isinstance(type, int) and n is None:
@@ -295,8 +295,8 @@ cdef class BitStream:
             return read_uint8(self, n)
         elif type is int8:
             return read_int8(self, n)
-        elif type is str:
-            return read_str(self, n)
+        elif type is bytes:
+            return read_bytes(self, n)
         elif type is BitStream:
             return read_bitstream(self, n)
         elif type is uint16:
@@ -329,6 +329,8 @@ cdef class BitStream:
             else:
                 reader = reader_factory(instance)
                 return reader(self, n)
+
+    # TODO: implement __unicode__ and change __str__ accordingly
 
     def __str__(self):
         """
@@ -1473,7 +1475,7 @@ cpdef read_float64(BitStream stream, n=None):
     else:
         n_ = n
 
-    chars = read_str(stream, 8*n_)
+    chars = read_bytes(stream, 8*n_)
     float64s = struct.unpack(">" + n_*"d", chars) # big-endian
 
     if n is None:
@@ -1531,7 +1533,7 @@ register(float, reader=read_float64, writer=write_float64)
 
 # String Reader / Writer
 # ------------------------------------------------------------------------------
-cpdef read_str(BitStream stream, n=None):
+cpdef read_bytes(BitStream stream, n=None):
     """
     Read a string from a stream.
     """
@@ -1544,14 +1546,14 @@ cpdef read_str(BitStream stream, n=None):
         raise ReadError("end of stream")
     return read_uint8(stream, n).tostring()
 
-cpdef write_str(BitStream stream, string):
+cpdef write_bytes(BitStream stream, string):
     """
     Write a string into a stream.
     """
     array = numpy.fromstring(string, dtype=uint8)
     _write_uint8(stream, array)
 
-register(str, reader=read_str, writer=write_str)
+register(bytes, reader=read_bytes, writer=write_bytes)
 
 
 # BitStream Reader/Writer
