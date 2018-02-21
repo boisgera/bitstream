@@ -120,7 +120,7 @@ Read / Write
 
         >>> stream = BitStream(b"Hello World!")
         >>> stream.read(bytes, 2)
-        'He'
+        b'He'
         >>> stream.read(bool)
         False
         >>> stream.read(bool, 7)
@@ -130,7 +130,7 @@ Read / Write
         >>> stream.read(uint8)
         32
         >>> stream.read(bytes)
-        'World!'
+        b'World!'
 
     <h5>See also</h5>
 
