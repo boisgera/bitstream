@@ -119,7 +119,7 @@ Read / Write
     <h5>Usage</h5>
 
         >>> stream = BitStream(b"Hello World!")
-        >>> stream.read(bytes, 2)
+        >>> stream.read(bytes, 2) # doctest: +BYTES
         b'He'
         >>> stream.read(bool)
         False
@@ -129,7 +129,7 @@ Read / Write
         array([108, 111], dtype=uint8)
         >>> stream.read(uint8)
         32
-        >>> stream.read(bytes)
+        >>> stream.read(bytes) # doctest: +BYTES
         b'World!'
 
     <h5>See also</h5>

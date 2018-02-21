@@ -126,7 +126,7 @@ It reads DNA sequences represented as bytes, either
 `b'A'`, `b'C'`, `b'G'` or `b'T'`:
 
     >>> dna = BitStream(b"GATA")
-    >>> DNA_read(dna, 4)
+    >>> DNA_read(dna, 4) # doctest: +BYTES
     b'GATA'
 
 If there is a `'U'` in the sequence, this is an error since
@@ -145,7 +145,7 @@ The DNA reader correctly rejects the code
 
 but the initial stream is partially consumed in the process:
 
-    >>> stream.read(bytes)
+    >>> stream.read(bytes) # doctest: +BYTES
     b'TA'
 
 This implementation therefore only provides some basic exception safety.
@@ -184,7 +184,7 @@ raises an exception
 
 but now the original stream is intact
 
-    >>> stream.read(bytes)
+    >>> stream.read(bytes) # doctest: +BYTES
     b'GAUTA'
 
 
