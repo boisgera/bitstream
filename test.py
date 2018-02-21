@@ -26,12 +26,9 @@ _doctest_OutputChecker = doctest.OutputChecker
 class BytesOutputChecker(_doctest_OutputChecker):
     def check_output(self, want, got, optionflags):
         super_check_output = _doctest_OutputChecker.check_output
-        if sys.version_info[0] == 2:
+        if (optionflags & doctest.BYTES) and sys.version_info[0] == 2:
             want = want[1:] # strip the 'b' prefix from the expected result
         return super_check_output(self, want, got, optionflags)
-    def output_difference(self, example, got, optionflags):
-        super_output_difference = _doctest_OutputChecker.output_difference
-        return super_output_difference(self, example, got, optionflags)
 
 # monkey-patching
 doctest.OutputChecker = BytesOutputChecker
