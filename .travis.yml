@@ -3,14 +3,13 @@ dist: trusty
 language: bash
 
 env:
-- PYTHON_VERSION=2.7
-- PYTHON_VERSION=3.6
+- CONDA=https://repo.continuum.io/miniconda/Miniconda2-latest-Linux-x86_64.sh
+- CONDA=https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh
 
 before_install:
-  - curl https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh > conda.sh
+  - curl $CONDA > conda.sh
   - bash conda.sh -b -p $HOME/conda
   - export PATH=$HOME/conda/bin:$PATH
-  - conda install python=$PYTHON_VERSION
 
 install:
   - pip install -r requirements-dev.txt
