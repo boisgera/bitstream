@@ -554,7 +554,7 @@ True
 <p>It reads DNA sequences represented as bytes, either 
 <code>b'A'</code>, <code>b'C'</code>, <code>b'G'</code> or <code>b'T'</code>:</p>
 <pre><code>&gt;&gt;&gt; dna = BitStream(b"GATA")
-&gt;&gt;&gt; DNA_read(dna, 4)
+&gt;&gt;&gt; DNA_read(dna, 4) # doctest: +BYTES
 b'GATA'
 </code></pre>
 <p>If there is a <code>'U'</code> in the sequence, this is an error since
@@ -570,7 +570,7 @@ is only found in RNA.</p>
 Read error
 </code></pre>
 <p>but the initial stream is partially consumed in the process:</p>
-<pre><code>&gt;&gt;&gt; stream.read(bytes)
+<pre><code>&gt;&gt;&gt; stream.read(bytes) # doctest: +BYTES
 b'TA'
 </code></pre>
 <p>This implementation therefore only provides some basic exception safety.
@@ -606,7 +606,7 @@ raises an exception</p>
 Read error
 </code></pre>
 <p>but now the original stream is intact</p>
-<pre><code>&gt;&gt;&gt; stream.read(bytes)
+<pre><code>&gt;&gt;&gt; stream.read(bytes) # doctest: +BYTES
 b'GAUTA'
 </code></pre>
 <h2 id="multiple-snapshots">Multiple Snapshots<a class="headerlink" href="#multiple-snapshots" title="Permanent link">&para;</a></h2>
