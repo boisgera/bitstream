@@ -82,7 +82,7 @@ The main features are:
         >>> stream.read(int8, 1)
         array([-128], dtype=int8)
         >>> stream.read(bytes, 2) # doctest: +BYTES
-        'AB'
+        b'AB'
 
     NumPy arrays are a convenient way to deal with sequences of homogeneous data:
 
