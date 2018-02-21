@@ -9,9 +9,12 @@ Binary Data for Humans: <http://boisgera.github.io/bitstream/>
 # Imports
 # ------------------------------------------------------------------------------
 
-# Standard Python 2.7 Library 
-import __builtin__
-cdef object __builtin__type = __builtin__.type
+# Standard Python 2.7 Library
+try: 
+    import builtins
+except:
+    import __builtin__ as builtins
+cdef object builtins_type = builtins.type
 import atexit
 import copy
 import doctest
@@ -186,12 +189,12 @@ cdef class BitStream:
             if data is true or data is false:
                 type = bool
             else:
-                data_type = __builtin__type(data)
+                data_type = builtins_type(data)
                 if data_type is list:
                     if len(data) == 0:
                         return
                     else:
-                        type = __builtin__type(data[0])                  
+                        type = builtins_type(data[0])                  
                 elif data_type is ndarray:
                     type = data.dtype.type
                 else:
@@ -223,7 +226,7 @@ cdef class BitStream:
         elif type is float or type is float64:
             write_float64(self, data)
         # fallback to the writers dictionary
-        elif auto_detect or isinstance(type, __builtin__type):
+        elif auto_detect or isinstance(type, builtins_type):
             writer = _writers.get(type)
             if writer is None:
                 raise TypeError(type_error.format(type.__name__))
@@ -231,7 +234,7 @@ cdef class BitStream:
         # lookup for a writer *factory*
         else: 
             instance = type
-            type = __builtin__type(instance)
+            type = builtins_type(instance)
             writer_factory = _writers.get(type)
             if writer_factory is None:
                 raise TypeError(type_error.format(type.__name__))
@@ -311,7 +314,7 @@ cdef class BitStream:
         elif type is float or type is float64:
             return read_float64(self, n)
         # fallback to the readers dictionary
-        elif isinstance(type, __builtin__type):
+        elif isinstance(type, builtins_type):
             reader = _readers.get(type)
             if reader:
                 return reader(self, n)
@@ -319,7 +322,7 @@ cdef class BitStream:
                 raise TypeError("unsupported type {0!r}.".format(type.__name__))
         else: # lookup for a reader *factory*
             instance = type
-            type = __builtin__type(instance)
+            type = builtins_type(instance)
             reader_factory = _readers.get(type)
             if reader_factory is None:
                 raise TypeError("unsupported type {0!r}.".format(type.__name__))

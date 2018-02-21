@@ -3,9 +3,9 @@
 
 # Python Standard Library
 try:
-    import ConfigParser as configparser
-except ImportError:
     import configparser
+except ImportError:
+    import ConfigParser as configparser
 import datetime
 import distutils.version
 import importlib
