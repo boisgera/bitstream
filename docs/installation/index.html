@@ -483,15 +483,15 @@
                 
                   <h1>Installation</h1>
                 
-                <p>Bitstream supports Python 2.7 on Linux, Windows and MacOS.</p>
+                <p>Bitstream supports Python 2.7 and 3.6 on Linux, Windows and MacOS.</p>
 <p>We recommend you to install bitstream with pip. 
 If for some reason that doesn't work for you 
 -- for example if you want to modify the software -- 
 you can also install bitstream from sources.</p>
 <h2 id="install-with-pip">Install with Pip<a class="headerlink" href="#install-with-pip" title="Permanent link">&para;</a></h2>
 <p>Check the following prerequisites </p>
-<details class="note"><summary>Pip</summary><p>The pip package installer should be available for Python 2.7</p><pre><code>$ pip --version
-pip 9.0.1 from /usr/local/lib/python2.7/dist-packages (python 2.7)
+<details class="note"><summary>Pip</summary><p>The pip package installer should be available</p><pre><code>$ pip --version
+pip 9.0.1 from /usr/local/lib/python3.6/dist-packages (python 3.6)
 </code></pre><p>Otherwise follow these <a href="https://pip.pypa.io/en/stable/installing/">instructions</a>.</p></details><details class="note"><summary>NumPy</summary><p>Bitstream depends on the <a href="http://www.numpy.org/">NumPy</a> package; install it if necessary:</p><pre><code>$ pip install numpy
 </code></pre></details><details class="note"><summary>C compiler</summary><p>You need a compiler pip can work with. 
 On Windows, you can install the 
@@ -529,16 +529,7 @@ it's easier to install all developer dependencies with:</p>
 -- for example run the tests, regenerate the documentation, etc. --
 please refer to the <a href="../contributing">Contributing section</a>.</p>
 <h2 id="troubleshooting">Troubleshooting<a class="headerlink" href="#troubleshooting" title="Permanent link">&para;</a></h2>
-<details class="warning"><summary>What if pip is available but associated to Python 3?</summary><p>If <code>pip</code> refers to your Python 3 interpreter</p><pre><code>$ pip --version
-pip 9.0.1 from /usr/local/lib/python3.5/dist-packages (python 3.5)
-</code></pre><p>you may still have a version of pip for Python 2.7 installed.
-It may be named <code>pip2</code> or <code>pip2.7</code>; you can use it to install bitstream.
-Otherwise, refer to your Python 2.7 interpreter explicitly: 
-if it is named <code>python</code></p><pre><code>$ python --version
-Python 2.7.12
-</code></pre><p>then install pip for Python 2.7 with</p><pre><code>$ python -m pip install --upgrade pip
-</code></pre><p>and finally install bitstream</p><pre><code>$ python -m pip install bitstream
-</code></pre></details><details class="warning"><summary>The command <code>python setup.py install</code> doesn't work</summary><p>This is expected:
+<details class="warning"><summary>The command <code>python setup.py install</code> doesn't work</summary><p>This is expected:
 this command needs C files to build bitstream,
 which is a Python C extension module,
 but these files are not present in the git repository.

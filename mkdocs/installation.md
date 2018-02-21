@@ -1,6 +1,6 @@
 
 
-Bitstream supports Python 2.7 on Linux, Windows and MacOS.
+Bitstream supports Python 2.7 and 3.6 on Linux, Windows and MacOS.
 
 We recommend you to install bitstream with pip. 
 If for some reason that doesn't work for you 
@@ -13,10 +13,10 @@ Install with Pip
 Check the following prerequisites 
 
 ??? note "Pip"
-    The pip package installer should be available for Python 2.7
+    The pip package installer should be available
 
         $ pip --version
-        pip 9.0.1 from /usr/local/lib/python2.7/dist-packages (python 2.7)
+        pip 9.0.1 from /usr/local/lib/python3.6/dist-packages (python 3.6)
 
     Otherwise follow these [instructions][install-pip].
 
@@ -85,30 +85,6 @@ please refer to the [Contributing section](contributing).
 
 Troubleshooting
 --------------------------------------------------------------------------------
-
-??? warning "What if pip is available but associated to Python 3?"
-
-    If `pip` refers to your Python 3 interpreter
-
-        $ pip --version
-        pip 9.0.1 from /usr/local/lib/python3.5/dist-packages (python 3.5)
-
-    you may still have a version of pip for Python 2.7 installed.
-    It may be named `pip2` or `pip2.7`; you can use it to install bitstream.
-    Otherwise, refer to your Python 2.7 interpreter explicitly: 
-    if it is named `python`
-
-        $ python --version
-        Python 2.7.12
-
-    then install pip for Python 2.7 with
-
-        $ python -m pip install --upgrade pip
-
-    and finally install bitstream
-
-        $ python -m pip install bitstream
-
 
 ??? warning "The command `python setup.py install` doesn't work"
 
