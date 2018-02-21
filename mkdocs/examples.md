@@ -98,7 +98,7 @@ empty the buffer and start again[^pfc].
     ...     else:
     ...         buffer.write(stream.read(bool))
     ...         try:
-    ...             src += noops[bytes(buffer)]
+    ...             src += noops[str(buffer)]
     ...             buffer = BitStream()
     ...         except KeyError:
     ...             pass
