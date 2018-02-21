@@ -8,7 +8,7 @@ It is also tightly integrated with [NumPy](http://www.numpy.org/),
 since this is the library of choice to deals with arrays of numeric data.
 
     >>> import bitstream
-    >>> BitStream = bitstream.BitStream
+    >>> from bitstream import BitStream
     >>> from numpy import *
 
 

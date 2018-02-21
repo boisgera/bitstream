@@ -7,6 +7,7 @@ that bitstream does not support natively: how to define bitstream
 writer and reader functions and register them so that your custom
 types behave like native ones.
 
+    >>> import sys
     >>> import bitstream
     >>> from bitstream import BitStream
 
@@ -82,10 +83,10 @@ This writer behaves as expected:
     Traceback (most recent call last):
     ...
     ValueError: negative integers cannot be encoded
-    >>> write_uint(stream, {})
+    >>> write_uint(stream, {}) # doctest: +ELLIPSIS
     Traceback (most recent call last):
     ...
-    TypeError: int() argument must be a string or a number, not 'dict'
+    TypeError: int() argument must be ..., not 'dict'
 
 -----
 
@@ -223,7 +224,8 @@ type identifier in writes.
 For example, if we also associate our writer with Python integers:
 
     >>> bitstream.register(int, writer=write_uint)
-    >>> bitstream.register(long, writer=write_uint)
+    >>> if sys.version_info[0] == 2: # Python 2 has a 'long integer' type
+    ...     bitstream.register(long, writer=write_uint)
 
 then every Python integer will be automatically encoded with 
 the `write_uint` writer
