@@ -29,7 +29,7 @@ Check the following prerequisites
     You need a compiler which can work with pip and your version of Python. 
     On Windows, for Python 2.7 you can install the 
     [Microsoft Visual C++ Compiler for Python 2.7][MSVC].
-    For Python 3.6 a recent Visual Studio compiler (2015 or later)
+    For Python 3.6, a recent Visual Studio compiler (2015 or later)
     should work; you may for example install
     [Visual Studio Community](https://www.visualstudio.com/vs/community/).
 
