@@ -125,7 +125,7 @@ Consider the toy DNA reader below:
 It reads DNA sequences represented as strings of 
 `'A'`, `'C'`, `'G'` and `'T'` characters:
 
-    >>> dna = BitStream("GATA")
+    >>> dna = BitStream(b"GATA")
     >>> DNA_read(dna, 4)
     'GATA'
 
@@ -133,7 +133,7 @@ If there is a `'U'` in the sequence, this is an error since
 the [uracil base](https://en.wikipedia.org/wiki/Nucleobase) 
 is only found in RNA.
 
-    >>> stream = BitStream("GAUTA") # invalid DNA sequence
+    >>> stream = BitStream(b"GAUTA") # invalid DNA sequence
 
 The DNA reader correctly rejects the code
 
@@ -155,7 +155,7 @@ are plain: we simply restore the original stream whenever an
 error occurs
 
     >>> def DNA_read(stream, n=1):
-    ...     DNA_bases = "ACGT"
+    ...     DNA_bases = b"ACGT"
     ...     snapshot = stream.save()
     ...     try:
     ...         bases = []
@@ -174,7 +174,7 @@ error occurs
 With this new version, reading an invalid DNA code still 
 raises an exception
 
-    >>> stream = BitStream("GAUTA") # invalid DNA sequence
+    >>> stream = BitStream(b"GAUTA") # invalid DNA sequence
     >>> DNA_read(stream, 4)
     Traceback (most recent call last):
     ...
@@ -205,38 +205,38 @@ between write operations
 
     >>> stream = BitStream()
     >>> s0 = stream.save()
-    >>> stream.write("A")
+    >>> stream.write(b"A")
     >>> s1 = stream.save()
-    >>> stream.write("B")
-    >>> stream == BitStream("AB")
+    >>> stream.write(b"B")
+    >>> stream == BitStream(b"AB")
     True
 
 restore `s1`
 
     >>> stream.restore(s1)
-    >>> stream == BitStream("A")
+    >>> stream == BitStream(b"A")
     True
 
 and then `s0`
 
     >>> stream.restore(s0)
-    >>> stream == BitStream("")
+    >>> stream == BitStream(b"")
     True
 
 You can also make the same snapshots 
 
     >>> stream = BitStream()
     >>> s0 = stream.save()
-    >>> stream.write("A")
+    >>> stream.write(b"A")
     >>> s1 = stream.save()
-    >>> stream.write("B")
-    >>> stream == BitStream("AB")
+    >>> stream.write(b"B")
+    >>> stream == BitStream(b"AB")
     True
 
 and directly restore `s0`
 
     >>> stream.restore(s0)
-    >>> stream == BitStream("")
+    >>> stream == BitStream(b"")
     True
 
 but then `s1` cannot be used anymore

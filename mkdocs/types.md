@@ -144,28 +144,28 @@ they are empty.
 One-dimensional lists and numpy arrays are considered holders of 
 multiple data, each of which is converted to bool.
 
-    >>> bool("")
+    >>> bool(b"")
     False
-    >>> bool(" ")
+    >>> bool(b" ")
     True
-    >>> bool("A")
+    >>> bool(b"A")
     True
-    >>> bool("AAA")
+    >>> bool(b"AAA")
     True
 
     >>> stream = BitStream()
-    >>> stream.write("", bool)
-    >>> stream.write(" ", bool)
-    >>> stream.write("A", bool)
-    >>> stream.write("AAA", bool)
+    >>> stream.write(b"", bool)
+    >>> stream.write(b" ", bool)
+    >>> stream.write(b"A", bool)
+    >>> stream.write(b"AAA", bool)
     >>> stream
     0111
     >>> stream = BitStream()
-    >>> stream.write(["", " " , "A", "AAA"], bool)
+    >>> stream.write([b"", b" " , b"A", b"AAA"], bool)
     >>> stream
     0111
     >>> stream = BitStream()
-    >>> stream.write(array(["", " " , "A", "AAA"]), bool)
+    >>> stream.write(array([b"", b" " , b"A", b"AAA"]), bool)
     >>> stream
     0111
 
@@ -256,12 +256,12 @@ Their type is `str` (or equivalently `bytes` which is an alias).
 Fortunately, it's straightforward to convert strings to 
 bitstreams: create a stream from the string `"ABCD"` with
 
-    >>> stream = BitStream("ABCD")
+    >>> stream = BitStream(b"ABCD")
 
 To be totally explicit, the code above is equivalent to:
 
     >>> stream = BitStream()
-    >>> stream.write("ABCDE", bytes)
+    >>> stream.write(b"ABCDE", bytes)
 
 Now, the content of the stream is
 
@@ -333,7 +333,7 @@ you cannot create a bitstream from Python integers by default.
     ...
     TypeError: unsupported type 'long'.
 
-    >>> BitStream("A").read(int)
+    >>> BitStream(b"A").read(int)
     Traceback (most recent call last):
     ...
     TypeError: unsupported type 'int'.
@@ -471,7 +471,7 @@ Scalar, lists and arrays of floats are supported:
 The byte order is big endian:
 
     >>> import struct
-    >>> PI_BE = struct.pack(">d", pi)
+    >>> PI_BE = struct.pack(b">d", pi)
     >>> PI_BE
     '@\t!\xfbTD-\x18'
     >>> BitStream(pi) == BitStream(PI_BE)
@@ -480,7 +480,4 @@ The byte order is big endian:
 The NumPy `newbyteorder` method should be used beforeand
 (on a `float64` or an array of floats) 
 to get a little-endian representation instead.
-
-
-
 

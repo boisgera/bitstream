@@ -203,9 +203,9 @@ The rest of the work is a straightforward translation of the
     >>> # "RIFF" Chunk Descriptor
     >>> chunk_size = 36 + 2 * len(data)  # size of the chunk after "RIFF"
     >>> 
-    >>> write("RIFF"            )
+    >>> write(b"RIFF"           )
     >>> write(chunk_size, uint32)
-    >>> write("WAVE"            )
+    >>> write(b"WAVE"           )
 
 then the format subchunk
 
@@ -217,7 +217,7 @@ then the format subchunk
     >>> block_align     = 2       # number of bytes for one sample (all channels)
     >>> bits_per_sample = 16
     >>> 
-    >>> write("fmt "                 )
+    >>> write(b"fmt "                )
     >>> write(subchunk1_size , uint32)
     >>> write(audio_format   , uint16)
     >>> write(num_channels   , uint16)
@@ -231,7 +231,7 @@ and finally the data subchunk
     >>> # "data" SubChunk
     >>> subchunk2_size = 2 * len(data)  # size in bytes of the subchunk after "data"
     >>>  
-    >>> write("data"                )
+    >>> write(b"data"               )
     >>> write(subchunk2_size, uint32)
     >>> write(data          ,  int16)
 

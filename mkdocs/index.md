@@ -5,7 +5,7 @@ Overview
 Bitstream is a [Python] library to manage binary data as bitstreams:
 
     >>> from bitstream import BitStream
-    >>> BitStream("Hello World!")
+    >>> BitStream(b"Hello World!")
     010010000110010101101100011011000110111100100000010101110110111101110010011011000110010000100001
 
 If you need to deal with existing binary file formats,
@@ -29,8 +29,8 @@ The main features are:
     and read it to use this library:
 
         >>> stream = BitStream()
-        >>> stream.write("Hello")
-        >>> stream.write(" World!")
+        >>> stream.write(b"Hello")
+        >>> stream.write(b" World!")
         >>> stream.read(bytes, 5)
         'Hello'
         >>> stream.read(bytes, 7)
@@ -74,7 +74,7 @@ The main features are:
         >>> stream.write(False, bool)
         >>> from numpy import int8
         >>> stream.write(-128, int8)
-        >>> stream.write("AB", bytes)
+        >>> stream.write(b"AB", bytes)
         >>> stream
         10100000000100000101000010
         >>> stream.read(bool, 2)

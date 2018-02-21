@@ -40,7 +40,7 @@ Most of the library features are available through the `BitStream` class:
     <h5>Usage</h5>
 
         >>> stream = BitStream([False, True])
-        >>> stream = BitStream("Hello", bytes)
+        >>> stream = BitStream(b"Hello", bytes)
         >>> stream = BitStream(42, uint8)
 
     <h5>See also</h5>
@@ -74,7 +74,7 @@ Read / Write
         >>> stream.write(False)            # implicit bool type
         >>> stream.write(3*[False], bool)  # list (explicit type)
         >>> stream.write(3*[True])         # list (implicit type)
-        >>> stream.write("AB", bytes)      # bytes
+        >>> stream.write(b"AB", bytes)     # bytes
         >>> stream.write(-128, int8)       # signed 8 bit integer
 
     <h5>See also</h5>
@@ -118,8 +118,8 @@ Read / Write
 
     <h5>Usage</h5>
 
-        >>> stream = BitStream("Hello World!")
-        >>> stream.read(str, 2)
+        >>> stream = BitStream(b"Hello World!")
+        >>> stream.read(bytes, 2)
         'He'
         >>> stream.read(bool)
         False
@@ -148,7 +148,7 @@ String Representation
 
     <h5>Usage</h5>
 
-        >>> print BitStream("ABC")
+        >>> print BitStream(b"ABC")
         010000010100001001000011
 
 
@@ -158,7 +158,7 @@ String Representation
 
     <h5>Usage</h5>
 
-        >>> BitStream("ABC")
+        >>> BitStream(b"ABC")
         010000010100001001000011
 
 
@@ -191,7 +191,7 @@ They also support the interface required by the standard library `copy` module.
 
     <h5>Usage</h5>
 
-        >>> stream = BitStream("A")
+        >>> stream = BitStream(b"A")
         >>> stream
         01000001
         >>> copy = stream.copy()
@@ -214,7 +214,7 @@ They also support the interface required by the standard library `copy` module.
     <h5>Usage</h5>
 
         >>> from copy import copy
-        >>> stream = BitStream("A")
+        >>> stream = BitStream(b"A")
         >>> stream
         01000001
         >>> copy(stream)
@@ -249,7 +249,7 @@ Length and Comparison
         >>> len(stream) 
         2
 
-        >>> stream = BitStream("ABC")
+        >>> stream = BitStream(b"ABC")
         >>> len(stream)
         24
         >>> len(stream) // 8
@@ -272,11 +272,11 @@ Length and Comparison
         >>> BitStream(True) == BitStream([True, False])
         False
 
-        >>> ord("A")
+        >>> ord(b"A")
         65
-        >>> BitStream("A") == BitStream(65, uint8)
+        >>> BitStream(b"A") == BitStream(65, uint8)
         True
-        >>> BitStream("A") == BitStream(66, uint8)
+        >>> BitStream(b"A") == BitStream(66, uint8)
         False
   
 
@@ -294,11 +294,11 @@ Length and Comparison
         >>> BitStream(True) != BitStream([True, False])
         True
 
-        >>> ord("A")
+        >>> ord(b"A")
         65
-        >>> BitStream("A") != BitStream(65, uint8)
+        >>> BitStream(b"A") != BitStream(65, uint8)
         False
-        >>> BitStream("A") != BitStream(66, uint8)
+        >>> BitStream(b"A") != BitStream(66, uint8)
         True
 
 ??? note "`BitStream.__hash__(self)`"
