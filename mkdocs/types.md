@@ -7,7 +7,8 @@ Bitstream reads and writes work out-of-the-box for many Python data types.
 It is also tightly integrated with [NumPy](http://www.numpy.org/),
 since this is the library of choice to deals with arrays of numeric data.
 
-    >>> from bitstream import BitStream
+    >>> import bitstream
+    >>> BitStream = bitstream.BitStream
     >>> from numpy import *
 
 
@@ -93,8 +94,8 @@ differs from the default value (which is `None`),
 
 Numpy `bool_` scalars or one-dimensional arrays can be used instead:
 
-    >>> bool_
-    <type 'numpy.bool_'>
+    >>> bool_ # doctest: +ELLIPSIS
+    <... 'numpy.bool_'>
     >>> stream = BitStream()
     >>> stream.write(bool_(False)  , bool)
     >>> stream.write(bool_(True)   , bool)
@@ -185,14 +186,15 @@ is considered as a single datum.
     011
 
 More generally, arbitrary custom "bool-like" instances, 
-which have a `__nonzero__` method to handle the conversion 
-to boolean, can also be used:
+which have a `__bool__` method (or `__nonzero__` for Python 2) 
+to handle the conversion to boolean, can also be used:
 
     >>> class BoolLike(object):
     ...     def __init__(self, value):
     ...         self.value = bool(value)
-    ...     def __nonzero__(self):
+    ...     def __bool__(self):
     ...         return self.value
+    ...     __nonzero__ = __bool__
     >>> false = BoolLike(False)
     >>> true = BoolLike(True)
 
@@ -284,23 +286,24 @@ characters are represented as bytes of length 1.
 To read one or several characters from a bitstream, 
 use the `read` method with the `bytes` type:
 
-    >>> stream.read(bytes, 1)
-    'A'
-    >>> stream.read(bytes, 2)
-    'BC'
+    >>> stream.read(bytes, 1) # doctest: +BYTES
+    b'A'
+    >>> stream.read(bytes, 2) # doctest: +BYTES
+    b'BC'
 
 Without an explicit number of characters, the bitstream is emptied
 
-    >>> stream.read(bytes)
-    'DE'
+    >>> stream.read(bytes) # doctest: +BYTES
+    b'DE'
 
 but that works only if the bitstream contains a multiple of 8 bits.
 
     >>> stream = BitStream(42 * [True])
-    >>> stream.read(bytes) # doctest: +ELLIPSIS
-    Traceback (most recent call last):
-    ...
-    ReadError: ...
+    >>> try:
+    ...     stream.read(bytes)
+    ... except bitstream.ReadError:
+    ...     print("42 is not a multiple of 8")
+    42 is not a multiple of 8
 
 To accept up to seven trailing bits instead, use the more explicit code:
 
@@ -308,8 +311,8 @@ To accept up to seven trailing bits instead, use the more explicit code:
     >>> n = len(stream) // 8
     >>> n
     5
-    >>> stream.read(bytes, n)
-    '\xff\xff\xff\xff\xff'
+    >>> stream.read(bytes, n) # doctest: +BYTES
+    b'\xff\xff\xff\xff\xff'
     >>> stream
     11
 
@@ -328,10 +331,10 @@ you cannot create a bitstream from Python integers by default.
     ...
     TypeError: unsupported type 'int'.
 
-    >>> BitStream(2**100)
+    >>> BitStream(2**100) # doctest: +ELLIPSIS
     Traceback (most recent call last):
     ...
-    TypeError: unsupported type 'long'.
+    TypeError: unsupported type ...
 
     >>> BitStream(b"A").read(int)
     Traceback (most recent call last):
@@ -453,8 +456,8 @@ which have a well-defined binary representation (see e.g. [What every computer s
     >>> len(stream)
     640
     >>> output = stream.read(float, 10)
-    >>> type(output)
-    <type 'numpy.ndarray'>
+    >>> type(output) # doctest: +ELLIPSIS
+    <... 'numpy.ndarray'>
     >>> all(output == arange(10.0))
     True
 
@@ -472,8 +475,8 @@ The byte order is big endian:
 
     >>> import struct
     >>> PI_BE = struct.pack(b">d", pi)
-    >>> PI_BE
-    '@\t!\xfbTD-\x18'
+    >>> PI_BE # doctest: +BYTES
+    b'@\t!\xfbTD-\x18'
     >>> BitStream(pi) == BitStream(PI_BE)
     True
 
