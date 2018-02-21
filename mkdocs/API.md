@@ -148,7 +148,7 @@ String Representation
 
     <h5>Usage</h5>
 
-        >>> print BitStream(b"ABC")
+        >>> print(BitStream(b"ABC"))
         010000010100001001000011
 
 
@@ -228,7 +228,7 @@ They also support the interface required by the standard library `copy` module.
     <h5>Usage</h5>
 
         >>> from copy import deepcopy
-        >>> stream = BitStream("A")
+        >>> stream = BitStream(b"A")
         >>> stream
         01000001
         >>> deepcopy(stream)

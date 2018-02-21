@@ -9,6 +9,34 @@ import sys
 import yaml
 
 
+# Doctest Helper
+# ------------------------------------------------------------------------------
+# The issue: b'A' displays as b'A' in Python 3 but as 'A' in Python 2.
+# The solution: write your doctests with the 'b' prefix
+# -- that is, target Python 3 -- but use the doctest directive BYTES 
+# that we introduce in this section to automatically tweak them for Python 2.
+
+# declare 'BYTES' 
+doctest.BYTES = doctest.register_optionflag("BYTES")
+doctest.__all__.append("BYTES")
+doctest.COMPARISON_FLAGS = doctest.COMPARISON_FLAGS | doctest.BYTES
+
+_doctest_OutputChecker = doctest.OutputChecker
+
+class BytesOutputChecker(_doctest_OutputChecker):
+    def check_output(self, want, got, optionflags):
+        super_check_output = _doctest_OutputChecker.check_output
+        if sys.version_info[0] == 2:
+            want = want[1:] # strip the 'b' prefix from the expected result
+        return super_check_output(self, want, got, optionflags)
+    def output_difference(self, example, got, optionflags):
+        super_output_difference = _doctest_OutputChecker.output_difference
+        return super_output_difference(self, example, got, optionflags)
+
+# monkey-patching
+doctest.OutputChecker = BytesOutputChecker
+
+
 # Test Files
 # ------------------------------------------------------------------------------
 mkdocs_pages = yaml.load(open("mkdocs.yml"))["pages"]

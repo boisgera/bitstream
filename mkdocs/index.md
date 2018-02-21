@@ -31,10 +31,10 @@ The main features are:
         >>> stream = BitStream()
         >>> stream.write(b"Hello")
         >>> stream.write(b" World!")
-        >>> stream.read(bytes, 5)
-        'Hello'
-        >>> stream.read(bytes, 7)
-        ' World!'
+        >>> stream.read(bytes, 5) # doctest: +BYTES
+        b'Hello'
+        >>> stream.read(bytes, 7) # doctest: +BYTES
+        b' World!'
 
     This simple way to manage binary data is good enough for a surprisingly
     large number of use cases. 
@@ -81,7 +81,7 @@ The main features are:
         [True, False]
         >>> stream.read(int8, 1)
         array([-128], dtype=int8)
-        >>> stream.read(bytes, 2)
+        >>> stream.read(bytes, 2) # doctest: +BYTES
         'AB'
 
     NumPy arrays are a convenient way to deal with sequences of homogeneous data:
