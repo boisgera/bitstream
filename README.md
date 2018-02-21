@@ -1,4 +1,4 @@
-[![Python 2.7](https://img.shields.io/badge/python-2.7-blue.svg)](https://www.python.org/download/releases/2.7/)
+![Python](https://img.shields.io/pypi/pyversions/bitstream.svg)
 [![PyPI version](https://img.shields.io/pypi/v/bitstream.svg)](https://pypi.python.org/pypi/bitstream/2.0.3)
 [![Mkdocs](https://img.shields.io/badge/doc-mkdocs-blue.svg)](http://boisgera.github.io/bitstream)
 [![status](http://joss.theoj.org/papers/dd351bf2ed414a623557bb51d75b2536/status.svg)](http://joss.theoj.org/papers/dd351bf2ed414a623557bb51d75b2536)
@@ -41,7 +41,7 @@ Examples
 First, the mandatory "Hello World!" example:
 
     >>> from bitstream import BitStream
-    >>> BitStream("Hello World!")
+    >>> BitStream(b"Hello World!")
     010010000110010101101100011011000110111100100000010101110110111101110010011011000110010000100001
 
 The basic API is made of three methods only:
@@ -59,13 +59,13 @@ For example:
     >>> stream.write(False, bool) # 10
     >>> from numpy import int8
     >>> stream.write(-128, int8)  # 1010000000
-    >>> stream.write("AB", str)   # 10100000000100000101000010
+    >>> stream.write("AB", bytes) # 10100000000100000101000010
     >>> stream.read(bool, 2)      # 100000000100000101000010
     [True, False]
     >>> stream.read(int8, 1)      # 0100000101000010
     array([-128], dtype=int8)
-    >>> stream.read(str, 2)       # <empty>
-    "AB"
+    >>> stream.read(bytes, 2)     # <empty>
+    b'AB'
 
 Refer to the documentation [Overview](http://boisgera.github.io/bitstream/) 
 section for more elementary examples.
