@@ -1,0 +1,10 @@
+clone_folder: c:\projects\bitstream
+
+install:
+    - cmd: set PATH=%PATH%;C:\Miniconda36-x64;C:\Miniconda36-x64\Scripts
+    - cmd: cd c:\projects\bitstream
+        
+build_script:
+    - cmd: pip install -r requirements-dev.txt
+    - cmd: python setup.py --cython install
+- cmd: python test.py
