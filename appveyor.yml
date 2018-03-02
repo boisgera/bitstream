@@ -1,7 +1,12 @@
 clone_folder: c:\projects\bitstream
 
+environment:
+  matrix:
+    - CONDA: C:\Miniconda-x64
+    - CONDA: C:\Miniconda36-x64
+
 install:
-  - cmd: set PATH=%PATH%;C:\Miniconda36-x64;C:\Miniconda36-x64\Scripts
+  - cmd: set PATH=%PATH%;%PATH%;%PATH%\Scripts
   - cmd: cd c:\projects\bitstream
         
 build_script:
