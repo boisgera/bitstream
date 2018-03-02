@@ -37,7 +37,7 @@ except pkg_resources.DistributionNotFound:
 # ------------------------------------------------------------------------------
 metadata = dict(
   name = "bitstream",
-  version = "2.5.2",
+  version = "2.5.3",
   description = "Binary Data for Humans",
   url = "https://github.com/boisgera/bitstream",
   author = u"Sébastien Boisgérault",
@@ -149,6 +149,11 @@ if __name__ == "__main__":
     if REST:
         make_rest()
     if os.path.isfile("README.rst"):
+        try:
+            long_description = open("README.rst").read()
+        except UnicodeDecodeError:
+            long_description = open("README.rst", encoding="utf-8").read()
+        
         metadata["long_description"] = open("README.rst").read()
 
     # Assembly of setup arguments
