@@ -6,7 +6,7 @@ environment:
     - CONDA: C:\Miniconda36-x64
 
 install:
-  - cmd: set PATH=%PATH%;%PATH%;%PATH%\Scripts
+  - cmd: set PATH=%PATH%;%CONDA%;%CONDA%\Scripts
   - cmd: cd c:\projects\bitstream
         
 build_script:
