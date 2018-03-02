@@ -37,7 +37,7 @@ except pkg_resources.DistributionNotFound:
 # ------------------------------------------------------------------------------
 metadata = dict(
   name = "bitstream",
-  version = "2.5.1",
+  version = "2.5.2",
   description = "Binary Data for Humans",
   url = "https://github.com/boisgera/bitstream",
   author = u"Sébastien Boisgérault",
@@ -100,14 +100,14 @@ def make_extension():
         pkg_resources.require("Cython")
         import Cython
         from Cython.Build import cythonize
-        extensions = cythonize("src/bitstream/__init__.pyx", 
+        extensions = cythonize("src/bitstream.pyx", 
                                include_path=[numpy.get_include()])
         extensions[0].include_dirs=[numpy.get_include()]
         return extensions
     else:
-        if os.path.exists("src/bitstream/__init__.c"):
+        if os.path.exists("src/bitstream.c"):
             return [setuptools.Extension("bitstream", 
-                                         sources=["src/bitstream/__init__.c"],
+                                         sources=["src/bitstream.c"],
                                          include_dirs=[numpy.get_include()])]
         else:
             error  = "C files not found, Cython compilation required: \n"

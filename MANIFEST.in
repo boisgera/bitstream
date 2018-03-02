@@ -1,6 +1,6 @@
-include src/bitstream/__init__.pxd
-include src/bitstream/__init__.pyx
-include src/bitstream/__init__.c
+include src/bitstream.pxd
+include src/bitstream.pyx
+include src/bitstream.c
 
 include benchmark.py
 
