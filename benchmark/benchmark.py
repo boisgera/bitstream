@@ -15,6 +15,24 @@ from bitstream import *
 #
 # TODO: extract a one-liner from the docstring ? (if there is one, followed by
 #       a blankline).
+#
+# TODO: display the perf data in JSON for simpler analysis?
+#
+# TODO: can we do some post-processing and replace say the time by some other
+#       indicator (such as bitrate in this case?)
+#
+# TODO: sort the results by some perf indicator?
+#
+# TODO: have a MATRIX of cases? (varying length, offset, type, etc) and
+#       generate all tests?
+#
+# TODO: how can we do some regresion testing (hint: use json output and
+#       a script for the analysis. But how can we check wrt the latest
+#       commited code? Automatically? Manually?)
+#
+# TODO: get some "metadata" from the test (such as computer spec, etc.)
+#       that are attached to the data to get some sense of the perf?
+#       (regression testing wrt different machines is meaningless).
 
 def do_nothing():
     pass
@@ -880,106 +898,106 @@ def read_int8_all():
 
 # ------------------------------------------------------------------------------
 
-def write_str_1_by_1_auto_type_not_aligned():
+def write_bytes_1_by_1_auto_type_not_aligned():
     """
     >>> n = 44100 * 2 * 2
-    >>> string = n * "A"
+    >>> string = n * b"A"
     >>> stream = BitStream(4 * [True])
     >>> for char in string:
     ...     stream.write(char)
     """
 
-def write_str_1_by_1_auto_type():
+def write_bytes_1_by_1_auto_type():
     """
     >>> n = 44100 * 2 * 2
-    >>> string = n * "A"
+    >>> string = n * b"A"
     >>> stream = BitStream()
     >>> for char in string:
     ...     stream.write(char)
     """
 
-def write_str_1_by_1_given_type():
+def write_bytes_1_by_1_given_type():
     """
     >>> n = 44100 * 2 * 2
-    >>> string = n * "A"
+    >>> string = n * b"A"
     >>> stream = BitStream()
     >>> for char in string:
     ...     stream.write(char, str)
     """
 
-def write_str_1_by_1_specialized_type():
+def write_bytes_1_by_1_specialized_type():
     """
     >>> n = 44100 * 2 * 2
-    >>> string = n * "A"
+    >>> string = n * b"A"
     >>> stream = BitStream()
     >>> for char in string:
-    ...     write_str(stream, char)
+    ...     write_bytes(stream, char)
     """
 
-def write_str_1_by_1_loop_only():
+def write_bytes_1_by_1_loop_only():
     """
     >>> n = 44100 * 2 * 2
-    >>> string = n * "A"
+    >>> string = n * b"A"
     >>> stream = BitStream()
     >>> for char in string:
     ...     do_nothing()
     """
 
-def write_str_all():
+def write_bytes_all():
     """
     >>> n = 44100 * 2 * 2
-    >>> string = n * "A"
+    >>> string = n * b"A"
     >>> stream = BitStream()
     >>> stream.write(string)
     """
 
-def read_str_1_by_1_not_aligned():
+def read_bytes_1_by_1_not_aligned():
     """
     >>> n = 44100 * 2 * 2
     >>> stream = BitStream(4 * [True])
-    >>> stream.write(n * "A")
+    >>> stream.write(n * b"A")
     >>> stream.read(bool, 4)
     [True, True, True, True]
     >>> for i in range(n):
     ...     stream.read(str, 1)
     """
 
-def read_str_1_by_1():
+def read_bytes_1_by_1():
     """
     >>> n = 44100 * 2 * 2
-    >>> stream = BitStream(n * "A")
+    >>> stream = BitStream(n * b"A")
     >>> for i in range(n):
     ...     stream.read(str, 1)
     """
 
-def read_str_2_by_2():
+def read_bytes_2_by_2():
     """
     >>> n = 44100 * 2 * 2
-    >>> stream = BitStream(n * "A")
+    >>> stream = BitStream(n * b"A")
     >>> for i in range(n / 2):
     ...     stream.read(str, 2)
     """
 
-def read_str_4_by_4():
+def read_bytes_4_by_4():
     """
     >>> n = 44100 * 2 * 2
-    >>> stream = BitStream(n * "A")
+    >>> stream = BitStream(n * b"A")
     >>> for i in range(n / 4):
     ...     stream.read(str, 4)
     """
 
-def read_str_8_by_8():
+def read_bytes_8_by_8():
     """
     >>> n = 44100 * 2 * 2
-    >>> stream = BitStream(n * "A")
+    >>> stream = BitStream(n * b"A")
     >>> for i in range(n / 8):
     ...     stream.read(str, 8)
     """
 
-def read_str_all():
+def read_bytes_all():
     """
     >>> n = 44100 * 2 * 2
-    >>> stream = BitStream(n * "A")
+    >>> stream = BitStream(n * b"A")
     >>> stream.read(str, n)
     """
 
@@ -1302,7 +1320,7 @@ def write_uint8_1_by_1_test_array_cast():
 if __name__ == "__main__":
     import docbench
     import sys
-    docbench.benchmod()
+    docbench.benchmod(profile=True)
 #    docbench.main(filename="./benchmark.py",
 #                  format="text", 
 #                  profile=False,
