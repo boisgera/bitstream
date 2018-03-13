@@ -65,6 +65,7 @@ cdef type ndarray = numpy.ndarray
 cdef object zero = 0
 cdef object one  = 1
 
+
 # Cython Interface (pxd file)
 # ------------------------------------------------------------------------------
 _include = None
@@ -135,8 +136,8 @@ def get_include():
     "Return a path to a directory that contains the bitstream pxd file"
     global _include
     if _include is None:
-        _include = tempfile.mkdtemp()
-        pxd_path = os.path.join(_include, "bitstream.pxd")
+        _include = tempfile.mkdtemp(prefix='bitstream-')
+        pxd_path = os.path.join(_include, 'bitstream.pxd')
         pxd_file = open(pxd_path, 'wb')
         pxd_file.write(_pxd_src)
         pxd_file.close()
@@ -146,7 +147,10 @@ def _cleanup():
     if _include is not None:
         shutil.rmtree(_include)
 
-atexit.register(_cleanup)
+# Do NOT remove automatically the _include directory; 
+# we may leak a few files but we will avoid some bugs.
+#
+# atexit.register(_cleanup)
 
 
 # Helpers (not used)

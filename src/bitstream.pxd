@@ -1,4 +1,3 @@
-
 cimport numpy as np
 
 cdef class BitStream:
@@ -58,11 +57,4 @@ cpdef read_bytes(BitStream stream, n=?)
 cpdef write_bytes(BitStream stream, string)
 cpdef write_bitstream(BitStream sink, BitStream source)
 cpdef read_bitstream(BitStream source, n=?)
-
-
-
-
-
-
-
 
