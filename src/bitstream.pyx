@@ -86,6 +86,15 @@ def _cleanup():
 atexit.register(_cleanup)
 
 
+# Helpers
+# ------------------------------------------------------------------------------
+cdef inline size_t div8(unsigned long long value):
+    return value >> 3
+
+cdef inline unsigned char rem8 (unsigned long long value):
+    return value & 7
+
+
 # BitStream
 # ------------------------------------------------------------------------------
 cdef class BitStream:
@@ -666,13 +675,16 @@ cpdef read_bool(BitStream stream, n=None):
     stream._read_offset += _n
     return bools
 
+
+# TODO: mask_2 is useless when the bit is True; a single mask is ok
+#       in each case (true or false).
 cpdef write_bool(BitStream stream, bools):
     """
     Write bools into a stream.
     """
     cdef unsigned char *_bytes
     cdef unsigned char _byte
-    cdef unsigned char mask1, mask2, mask
+    cdef unsigned char mask
     cdef unsigned long long i, n
     cdef size_t byte_index
     cdef unsigned char bit_index
@@ -685,20 +697,18 @@ cpdef write_bool(BitStream stream, bools):
     if bools is false or bools is zero: # False or 0 (if cached).
         stream._extend(1)
         _bytes = stream._bytes
-        byte_index = offset / 8
-        bit_index  = offset - 8 * byte_index
-        mask1 = 128 >> bit_index
-        mask2 = 255 - mask1
-        _bytes[byte_index] = (_bytes[byte_index] & mask2)
+        byte_index = offset >> 3
+        bit_index  = offset & 7
+        mask = 128 >> bit_index
+        _bytes[byte_index] = _bytes[byte_index] & ~mask
         stream._write_offset += 1
     elif bools is true or bools is one: # True or 1 (if cached).
         stream._extend(1)
         _bytes = stream._bytes
-        byte_index = offset / 8
-        bit_index  = offset - 8 * byte_index
-        mask1 = 128 >> bit_index
-        mask2 = 255 - mask1
-        _bytes[byte_index] = (_bytes[byte_index] & mask2) | mask1
+        byte_index = offset >> 3
+        bit_index  = offset & 7
+        mask = 128 >> bit_index
+        _bytes[byte_index] = _bytes[byte_index] | mask
         stream._write_offset += 1
     else:
         _type = type(bools)
@@ -709,17 +719,16 @@ cpdef write_bool(BitStream stream, bools):
             _bytes = stream._bytes
             i = 0
             for _bool in _bools: # faster than a loop on i
-                byte_index = (offset + i) / 8
-                bit_index  = (offset + i) - 8 * byte_index
-                mask1 = 128 >> bit_index
-                mask2 = 255 - mask1
+                byte_index = (offset + i) >> 3
+                bit_index  = (offset + i) & 7
                 _byte = _bytes[byte_index]
+                mask = 128 >> bit_index
                 if _bool is false:
-                    _bytes[byte_index] = (_byte & mask2)
+                    _bytes[byte_index] = _byte & ~mask
                 elif _bool is true or _bool:
-                    _bytes[byte_index] = (_byte & mask2) | mask1
+                    _bytes[byte_index] = _byte | mask
                 else:
-                    _bytes[byte_index] = (_byte & mask2)
+                    _bytes[byte_index] = _byte & ~mask
                 i += 1
             stream._write_offset += n
         elif _type is ndarray:
@@ -728,34 +737,31 @@ cpdef write_bool(BitStream stream, bools):
             _bytes = stream._bytes
             i = 0
             for _bool in bools:
-                byte_index = (offset + i) / 8
-                bit_index  = (offset + i) - 8 * byte_index
-                mask1 = 128 >> bit_index
-                mask2 = 255 - mask1
+                byte_index = (offset + i) >> 3
+                bit_index  = (offset + i) & 7
+                mask = 128 >> bit_index
                 _byte = _bytes[byte_index]
                 if _bool:
-                    _bytes[byte_index] = (_byte & mask2) | mask1
+                    _bytes[byte_index] = _byte | mask
                 else:
-                    _bytes[byte_index] = (_byte & mask2)
+                    _bytes[byte_index] = _byte & ~mask
                 i += 1
             stream._write_offset += n
         elif bools:
             stream._extend(1)
             _bytes = stream._bytes
-            byte_index = offset / 8
-            bit_index  = offset - 8 * byte_index
-            mask1 = 128 >> bit_index
-            mask2 = 255 - mask1
-            _bytes[byte_index] = (_bytes[byte_index] & mask2) | mask1
+            byte_index = offset >> 3
+            bit_index  = offset & 7
+            mask = 128 >> bit_index
+            _bytes[byte_index] = _bytes[byte_index] | mask
             stream._write_offset += 1
         else:
             stream._extend(1)
             _bytes = stream._bytes
-            byte_index = offset / 8
-            bit_index  = offset - 8 * byte_index
-            mask1 = 128 >> bit_index
-            mask2 = 255 - mask1
-            _bytes[byte_index] = (_bytes[byte_index] & mask2)
+            byte_index = offset >> 3
+            bit_index  = offset & 7
+            mask = 128 >> bit_index
+            _bytes[byte_index] = _bytes[byte_index] & ~mask
             stream._write_offset += 1
 
 register(bool, reader=read_bool, writer=write_bool)
