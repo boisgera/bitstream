@@ -10,6 +10,10 @@ before_install:
   - curl $CONDA > conda.sh
   - bash conda.sh -b -p $HOME/conda
   - export PATH=$HOME/conda/bin:$PATH
+  - echo "*****************************************************"
+  - which conda
+  - conda install pip
+
 
 install:
   - pip install -r requirements-test.txt
