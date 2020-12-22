@@ -10,6 +10,6 @@ install:
   - cmd: cd c:\projects\bitstream
         
 build_script:
-  - cmd: pip install -r requirements-dev.txt
+  - cmd: pip install -r requirements-test.txt
   - cmd: python setup.py --cython install
   - cmd: python test.py

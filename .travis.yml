@@ -12,7 +12,7 @@ before_install:
   - export PATH=$HOME/conda/bin:$PATH
 
 install:
-  - pip install -r requirements-dev.txt
+  - pip install -r requirements-test.txt
   - python setup.py --cython install
 
 script: 
