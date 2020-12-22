@@ -104,6 +104,6 @@ License
 
 Bitstream is open source software released under the [MIT license](https://github.com/boisgera/bitstream/blob/master/LICENSE.txt).
 
-Copyright (c) 2012-2018 Sébastien Boisgérault
+Copyright (c) 2012-2020 Sébastien Boisgérault
 
 
