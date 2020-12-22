@@ -1614,7 +1614,7 @@ cpdef read_bytes(BitStream stream, n=None):
             n = len(stream) / 8
     elif n > len(stream) / 8:
         raise ReadError("end of stream")
-    return read_uint8(stream, n).tostring()
+    return read_uint8(stream, n).tobytes()
 
 cpdef write_bytes(BitStream stream, string):
     """
