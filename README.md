@@ -27,7 +27,7 @@ section for more details.
 Quickstart
 --------------------------------------------------------------------------------
 
-Make sure that Python 2.7 or Python 3.6 are installed 
+Make sure that Python 2.7 or Python 3.6 to 3.9 are installed 
 and that pip, NumPy and a C compiler are available, 
 then install bitstream with
 
