@@ -36,7 +36,7 @@ doctest.OutputChecker = BytesOutputChecker
 
 # Test Files
 # ------------------------------------------------------------------------------
-mkdocs_pages = yaml.load(open("mkdocs.yml"))["pages"]
+mkdocs_pages = yaml.load(open("mkdocs.yml"), Loader=yaml.FullLoader)["pages"]
 mkdocs_files = ["mkdocs/" + list(item.values())[0] for item in mkdocs_pages]
 extra_testfiles = []
 test_files = mkdocs_files + extra_testfiles
