@@ -1620,7 +1620,7 @@ cpdef write_bytes(BitStream stream, string):
     """
     Write a string into a stream.
     """
-    array = numpy.fromstring(string, dtype=uint8)
+    array = numpy.frombuffer(string, dtype=uint8)
     _write_uint8(stream, array)
 
 register(bytes, reader=read_bytes, writer=write_bytes)
