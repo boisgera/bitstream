@@ -1,5 +1,6 @@
 ![Python](https://img.shields.io/pypi/pyversions/bitstream.svg)
 [![PyPI version](https://img.shields.io/pypi/v/bitstream.svg)](https://pypi.python.org/pypi/bitstream)
+[![Downloads](https://pepy.tech/badge/bitstream)](https://pepy.tech/project/bitstream)
 [![Mkdocs](https://img.shields.io/badge/doc-mkdocs-blue.svg)](http://boisgera.github.io/bitstream)
 [![status](http://joss.theoj.org/papers/dd351bf2ed414a623557bb51d75b2536/status.svg)](http://joss.theoj.org/papers/dd351bf2ed414a623557bb51d75b2536)
 [![Travis Build Status](https://travis-ci.org/boisgera/bitstream.svg?branch=master)](https://travis-ci.org/boisgera/bitstream)
