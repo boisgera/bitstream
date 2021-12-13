@@ -12,7 +12,7 @@ A Python library to manage binary data as [bitstreams](https://en.wikipedia.org/
 
 Overview
 --------------------------------------------------------------------------------
-
+ 
 Bitstream three main features:
 
   - It is easy to use since the bitstream abstraction is simple.
