@@ -1,5 +1,6 @@
 ![Python](https://img.shields.io/pypi/pyversions/bitstream.svg)
 [![PyPI version](https://img.shields.io/pypi/v/bitstream.svg)](https://pypi.python.org/pypi/bitstream)
+[![Downloads](https://pepy.tech/badge/bitstream)](https://pepy.tech/project/bitstream)
 [![Mkdocs](https://img.shields.io/badge/doc-mkdocs-blue.svg)](http://boisgera.github.io/bitstream)
 [![status](http://joss.theoj.org/papers/dd351bf2ed414a623557bb51d75b2536/status.svg)](http://joss.theoj.org/papers/dd351bf2ed414a623557bb51d75b2536)
 [![Travis Build Status](https://travis-ci.org/boisgera/bitstream.svg?branch=master)](https://travis-ci.org/boisgera/bitstream)
@@ -11,12 +12,12 @@ A Python library to manage binary data as [bitstreams](https://en.wikipedia.org/
 
 Overview
 --------------------------------------------------------------------------------
-
+ 
 Bitstream three main features:
 
   - It is easy to use since the bitstream abstraction is simple.
 
-  - It works seamlesly at the bit and byte level.
+  - It works seamlessly at the bit and byte level.
 
   - It supports Python, NumPy and user-defined types.
 
@@ -104,6 +105,6 @@ License
 
 Bitstream is open source software released under the [MIT license](https://github.com/boisgera/bitstream/blob/master/LICENSE.txt).
 
-Copyright (c) 2012-2020 Sébastien Boisgérault
+Copyright (c) 2012-2021 Sébastien Boisgérault
 
 
