@@ -214,7 +214,7 @@ cdef class BitStream:
         
         num_extra_bits = num_bits + self._write_offset - 8 * self._num_bytes
         if num_extra_bits > 0:
-            num_extra_bytes = num_extra_bits / 8
+            num_extra_bytes = num_extra_bits // 8
             num_extra_bits  = num_extra_bits - 8 * num_extra_bytes
             new_num_bytes = self._num_bytes + num_extra_bytes + (num_extra_bits != 0)
             self._bytes = <unsigned char *>realloc(self._bytes, new_num_bytes)
@@ -542,7 +542,7 @@ cdef class BitStream:
             >>> stream = BitStream("ABC")
             >>> len(stream)
             24
-            >>> len(stream) // 8
+            >>> len(stream) /// 8
             3
             >>> len(stream) % 8
             0
@@ -593,7 +593,7 @@ cdef class BitStream:
         else:
            s1 = self.copy()
            s2 = other.copy() # test for type, 
-           equal = all(s1.read(numpy.uint8, len(s1) / 8) == s2.read(numpy.uint8, len(s2) / 8)) and\
+           equal = all(s1.read(numpy.uint8, len(s1) // 8) == s2.read(numpy.uint8, len(s2) // 8)) and\
                    (s1.read(bool, len(s1)) == s2.read(bool, len(s2)))
         if operation == 2:
             return equal
@@ -607,7 +607,7 @@ cdef class BitStream:
         The computed hash is consistent with the equality operator.
         """
         copy = self.copy()
-        uint8s = copy.read(numpy.uint8, len(self) / 8)
+        uint8s = copy.read(numpy.uint8, len(self) // 8)
         bools  = copy.read(bool, len(copy))
         return hash((hashlib.sha1(uint8s).hexdigest(), tuple(bools)))
 
@@ -722,7 +722,7 @@ cpdef read_bool(BitStream stream, n=None):
     if n is None: # read a single bool.
         if len(stream) == 0:
             raise ReadError("end of the stream")
-        byte_index = stream._read_offset / 8
+        byte_index = stream._read_offset // 8
         bit_index  = stream._read_offset - 8 * byte_index
         mask = 128 >> bit_index
         stream._read_offset += 1
@@ -735,7 +735,7 @@ cpdef read_bool(BitStream stream, n=None):
 
     bools = _n * [False]
     for i in range(_n):
-        byte_index = (stream._read_offset + i ) / 8
+        byte_index = (stream._read_offset + i ) // 8
         bit_index  = (stream._read_offset + i ) - 8 * byte_index            
         mask = 128 >> bit_index
         bools[i] = bool(_bytes[byte_index] & mask)
@@ -846,7 +846,7 @@ cpdef write_uint8(BitStream stream, data):
     cdef np.ndarray[np.uint8_t, ndim=1] array
     cdef np.uint8_t uint8_
 
-    byte_index = stream._write_offset / 8
+    byte_index = stream._write_offset // 8
     bit_index  = stream._write_offset - 8 * byte_index
     bit_index_c = 8 - bit_index
     mask2 = 255 >> bit_index
@@ -903,7 +903,7 @@ cpdef _write_uint8(BitStream stream, np.ndarray[np.uint8_t, ndim=1] uint8s):
     stream._extend(8 * num_bytes)
     _bytes = stream._bytes        
     
-    byte_index = stream._write_offset / 8
+    byte_index = stream._write_offset // 8
     bit_index  = stream._write_offset - 8 * byte_index
     bit_index_c = 8 - bit_index
 
@@ -935,7 +935,7 @@ cpdef read_uint8(BitStream stream, n=None):
     cdef np.ndarray[np.uint8_t, ndim=1] uint8s
 
     _bytes = stream._bytes
-    byte_index = stream._read_offset / 8
+    byte_index = stream._read_offset // 8
     bit_index  = stream._read_offset - 8 * byte_index
     bit_index_c = 8 - bit_index
     
@@ -955,7 +955,7 @@ cpdef read_uint8(BitStream stream, n=None):
     
     if len(stream) < 8 * n:
         raise ReadError("end of stream")
-    num_bytes = min(n, len(stream) / 8)
+    num_bytes = min(n, len(stream) // 8)
     uint8s = numpy.zeros(num_bytes, dtype=uint8)
     if bit_index == 0:
         for i in range(num_bytes):
@@ -992,7 +992,7 @@ cpdef _write_int8(BitStream stream, np.ndarray[np.int8_t, ndim=1] int8s):
     stream._extend(8 * num_bytes)
     _bytes = stream._bytes
 
-    byte_index = stream._write_offset / 8
+    byte_index = stream._write_offset // 8
     bit_index  = stream._write_offset - 8 * byte_index
     bit_index_c = 8 - bit_index
 
@@ -1033,7 +1033,7 @@ cpdef read_uint16(BitStream stream, n=None):
     cdef size_t num_uint16s
 
     _bytes = stream._bytes        
-    byte_index = stream._read_offset / 8
+    byte_index = stream._read_offset // 8
     bit_index  = stream._read_offset - 8 * byte_index
     
     if n is None:
@@ -1098,7 +1098,7 @@ cpdef _write_uint16(BitStream stream, np.ndarray[np.uint16_t, ndim=1] uint16s):
     stream._extend(16 * num_uint16s)
     _bytes = stream._bytes
 
-    byte_index = stream._write_offset / 8
+    byte_index = stream._write_offset // 8
     bit_index  = stream._write_offset - 8 * byte_index
     bit_index_c = 8 - bit_index
 
@@ -1155,7 +1155,7 @@ cpdef _write_int16(BitStream stream, np.ndarray[np.int16_t, ndim=1] int16s):
     stream._extend(16 * num_int16s)
     _bytes = stream._bytes
 
-    byte_index = stream._write_offset / 8
+    byte_index = stream._write_offset // 8
     bit_index  = stream._write_offset - 8 * byte_index
     bit_index_c = 8 - bit_index
 
@@ -1201,7 +1201,7 @@ cpdef read_uint32(BitStream stream, n=None):
     cdef size_t num_uint32s
 
     _bytes = stream._bytes
-    byte_index = stream._read_offset / 8
+    byte_index = stream._read_offset // 8
     bit_index  = stream._read_offset - 8 * byte_index
     
     if n is None:
@@ -1271,7 +1271,7 @@ cpdef _write_uint32(BitStream stream, np.ndarray[np.uint32_t, ndim=1] uint32s):
     stream._extend(32 * num_uint32s)
     _bytes = stream._bytes
 
-    byte_index = stream._write_offset / 8
+    byte_index = stream._write_offset // 8
     bit_index  = stream._write_offset - 8 * byte_index
     bit_index_c = 8 - bit_index
 
@@ -1324,7 +1324,7 @@ cpdef _write_int32(BitStream stream, np.ndarray[np.int32_t, ndim=1] int32s):
     stream._extend(32 * num_int32s)
     _bytes = stream._bytes
 
-    byte_index = stream._write_offset / 8
+    byte_index = stream._write_offset // 8
     bit_index  = stream._write_offset - 8 * byte_index
     bit_index_c = 8 - bit_index
 
@@ -1366,7 +1366,7 @@ cpdef read_uint64(BitStream stream, n=None):
     cdef size_t num_uint64s
 
     _bytes = stream._bytes
-    byte_index = stream._read_offset / 8
+    byte_index = stream._read_offset // 8
     bit_index  = stream._read_offset - 8 * byte_index
     
     if n is None:
@@ -1444,7 +1444,7 @@ cpdef _write_uint64(BitStream stream, np.ndarray[np.uint64_t, ndim=1] uint64s):
     stream._extend(64 * num_uint64s)
     _bytes = stream._bytes
 
-    byte_index = stream._write_offset / 8
+    byte_index = stream._write_offset // 8
     bit_index  = stream._write_offset - 8 * byte_index
     bit_index_c = 8 - bit_index
 
@@ -1501,7 +1501,7 @@ cpdef _write_int64(BitStream stream, np.ndarray[np.int64_t, ndim=1] int64s):
     stream._extend(64 * num_int64s)
     _bytes = stream._bytes
 
-    byte_index = stream._write_offset / 8
+    byte_index = stream._write_offset // 8
     bit_index  = stream._write_offset - 8 * byte_index
     bit_index_c = 8 - bit_index
 
@@ -1579,7 +1579,7 @@ cpdef _write_float64(BitStream stream, np.ndarray[np.float64_t, ndim=1] float64s
     stream._extend(64 * num_floats)
 
     bit_offset  = stream._write_offset % 8
-    byte_offset = stream._write_offset / 8
+    byte_offset = stream._write_offset // 8
     pointer = stream._bytes + byte_offset
     if bit_offset == 0:
         for _float in float64s:
@@ -1611,8 +1611,8 @@ cpdef read_bytes(BitStream stream, n=None):
         if (len(stream) % 8) != 0:
             raise ReadError("cannot empty the stream.")
         else:
-            n = len(stream) / 8
-    elif n > len(stream) / 8:
+            n = len(stream) // 8
+    elif n > len(stream) // 8:
         raise ReadError("end of stream")
     return read_uint8(stream, n).tobytes()
 
@@ -1632,7 +1632,7 @@ cpdef write_bitstream(BitStream sink, BitStream source):
     """
     Write the stream `source` into the stream `sink`.
     """
-    write_uint8(sink, read_uint8(source, len(source) / 8))
+    write_uint8(sink, read_uint8(source, len(source) // 8))
     write_bool(sink, read_bool(source, len(source)))
 
 cpdef read_bitstream(BitStream source, n=None):
@@ -1651,9 +1651,9 @@ cpdef read_bitstream(BitStream source, n=None):
     if num_bits == 0:
         return BitStream()
     else:
-        start_byte_index = source._read_offset / 8 # byte index of the first bit
+        start_byte_index = source._read_offset // 8 # byte index of the first bit
         # byte index of the last bit needed.
-        end_byte_index   = (source._read_offset + num_bits - 1) / 8
+        end_byte_index   = (source._read_offset + num_bits - 1) // 8
         new_num_bytes = end_byte_index - start_byte_index + 1
 
     sink = BitStream()

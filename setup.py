@@ -2,10 +2,7 @@
 # coding: utf-8
 
 # Python Standard Library
-try:
-    import configparser
-except ImportError:
-    import ConfigParser as configparser
+import configparser
 import datetime
 import distutils.version
 import importlib
@@ -37,7 +34,7 @@ except pkg_resources.DistributionNotFound:
 # ------------------------------------------------------------------------------
 metadata = dict(
   name = "bitstream",
-  version = "2.6.0.1",
+  version = "3.0",
   description = "Binary Data for Humans",
   url = "https://github.com/boisgera/bitstream",
   author = u"Sébastien Boisgérault",
@@ -47,7 +44,6 @@ metadata = dict(
     "Development Status :: 5 - Production/Stable",
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
-    "Programming Language :: Python :: 2.7",
     "Programming Language :: Python :: 3",
     "Programming Language :: Cython",
     ]
@@ -108,7 +104,7 @@ def make_extension():
         if os.path.exists("src/bitstream.c"):
             return [setuptools.Extension("bitstream", 
                                          sources=["src/bitstream.c"],
-                                         include_dirs=[numpy.get_include()])]
+                                         include_path=[numpy.get_include()])]
         else:
             error  = "C files not found, Cython compilation required: \n"
             error += "execute `python setup.py --cython install`"
