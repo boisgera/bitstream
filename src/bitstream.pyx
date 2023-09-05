@@ -37,8 +37,16 @@ cimport numpy as np
 from libc.stdlib cimport malloc, realloc, free
 from libc.string cimport memcpy
 from cpython cimport bool as boolean, Py_INCREF, Py_DECREF, PyObject, PyObject_GetIter, PyErr_Clear
-cdef extern from "Python.h":
-    int _PyFloat_Pack8 (double, unsigned char *, int) except -1
+
+# Context: https://github.com/python/cpython/issues/91062
+cdef extern from "Python.h": 
+    """
+    #if (PY_VERSION_HEX < ((3 << 24) | (11 << 16)))
+    #define PyFloat_Pack8 _PyFloat_Pack8 
+    #endif
+    """
+    int PyFloat_Pack8(double x, unsigned char *p, int le) except -1
+
 
 
 # Metadata
@@ -1583,12 +1591,12 @@ cpdef _write_float64(BitStream stream, np.ndarray[np.float64_t, ndim=1] float64s
     pointer = stream._bytes + byte_offset
     if bit_offset == 0:
         for _float in float64s:
-            _PyFloat_Pack8(_float, pointer, 0) # 0 is for big endian.
+            PyFloat_Pack8(_float, pointer, 0) # 0 is for big endian.
             pointer += 8
     else:
         bit_offset_c = 8 - bit_offset
         for _float in float64s:
-            _PyFloat_Pack8(_float, _buffer, 0)
+            PyFloat_Pack8(_float, _buffer, 0)
             for i in range(8):
                 pointer[i  ] =  (pointer[i  ] & (255 << bit_offset_c)) + \
                                ((_buffer[i  ] & (255 << bit_offset  )) >> bit_offset  )
