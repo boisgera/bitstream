@@ -7,6 +7,7 @@ on:
 jobs:
   main:
     strategy:
+      fail-fast: true
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
     runs-on: ${{ matrix.os }}
@@ -19,11 +20,14 @@ jobs:
         with:
           python-version: "3.11"         
 
-      - name: Install Build + Test Dependencies (NumPy, Cython and PyYaml)
+      - name: Install Build + Test Dependencies
         run: pip install -r requirements-test.txt
 
       - name: Install Bitstream
         run: python setup.py --cython install
           
       - name: Run Tests
-        run: python test.py          
+        run: python test.py
+        
+      - name: Run Tests (verbose)
+        run: python test.py --verbose
