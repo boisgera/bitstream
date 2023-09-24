@@ -1,0 +1,27 @@
+name: build
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  main:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Install Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"         
+
+      - name: Install Test Dependencies
+        run: pip install -r requirements-test.txt
+
+      - name: Install Bitstream
+        run: python setup.py install
+          
+      - name: Run Tests
+        run: python test.py          
+
