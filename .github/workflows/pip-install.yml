@@ -1,8 +1,7 @@
 name: build
 on:
   push:
-    branches:
-      - master
+    branches: [ master, new-setup ]
 
 jobs:
   main:
@@ -20,12 +19,12 @@ jobs:
         with:
           python-version: "3.11"         
 
-      - name: Install Build + Test Dependencies
-        run: pip install -r requirements-test.txt
-
       - name: Install Bitstream
-        run: pip install bitstream
-          
+        run: pip install bitstream==3.b1
+
+      - name: Install Test Dependency
+        run: pip install pyyaml        
+
       - name: Run Tests
         run: python test.py
         
