@@ -20,7 +20,7 @@ jobs:
           python-version: "3.11"         
 
       - name: Install Bitstream
-        run: pip install bitstream==3.1b1
+        run: pip install --pre bitstream
 
       - name: Install Test Dependency
         run: pip install pyyaml        
