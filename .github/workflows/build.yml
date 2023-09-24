@@ -20,7 +20,7 @@ jobs:
         run: pip install -r requirements-test.txt
 
       - name: Install Bitstream
-        run: python setup.py install
+        run: python setup.py --cython install
           
       - name: Run Tests
         run: python test.py          
