@@ -30,6 +30,7 @@ if __name__ == "__main__":
 
     contents = {
         "packages": setuptools.find_packages(),
+        "install_requires": ["numpy"],
         "ext_modules": extensions,
         "zip_safe": False,
     }
