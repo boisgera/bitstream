@@ -6,7 +6,7 @@ import setuptools
 
 metadata = dict(
     name="bitstream",
-    version="3.0.1",
+    version="3.1b1",
     description="Binary Data for Humans",
     long_description=open("README.md", "rt", encoding="utf-8").read(),
     long_description_content_type="text/markdown",
